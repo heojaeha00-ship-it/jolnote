@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>졸아도 노트</title>
+<meta name="theme-color" content="#0e6e6b">
+<meta name="description" content="수업을 녹음하고 실시간으로 받아 적어 주는 노트">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="졸아도 노트">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:#ffffff;--ink:#121a21;--sub:#5b6870;--line:#e3e8ea;--mist:#eef5f4;--teal:#0e6e6b;--onteal:#ffffff;--red:#d93a26;--starbg:#fff3ef}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1416;--ink:#e7eded;--sub:#97a5aa;--line:#243034;--mist:#162124;--teal:#4fc2b9;--onteal:#06201e;--starbg:#2a1a16}}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+.wrap{max-width:760px;margin:0 auto;padding:0 max(4vw,16px) 140px}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 0 10px;gap:12px}
+.brand{font-weight:700;font-size:20px;display:flex;align-items:center;gap:8px}
+.brand i{width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block}
+button,.btn{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:var(--bg);border-radius:12px;min-height:44px;padding:0 16px;font-weight:500;-webkit-appearance:none;appearance:none;touch-action:manipulation;white-space:nowrap;flex:none;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible,.btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.pri{background:var(--teal)!important;border-color:var(--teal)!important;color:var(--onteal)!important}
+.ghost{border-color:transparent!important;background:transparent!important}
+button:disabled{opacity:.45;cursor:default}
+input,textarea{font:inherit;font-size:16px;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+textarea{min-height:160px;resize:vertical}
+.hide{display:none!important}
+.deck{background:var(--mist);border-radius:22px;padding:22px 20px 20px;margin-top:6px}
+.meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:8px}
+.meta input{border-color:transparent}
+.clock{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:22px}
+.time{font-size:clamp(44px,13vw,64px);font-weight:500;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.state{color:var(--sub);font-size:14px;margin-top:8px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.badge{font-size:12px;border-radius:99px;padding:2px 10px;background:var(--bg);color:var(--sub)}
+.badge.on{color:var(--red)}
+.rec{width:84px;height:84px;border-radius:50%;border:3px solid var(--red);background:var(--bg);padding:0}
+.rec b{width:34px;height:34px;border-radius:50%;background:var(--red);transition:all .2s;display:block}
+.rec.on b{border-radius:8px;width:28px;height:28px}
+.rec.on{animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(217,58,38,.45)}70%{box-shadow:0 0 0 16px rgba(217,58,38,0)}100%{box-shadow:0 0 0 0 rgba(217,58,38,0)}}
+@media(prefers-reduced-motion:reduce){.rec.on{animation:none}}
+.alert{margin-top:14px;border-radius:14px;padding:12px 14px;background:var(--bg);border:1px solid var(--red);font-size:15px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.alert span{flex:1 1 220px}
+.note{font-size:14px;color:var(--sub);margin:12px 2px 0}
+.tabs{display:flex;gap:4px;margin:22px 0 6px;border-bottom:1px solid var(--line)}
+.tabs button{border:0;border-radius:0;background:none;border-bottom:3px solid transparent;color:var(--sub);padding:0 14px}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--teal);font-weight:700}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.log{list-style:none;margin:0;padding:0}
+.log li{display:grid;grid-template-columns:4.2em minmax(0,1fr);gap:10px;padding:7px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.log li .t{color:var(--sub);font-size:13px;font-variant-numeric:tabular-nums;padding-top:3px;white-space:nowrap}
+.log li.star{background:var(--starbg)}
+.log li.star .t::after{content:" ★";color:var(--red)}
+.log li.part{color:var(--sub);font-style:italic;cursor:default}
+.log li.gap{color:var(--red);font-size:13px;cursor:default}
+.log li.playing{outline:2px solid var(--teal);outline-offset:-2px}
+.empty{color:var(--sub);text-align:center;padding:36px 12px;display:block}
+.md h2{font-size:18px;margin:26px 0 8px;color:var(--teal)}
+.md h3{font-size:16px;margin:16px 0 4px}
+.md ul{margin:0;padding-left:1.2em}.md li{margin:3px 0}.md p{margin:6px 0}
+.md .ts{color:var(--sub);font-size:13px;white-space:nowrap}
+.player{display:flex;gap:8px;align-items:center;margin-top:12px}
+.player audio{flex:1;height:40px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px max(4vw,16px) calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:center;z-index:5}
+.bar button{flex:1;max-width:240px}
+.bar .mini{flex:none;width:52px;padding:0;border-radius:50%;border-color:var(--red);color:var(--red);font-size:20px}
+.list{list-style:none;margin:10px 0 0;padding:0}
+.list li{border-bottom:1px solid var(--line)}
+.list button{width:100%;text-align:left;border:0;border-radius:0;padding:14px 4px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;background:none;white-space:normal}
+.list .s{font-size:13px;color:var(--teal);font-weight:700}
+.list .n{font-size:17px;font-weight:500;grid-column:1}
+.list .d{font-size:13px;color:var(--sub);grid-column:2;grid-row:1/3;align-self:center;text-align:right;white-space:nowrap}
+.dlg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:grid;place-items:end center;z-index:10;padding:12px}
+.dlg>div{background:var(--bg);border-radius:20px;padding:20px;width:100%;max-width:640px}
+.dlg h3{margin:0 0 8px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:20;max-width:90vw;text-align:center}
+.desk,.ph{display:none}
+kbd{font:inherit;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:0 5px;color:var(--sub)}
+.steps{margin:6px 0 0;padding-left:1.3em;color:var(--sub);font-size:14px}
+@media(max-width:600px){.meta{grid-template-columns:minmax(0,1fr)}.rec{width:76px;height:76px}}
+@media(min-width:1000px){
+  .wrap{max-width:1240px;padding-bottom:48px}
+  #vLec:not(.hide){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
+  .colB{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;padding-right:4px}
+  .tabs,.bar{display:none!important}
+  #tLog,#tSum{display:block!important}
+  #tLog{margin-top:18px}
+  .desk{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+  .ph{display:block;font-size:18px;margin:6px 0 0}
+  .dlg{place-items:center}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><i></i>졸아도 노트</div>
+    <div style="display:flex;gap:4px">
+      <button id="installBtn" class="ghost hide">앱 설치</button>
+      <button id="toList" class="ghost">수업 목록</button>
+    </div>
+  </header>
+
+  <section id="vLec">
+   <div class="colA">
+    <div class="deck">
+      <div class="meta">
+        <input id="fSub" placeholder="과목 (예: 해사법규)" aria-label="과목">
+        <input id="fTitle" placeholder="수업 제목 (예: 3주차 충돌예방규칙)" aria-label="수업 제목">
+      </div>
+      <div class="clock">
+        <div>
+          <div class="time" id="time">00:00</div>
+          <div class="state" id="state">대기 중 · 버튼을 눌러 녹음 시작</div>
+          <div class="badges"><span class="badge" id="bAudio">녹음 파일</span><span class="badge" id="bStt">실시간 받아쓰기</span></div>
+        </div>
+        <button class="rec" id="recBtn" aria-label="녹음 시작"><b></b></button>
+      </div>
+      <div class="alert hide" id="alert"><span id="alertMsg"></span><span style="display:flex;gap:8px;flex:none" id="alertBtns"></span></div>
+      <div class="desk">
+        <button id="starBtn2">★ 중요 표시 <kbd>S</kbd></button>
+        <span class="note" style="margin:0">녹음 시작·멈춤 <kbd>R</kbd></span>
+      </div>
+      <p class="note" id="envNote"></p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="log" aria-selected="true">받아쓰기</button>
+      <button role="tab" data-tab="sum" aria-selected="false">정리 노트</button>
+    </div>
+
+    <div id="tLog">
+      <div class="player hide" id="player"><audio id="audio" controls preload="none"></audio></div>
+      <div class="tools">
+        <button id="imp">불러오기</button>
+        <button id="dlTxt">텍스트 저장</button>
+        <button id="dlAudio">녹음 파일 저장</button>
+        <button id="del" class="ghost">삭제</button>
+      </div>
+      <ul class="log" id="log"></ul>
+      <p class="note">줄을 누르면 그 시점의 녹음이 재생돼요. 길게 누르면(PC는 우클릭) ★중요 표시가 붙어요.</p>
+    </div>
+   </div>
+   <div class="colB">
+    <div id="tSum" class="hide">
+      <h2 class="ph">정리 노트</h2>
+      <ol class="steps">
+        <li>[AI 정리용 복사]를 눌러요.</li>
+        <li>ChatGPT나 Claude에 붙여넣고 보내요.</li>
+        <li>받은 답을 아래 칸에 붙여넣고 [노트 저장]을 눌러요.</li>
+      </ol>
+      <div class="tools">
+        <button id="cpPrompt" class="pri">AI 정리용 복사</button>
+        <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT 열기</a>
+        <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">Claude 열기</a>
+      </div>
+      <textarea id="notesIn" placeholder="AI가 정리해 준 내용을 여기에 붙여넣기" aria-label="정리 노트 붙여넣기"></textarea>
+      <div class="tools"><button id="saveNotes">노트 저장</button><button id="cpNotes">노트 복사</button></div>
+      <div class="md" id="sum"></div>
+    </div>
+   </div>
+  </section>
+
+  <section id="vList" class="hide">
+    <div class="tools" style="flex-wrap:nowrap">
+      <input id="q" placeholder="과목·제목·내용 검색" aria-label="검색">
+      <button class="pri" id="newLec">새 수업</button>
+    </div>
+    <ul class="list" id="list"></ul>
+    <p class="note" id="where">노트와 녹음은 이 기기의 브라우저에만 저장돼요. 브라우저 데이터를 지우면 함께 지워지니, 중요한 건 [텍스트 저장]으로 따로 받아 두세요.</p>
+  </section>
+</div>
+
+<div class="bar" id="bar">
+  <button class="mini" id="starBtn" aria-label="방금 내용 중요 표시">★</button>
+  <button id="barSum">정리 노트</button>
+</div>
+
+<div class="dlg hide" id="dlg"><div>
+  <h3>받아쓰기 원문 불러오기</h3>
+  <p class="note" style="margin-top:0">텍스트를 붙여넣거나 .txt 파일을 고르세요. 줄 앞의 00:00 시간은 자동으로 인식해요.</p>
+  <textarea id="pasteIn" placeholder="여기에 붙여넣기"></textarea>
+  <div class="tools"><input type="file" id="file" accept=".txt,.srt,.vtt,text/plain"></div>
+  <div class="tools" style="justify-content:flex-end"><button id="dlgX" class="ghost">취소</button><button id="dlgOk" class="pri">추가</button></div>
+</div></div>
+
+<script src="app.js"></script>
+</body>
+</html>
