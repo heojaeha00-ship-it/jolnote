@@ -1,5 +1,5 @@
 // 졸아도 노트 서비스 워커: 앱 파일을 저장해 두고 오프라인에서도 열리게 함
-const CACHE = 'jolnote-v2';
+const CACHE = 'jolnote-v3';
 const FILES = ['./', 'index.html', 'app.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'maskable-512.png', 'icon-180.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

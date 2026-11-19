@@ -49,6 +49,10 @@ let lecs = [], cur = newLec();
 let rec = false, startedAt = 0, partial = '', partialT = null, starNext = false, tab = 'log';
 let useStt = !!SR, useAudio = canRecord && !(isAndroid && SR); // 안드로이드는 녹음과 받아쓰기가 마이크를 동시에 못 씀 → 기본은 받아쓰기
 let lastResultAt = 0, srRestarts = 0;
+// ---------- 진단 줄: 받아쓰기가 어디서 막히는지 화면에 표시
+const D = { start: 0, audio: 0, speech: 0, result: 0, end: 0, err: '' };
+const diagEl = document.createElement('p'); diagEl.className = 'note'; diagEl.style.fontSize = '12px'; diagEl.style.fontFamily = 'ui-monospace,monospace';
+const diag = () => { diagEl.textContent = `[진단 v3] ${SR ? '엔진 있음' : '엔진 없음'} · 녹음기 ${canRecord ? '있음' : '없음'} · 시작 ${D.start} · 마이크 ${D.audio} · 말 감지 ${D.speech} · 결과 ${D.result} · 종료 ${D.end}${D.err ? ' · 오류 ' + D.err : ''} · ${isAndroid ? 'Android' : isIOS ? 'iOS' : 'PC'} ${(ua.match(/(SamsungBrowser|Edg|Chrome|CriOS|Firefox|FxiOS|Version)\/[\d]+/) || [''])[0]}${isInApp ? ' · 앱내브라우저' : ''}`; };
 let stream = null, mr = null, segIdx = -1, chunkN = 0;
 let sr = null, srWanted = false, srQuick = 0, srLastStart = 0, srGotResult = false;
 let wake = null, hiddenAt = 0;
@@ -120,17 +124,18 @@ function srStart() {
   if (!sr) {
     sr = new SR(); sr.lang = 'ko-KR'; sr.interimResults = true; sr.maxAlternatives = 1;
     sr.continuous = !isAndroid; // 안드로이드는 continuous에서 결과가 중복되는 문제가 있어 한 문장씩 받고 다시 시작
-    sr.onresult = e => { srGotResult = true; lastResultAt = Date.now(); let interim = '';
+    sr.onstart = () => { D.start++; diag(); }; sr.onaudiostart = () => { D.audio++; diag(); }; sr.onspeechstart = () => { D.speech++; diag(); };
+    sr.onresult = e => { D.result++; diag(); srGotResult = true; lastResultAt = Date.now(); let interim = '';
       for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i];
         if (r.isFinal) { if (partialT == null) partialT = elapsed(); addLine(r[0].transcript); } else interim += r[0].transcript; }
       if (interim && partialT == null) partialT = elapsed(); partial = interim.trim(); renderLog(); autoScroll(); };
-    sr.onerror = e => {
+    sr.onerror = e => { D.err = e.error + (e.message ? '(' + e.message + ')' : ''); diag();
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { srWanted = false; useStt = false; renderRec();
         alertBox('받아쓰기 권한이 거부됐어요. 녹음 파일만 저장돼요. 브라우저 설정에서 마이크를 허용하면 받아쓰기도 돼요.', [['확인', hideAlert]]); }
       else if (e.error === 'audio-capture' && useAudio && canRecord) srConflict();
       else if (e.error === 'network') { srWanted = false; renderRec(); alertBox('받아쓰기는 인터넷이 필요해요. 연결을 확인한 뒤 다시 시도해 주세요.', [['다시 시도', () => { hideAlert(); srQuick = 0; srStart(); }, true]]); }
     };
-    sr.onend = () => {
+    sr.onend = () => { D.end++; diag();
       if (partial) { addLine(partial); partial = ''; renderLog(); }
       if (!srWanted || !rec || document.hidden) return;
       const quick = Date.now() - srLastStart < 1500 && !srGotResult;
@@ -141,7 +146,7 @@ function srStart() {
   }
   srKick();
 }
-function srKick() { srLastStart = Date.now(); srGotResult = false; srRestarts++; try { sr.start(); } catch (e) { /* 이미 실행 중 */ } }
+function srKick() { srLastStart = Date.now(); srGotResult = false; srRestarts++; try { sr.start(); } catch (e) { if (!/already|InvalidState/i.test(String(e))) { D.err = 'start:' + (e.name || e); diag(); } } }
 // 감시: 녹음과 받아쓰기를 같이 켰는데 20초 동안 한 글자도 안 들어오면 마이크 충돌로 보고 물어봄
 setInterval(() => { if (rec && srWanted && mr && srRestarts >= 2 && Date.now() - Math.max(lastResultAt, startedAt) > 20000) { lastResultAt = Date.now(); srConflict(); } }, 5000);
 function srStop() { srWanted = false; if (sr) { try { sr.stop(); } catch (e) {} } }
@@ -365,6 +370,7 @@ if (isInApp) {
 })();
 
 // ---------- 시작
+$('#envNote').after(diagEl); diag();
 renderMeta(); renderLog(); renderSum(); renderRec();
 store.list().then(a => { lecs = a || []; }).catch(() => toast('이 브라우저에서는 저장을 쓸 수 없어요 (사생활 보호 모드인지 확인해 주세요)'));
 })();
