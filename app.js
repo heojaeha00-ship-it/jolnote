@@ -47,7 +47,7 @@ try { navigator.storage && navigator.storage.persist && navigator.storage.persis
 // ---------- 상태
 let lecs = [], cur = newLec();
 let rec = false, startedAt = 0, partial = '', partialT = null, starNext = false, tab = 'log';
-let useStt = !!SR, useAudio = canRecord && !(isAndroid && SR); // 안드로이드는 녹음과 받아쓰기가 마이크를 동시에 못 씀 → 기본은 받아쓰기
+let useStt = !!SR, useAudio = canRecord && !SR; // 기본은 받아쓰기만, 녹음은 옵션
 let lastResultAt = 0, srRestarts = 0;
 // ---------- 진단 줄: 받아쓰기가 어디서 막히는지 화면에 표시
 const D = { start: 0, audio: 0, speech: 0, result: 0, end: 0, err: '' };
