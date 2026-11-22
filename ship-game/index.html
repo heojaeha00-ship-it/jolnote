@@ -17,7 +17,7 @@
   --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
   color-scheme:dark;
 }
-html,body{height:100%;margin:0;background:#04070b;color:var(--ink);font-family:var(--f-body);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+html,body{word-break:keep-all;height:100%;margin:0;background:#04070b;color:var(--ink);font-family:var(--f-body);overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
 *{box-sizing:border-box}
 canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block}
 button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:8px;padding:8px 12px;min-height:40px}
@@ -119,6 +119,20 @@ body.touch #toasts{top:calc(272px + env(safe-area-inset-top,0px))}body.touch #to
 body.touch #prompt{bottom:calc(170px + env(safe-area-inset-bottom,0px))}
 body.touch #sub{bottom:calc(214px + env(safe-area-inset-bottom,0px))}
 body.touch .bar i{width:60px}
+#tip{position:fixed;z-index:25;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,calc(100vw - 32px));background:#0d1b27;border:2px solid var(--brass);border-radius:12px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:grid;gap:12px}
+.tiph{font-family:var(--f-display);font-size:22px;color:var(--brass)}.tipb{line-height:1.7;font-size:15px}
+#tip button{background:var(--brass);color:#1b1205;border-color:var(--brass);font-weight:700}
+#intro h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,6vw,40px);color:var(--brass);margin:0}
+#intro .step{font-family:var(--f-mono);color:var(--dim);font-size:13px}
+#intro .lead{color:var(--ink);font-size:16px;line-height:1.8}
+body.emg::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:3;box-shadow:inset 0 0 120px rgba(255,40,30,.55);animation:emgp 1s ease-in-out infinite}
+@keyframes emgp{50%{box-shadow:inset 0 0 40px rgba(255,40,30,.25)}}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:8px 0}.mode button.on{background:var(--sea);color:#04161a;border-color:var(--sea);font-weight:700}
+#handRow{grid-template-columns:repeat(5,1fr)}
+.recbtn{width:100%;margin-top:8px;background:rgba(242,181,68,.15);border-color:var(--brass);font-weight:700}
+.emgbtn{width:100%;margin-top:8px;background:#c0261c;border-color:#ff5d52;font-weight:700;animation:emgp2 .8s infinite}
+@keyframes emgp2{50%{background:#7a140e}}
+#autoff{font-family:var(--f-mono);font-size:12px;color:var(--sea)}
 @media (prefers-reduced-motion:reduce){.toast,#banner.show{animation:none}}
 </style>
 <!--HEAD-END-->
@@ -156,12 +170,16 @@ body.touch .bar i{width:60px}
       <div class="kv"><span>속력 SOG</span><b id="nSog">14.0 kn</b></div>
       <div class="kv"><span>타각 RUDDER</span><b id="nRud">0°</b></div>
       <div class="kv"><span>레이더 거리</span><b>8 NM · 링 2 NM</b></div>
-      <div class="btnrow"><button data-c="-10">◀ 10</button><button data-c="-1">◀ 1</button><button data-c="1">1 ▶</button><button data-c="10">10 ▶</button></div>
+      <div class="mode"><button id="mAuto">AUTO 오토파일럿</button><button id="mHand">HAND 수동 조타</button></div>
+      <div class="btnrow" id="setRow"><button data-c="-10">◀ 10</button><button data-c="-1">◀ 1</button><button data-c="1">1 ▶</button><button data-c="10">10 ▶</button></div>
+      <div class="btnrow" id="handRow" hidden><button data-h="-20">좌 20</button><button data-h="-10">좌 10</button><button data-h="0">미드십</button><button data-h="10">우 10</button><button data-h="20">우 20</button></div>
       <div class="tele" id="tele"></div>
+      <button class="emgbtn" id="emgBtn" hidden></button>
+      <button class="recbtn" id="recBtn">💡 추천 조치 (R)</button>
       <div id="targets"></div>
     </div>
   </div>
-  <p class="hint">A/D 침로 ±1° · Shift+A/D ±10° · W/S 텔레그래프 · 우현 변침 = ▶</p>
+  <p class="hint">▶ = 오른쪽으로 돌기 · A/D 방향 ±1° (Shift ±10°) · W/S 엔진 속도 · R 추천 조치 · Esc 닫기</p>
 </div>
 
 <div id="mg" class="panel hidden" role="dialog"></div>
@@ -169,7 +187,7 @@ body.touch .bar i{width:60px}
 
 <div id="title" class="screen">
   <div class="card">
-    <div class="logo"><em>M/V 한바다호 · 3RD OFFICER</em>3항사<br>당직일지</div>
+    <div class="logo"><em>M/V 세계로호 · 3RD OFFICER</em>3항사<br>당직일지</div>
     <p class="lead">5만 톤급 벌크선의 3항사로 이틀을 산다. 08–12 데이워치, 20–24 나이트워치, 묘박과 접안, 그리고 밤의 회식까지. 선장의 신뢰를 얻어라.</p>
     <div class="menu" id="menu">
       <button class="pri" data-m="story">스토리 시작 <small>DAY 1 07:30 ~ DAY 2 접안</small></button>
@@ -185,6 +203,9 @@ body.touch .bar i{width:60px}
 </div>
 
 <div id="ending" class="screen hidden"><div class="card" id="endCard"></div></div>
+<div id="intro" class="screen hidden"><div class="card" id="introCard"></div></div>
+<div id="tip" class="hidden" role="dialog"></div>
+<div id="emgv" class="hidden"></div>
 <div id="fade"></div>
 
 <div id="touch" class="hidden">
@@ -327,7 +348,7 @@ function hullShape(){
   const postG = new THREE.BoxGeometry(0.07,1.1,0.07); const posts = new THREE.InstancedMesh(postG, M.white, Math.ceil(pts.length));
   pts.forEach((p,i)=>{ posts.setMatrixAt(i, new THREE.Matrix4().makeTranslation(p.x, DECK+0.55, p.z)); }); shipG.add(posts);
   // 선명
-  const nm = document.createElement('canvas'); nm.width=512; nm.height=96; const nx=nm.getContext('2d'); nx.fillStyle='#fff'; nx.font='700 64px "Noto Sans KR",sans-serif'; nx.textAlign='center'; nx.fillText('HANBADA', 256, 72);
+  const nm = document.createElement('canvas'); nm.width=512; nm.height=96; const nx=nm.getContext('2d'); nx.fillStyle='#fff'; nx.font='700 64px "Noto Sans KR",sans-serif'; nx.textAlign='center'; nx.fillText('SEGYERO', 256, 72);
   const nt = new THREE.CanvasTexture(nm); nt.colorSpace = THREE.SRGBColorSpace;
   for (const side of [-1,1]) { const pl = new THREE.Mesh(new THREE.PlaneGeometry(14, 2.6), new THREE.MeshBasicMaterial({map:nt, transparent:true})); pl.position.set(side*(halfW(52)+0.05), 5.6, -52); pl.rotation.y = side*Math.PI/2*(1) + (side<0?0:0); pl.rotation.y = side>0 ? Math.PI/2 : -Math.PI/2; pl.rotation.y += side>0 ? -0.22 : 0.22; shipG.add(pl); }
   // 해치·크레인
@@ -345,10 +366,10 @@ function hullShape(){
   zone.position.set(8.4, DECK+0.03, 55.25); shipG.add(zone);
   // 거주구역
   box(17,3.5,15,M.white,0,DECK+1.75,-43); box(17,3.5,15,M.white,0,DECK+5.25,-43); box(17,3,14,M.white,0,DECK+8.5,-43.5);
-  box(17,3,9,M.white,0,DECK+11.5,-42.5); box(25.2,3,4,M.white,0,DECK+11.5,-40);
+  shipG.userData.bridgeShell=[box(17,3,9,M.white,0,DECK+11.5,-42.5), box(25.2,3,4,M.white,0,DECK+11.5,-40)];
   box(25.6,0.25,4.4,M.white,0,DECK+13.1,-40); box(17.4,0.25,9.4,M.white,0,DECK+13.1,-42.5);
   for (const [y,s,w] of [[DECK+2.2,-35.45,15],[DECK+5.7,-35.45,15],[DECK+8.9,-36.45,15]]) box(w,1,0.1,M.win,0,y,s);
-  { const wp=new THREE.Mesh(new THREE.PlaneGeometry(24.6,1.5), M.win); wp.position.set(0,DECK+12.1,37.93); wp.rotation.y=Math.PI; shipG.add(wp); }
+  { const wp=new THREE.Mesh(new THREE.PlaneGeometry(24.6,1.5), M.win); wp.position.set(0,DECK+12.1,37.93); wp.rotation.y=Math.PI; shipG.add(wp); shipG.userData.bridgeShell.push(wp); }
   for (const x of [-8.55,8.55]) for (const y of [DECK+2.2,DECK+5.7]) for (const s of [-47,-43,-39]) box(0.1,0.8,1.4,M.win,x,y,s);
   box(2,2.6,0.1,M.win,0,DECK+1.3,-35.45);
   box(1.3,2.3,0.08,M.dark,-6.6,DECK+1.15,-50.55); box(0.9,0.8,0.08,M.yellow,-6.6,DECK+2.6,-50.55);
@@ -382,12 +403,10 @@ function room(w,h,d,x,y0,s,mat){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,
 (function buildInteriors(){
   // 식당
   room(16.6,3.3,14.6,0,DECK,-43,M.wall); box(16.4,0.05,14.4,M.floor,0,DECK+0.03,-43);
-  for (const x of [-3.5,3.5]) { box(1.8,0.12,7,M.wood,x,DECK+0.82,-43); for (const s of [-46,-40]) box(0.14,0.8,0.14,M.dark,x,DECK+0.4,s);
-    for (const dx of [-1.6,1.6]) for (const s of [-45,-43,-41]) box(0.5,0.5,0.5,M.red,x+dx,DECK+0.25,s); }
+  for (const x of [-3.5,3.5]) { box(1.8,0.12,7,M.wood,x,DECK+0.82,-43); for (const s of [-46,-40]) box(0.14,0.8,0.14,M.dark,x,DECK+0.4,s); }
   box(6,1,1.1,M.grey,0,DECK+0.5,-49.65); box(6,0.08,1.1,M.white,0,DECK+1.04,-49.65);
   box(0.6,1.1,2,M.dark,7.65,DECK+1.6,-44); box(0.05,0.9,1.7,screenMat(0x3a6ea8),7.33,DECK+1.6,-44);
-  box(1.2,0.1,0.8,M.dark,-3.5,DECK+0.93,-43); // 불판
-  box(1.4,2.6,0.1,M.dark,-7,DECK+1.3,-50.1); // 계단문
+    box(1.4,2.6,0.1,M.dark,-7,DECK+1.3,-50.1); // 계단문
   box(2,2.5,0.06,M.dark,0,DECK+1.25,-35.86);
   // 3항사 선실
   room(8,3,6,0,DECK+3.5,-44,M.wall); box(7.9,0.05,5.9,M.carpet,0,DECK+3.53,-44);
@@ -411,15 +430,186 @@ function room(w,h,d,x,y0,s,mat){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,
   // 콘솔
   box(6,1.05,1.1,M.console,0,by+0.53,-39.1); box(5.6,0.05,0.7,screenMat(0x123a2e),0,by+1.08,-39.1);
   const scr=(x,c)=>{ const m=new THREE.Mesh(new THREE.PlaneGeometry(1.2,0.7), screenMat(c)); m.position.set(x,by+1.35,39.45*-1); m.rotation.x=-0.5; shipG.add(m); };
-  scr(-1.6,0x0e5a3a); scr(0,0x1a3c6b); scr(1.6,0x0e5a3a);
-  box(2,1.25,1.3,M.console,-4.7,by+0.62,-39.2); const rs=new THREE.Mesh(new THREE.CircleGeometry(0.5,24),screenMat(0x16c36a)); rs.position.set(-4.7,by+1.3,-39.7); rs.rotation.x=-0.6; shipG.add(rs);
-  box(0.25,0.9,0.25,M.dark,1.6,by+1.5,-39.6); // 텔레그래프 레버
+  box(2,1.25,1.3,M.console,-4.7,by+0.62,-39.2); 
   box(3,1,1.8,M.wood,5.35,by+0.5,-45.5); box(2.8,0.03,1.6,lam(0xe9e1c8),5.35,by+1.02,-45.5);
   box(0.8,1.1,0.8,M.dark,6,by+0.55,-39.6); // 선장의자
   box(0.3,0.5,0.2,M.red,-8.25,by+1.4,-43); // 전화
   box(1.4,2.5,0.06,M.dark,-7.4,by+1.25,-46.85);
   box(0.3,1.2,0.3,M.dark,10.3,by+0.6,-38.6); // 쌍안경 거치대
 })();
+
+/* ============================ 소품 · 디테일 ============================ */
+const steelM=lam(0xb9c0c6), riceM=lam(0xf6f3ea), soupM=lam(0x9a5a2e), kimM=lam(0xc8442c), namM=lam(0x4f8a3a), meatM=lam(0x7a3f1f);
+function makeTray(){
+  const g=new THREE.Group(); const m=(geo,mat,x,y,z,par=g)=>{ const o=new THREE.Mesh(geo,mat); o.position.set(x,y,z); par.add(o); return o; };
+  m(new THREE.BoxGeometry(0.5,0.025,0.36),steelM,0,0,0);
+  const food=new THREE.Group(); g.add(food); g.userData.food=food;
+  m(new THREE.CylinderGeometry(0.07,0.055,0.05,10),riceM,-0.14,0.035,0.08,food); m(new THREE.CylinderGeometry(0.075,0.055,0.05,10),soupM,0.14,0.035,0.08,food);
+  m(new THREE.BoxGeometry(0.1,0.03,0.09),kimM,-0.16,0.025,-0.09,food); m(new THREE.BoxGeometry(0.1,0.03,0.09),namM,-0.02,0.025,-0.09,food); m(new THREE.BoxGeometry(0.12,0.035,0.09),meatM,0.14,0.027,-0.09,food);
+  m(new THREE.BoxGeometry(0.015,0.012,0.22),steelM,0.235,0.02,0); m(new THREE.BoxGeometry(0.015,0.012,0.22),steelM,0.21,0.02,0);
+  return g;
+}
+function wallPlane(w,h,tex,x,y,s,facing){ const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h), tex.isTexture?new THREE.MeshBasicMaterial({map:tex}):tex); m.position.set(x,y,-s); m.rotation.y={fwd:Math.PI,aft:0,stbd:Math.PI/2,port:-Math.PI/2}[facing]; shipG.add(m); return m; }
+function textTex(lines, w=512, h=256, bg='#22303a', fg='#f3efe2', size=34){
+  const c=document.createElement('canvas'); c.width=w; c.height=h; const x=c.getContext('2d'); const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
+  const draw=()=>{ x.fillStyle=bg; x.fillRect(0,0,w,h); x.fillStyle=fg; x.textAlign='center'; lines.forEach((l,i)=>{ x.font=`${i?500:700} ${i?size*0.8:size}px "Noto Sans KR",sans-serif`; x.fillText(l,w/2,size*1.4+i*size*1.25); }); t.needsUpdate=true; };
+  draw(); document.fonts?.ready.then(draw); return t;
+}
+// 실제 게임 시각을 가리키는 벽시계
+const clockC=document.createElement('canvas'); clockC.width=clockC.height=128; const clockX=clockC.getContext('2d'); const clockT=new THREE.CanvasTexture(clockC); clockT.colorSpace=THREE.SRGBColorSpace; let clockMin=-1;
+function drawClock(){ const m=Math.floor(G.t/60)%1440; if (m===clockMin) return; clockMin=m; const x=clockX; x.clearRect(0,0,128,128); x.fillStyle='#f4f1e8'; x.beginPath(); x.arc(64,64,62,0,7); x.fill(); x.strokeStyle='#222'; x.lineWidth=5; x.stroke();
+  for (let i=0;i<12;i++){ const a=i/12*Math.PI*2; x.fillStyle='#222'; x.fillRect(64+Math.sin(a)*50-2,64-Math.cos(a)*50-2,4,4); }
+  const hand=(a,l,w)=>{ x.lineWidth=w; x.beginPath(); x.moveTo(64,64); x.lineTo(64+Math.sin(a)*l,64-Math.cos(a)*l); x.stroke(); };
+  hand(((m/60)%12)/12*Math.PI*2,30,6); hand((m%60)/60*Math.PI*2,46,3); clockT.needsUpdate=true; }
+const clockMat=new THREE.MeshBasicMaterial({map:clockT, transparent:true});
+const partyDecor=new THREE.Group(); shipG.add(partyDecor); partyDecor.visible=false;
+(function buildDecor(){
+  const by=DECK+10;
+  // --- 식당: 뷔페 배식대 ---
+  box(6.2,0.06,1.0,steelM,0,DECK+1.08,-49.65);
+  const pan=(x,mat,cyl)=>{ box(0.95,0.14,0.6,steelM,x,DECK+1.13,-49.6); if (cyl) { cyl_(0.27,0.24,0.32,M.dark,x,DECK+1.3,-49.6); cyl_(0.25,0.25,0.02,soupM,x,DECK+1.47,-49.6); } else box(0.85,0.04,0.5,mat,x,DECK+1.2,-49.6); };
+  const cyl_=(a,b,h,m,x,y,s)=>cyl(a,b,h,m,x,y,s);
+  pan(-1.6,riceM); pan(-0.55,null,true); pan(0.5,meatM); pan(1.5,kimM); pan(2.5,namM);
+  for (let i=0;i<9;i++) box(0.5,0.025,0.36,steelM,-2.65,DECK+1.12+i*0.03,-49.6); // 식판 더미
+  cyl(0.07,0.07,0.22,M.dark,-2.65,DECK+1.25,-49.2); // 수저통
+  const guard=new THREE.Mesh(new THREE.PlaneGeometry(5.4,0.35), new THREE.MeshBasicMaterial({color:0xcfe6f0, transparent:true, opacity:.25, depthWrite:false, side:THREE.DoubleSide})); guard.position.set(0.4,DECK+1.55,49.2); guard.rotation.x=-0.3; shipG.add(guard);
+  wallPlane(3.2,1.1,textTex(['오늘의 메뉴','백미밥 · 미역국 · 제육볶음','배추김치 · 시금치나물']),0,DECK+2.35,-50.25,'fwd');
+  // 퇴식구 + 정수기 + 냉장고 + 커피머신
+  box(2.6,1,1,M.grey,6.5,DECK+0.5,-49.8); box(2.4,0.05,0.8,steelM,6.5,DECK+1.02,-49.8); for (let i=0;i<4;i++) box(0.5,0.02,0.36,steelM,7.3,DECK+1.06+i*0.03,-49.8);
+  wallPlane(1.4,0.35,textTex(['식판 반납 · 퇴식구'],512,128,'#3b4a55','#fff',48),6.5,DECK+1.8,-50.25,'fwd');
+  box(0.6,1.3,0.6,M.white,-7.6,DECK+0.65,-37.6); cyl(0.14,0.14,0.4,lam(0x7fc4e6),-7.6,DECK+1.5,-37.6);
+  box(0.8,1.9,0.8,lam(0xdfe3e6),7.5,DECK+0.95,-37.5);
+  box(0.6,0.9,1.4,M.wood,-7.6,DECK+0.45,-43.5); box(0.4,0.45,0.35,M.dark,-7.6,DECK+1.12,-43.8); cyl(0.05,0.05,0.1,M.white,-7.6,DECK+0.95,-43.1);
+  wallPlane(1.6,1.0,textTex(['선내 공지','당직 4시간 전 금주','비상 소집: 좌현 집합 장소','폐유·쓰레기 분리배출'],512,320,'#e9e2c8','#2a2a2a',36),-8.25,DECK+1.9,-40,'stbd');
+  wallPlane(0.5,0.5,clockMat,3,DECK+2.6,-35.78,'aft');
+  for (const s of [-46,-40]) { wallPlane(0.55,0.55,new THREE.MeshBasicMaterial({color:0x8fc3dd}),8.27,DECK+2,s,'port'); }
+  cyl(0.22,0.18,0.4,M.wood,7.5,DECK+0.2,-36.6); const plant=new THREE.Mesh(new THREE.SphereGeometry(0.35,8,6),lam(0x3f7d3a)); plant.position.set(7.5,DECK+0.7,36.6); shipG.add(plant);
+  // 의자 (등받이)
+  for (const x of [-3.5,3.5]) for (const dx of [-1.6,1.6]) for (const s of [-45,-43,-41]) { box(0.48,0.07,0.48,M.red,x+dx,DECK+0.45,s); box(0.08,0.4,0.08,M.dark,x+dx,DECK+0.22,s); box(0.07,0.55,0.46,M.red,x+dx+Math.sign(dx)*0.24,DECK+0.75,s); }
+  // 회식 상차림
+  const pd=(w,h,d,mat,x,y,s)=>{ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat); o.position.set(x,y,-s); partyDecor.add(o); return o; };
+  const pc=(r,h,mat,x,y,s)=>{ const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,10),mat); o.position.set(x,y,-s); partyDecor.add(o); return o; };
+  const sojuM=new THREE.MeshLambertMaterial({color:0x2f9a55, transparent:true, opacity:.85}), canM=lam(0xd8b23a), lettuce=lam(0x6fbf4a), plate=lam(0xf2f2f2);
+  for (const x of [-3.5,3.5]) { for (const s of [-44.6,-41.4]) { pd(0.7,0.08,0.7,M.dark,x,DECK+0.92,s); for (let i=0;i<5;i++) pd(0.16,0.03,0.08,meatM,x-0.2+(i%3)*0.2,DECK+0.98,s-0.15+Math.floor(i/3)*0.3); }
+    for (const s of [-45.6,-43,-40.3]) { pc(0.045,0.26,sojuM,x+0.5,DECK+1.01,s); pc(0.035,0.16,canM,x-0.5,DECK+0.96,s+0.3); }
+    pd(0.5,0.05,0.5,plate,x,DECK+0.9,-43); pd(0.4,0.08,0.4,lettuce,x,DECK+0.94,-43); }
+  // --- 선교 ---
+  wallPlane(0.45,0.45,clockMat,2.2,by+2.3,-46.83,'fwd');
+  cyl(0.045,0.04,0.1,M.white,2.4,by+1.15,-39.3); box(0.25,0.15,0.12,M.dark,-2.6,by+1.15,-39.2); // 머그컵, VHF
+  box(0.5,0.04,0.35,lam(0x2b4d7a),5.0,by+1.06,-45.3); box(0.7,0.01,0.5,lam(0xf3ecd2),5.8,by+1.05,-45.7); // 항해일지, 해도
+  cyl(0.02,0.02,0.5,M.dark,6.6,by+1.3,-46); box(0.25,0.1,0.15,M.dark,6.5,by+1.55,-45.9); // 해도등
+  box(1.8,1.2,0.5,lam(0x5a6b7d),-3,by+0.6,-46.55); // 신호기함
+  box(1.2,0.5,0.5,lam(0xe67e22),-5.2,by+0.25,-46.5); // 구명조끼함
+  // --- 3항사 선실 ---
+  box(0.3,1.1,1.6,M.wood,-3.8,DECK+5.0,-42.3); for (let i=0;i<7;i++) box(0.22,0.3,0.12,lam([0x8e3b2f,0x2f5d8a,0x3f6f45,0xd1a640][i%4]),-3.72,DECK+5.0+((i%2)?0.37:-0.1)*0,-41.7-i*0.17);
+  box(0.6,0.03,0.42,M.dark,3.0,DECK+4.36,-42.2); const lid=box(0.6,0.4,0.02,M.dark,3.25,DECK+4.55,-42.2); lid.rotation.z=0.3; // 노트북
+  box(0.5,0.25,0.6,lam(0xff7a1a),3.35,DECK+5.85,-46.1); // 구명조끼
+  wallPlane(0.4,0.4,clockMat,-1,DECK+5.7,-41.03,'aft');
+  box(2.2,0.02,1.4,lam(0x6d4c41),0.6,DECK+3.55,-44); // 러그
+  // --- 갑판 ---
+  for (const sg of [-1,1]) { const lb=new THREE.Group(); lb.position.set(sg*10.4,DECK+5.6,43.5); shipG.add(lb);
+    const hull=new THREE.Mesh(new THREE.CylinderGeometry(1.1,0.9,7,10,1,false), lam(0xf07a1a)); hull.rotation.x=Math.PI/2; hull.scale.set(1,1,0.75); lb.add(hull);
+    const roof=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.7,5), M.white); roof.position.y=0.8; lb.add(roof);
+    for (const s of [-46,-41]) { box(0.2,3.6,0.2,M.grey,sg*9.1,DECK+5.2,s); box(1.6,0.2,0.2,M.grey,sg*9.8,DECK+7,s); } }
+  for (const [sg,s] of [[1,-20],[-1,-20],[1,30],[-1,30]]) { const r=new THREE.Mesh(new THREE.TorusGeometry(0.33,0.08,8,16),lam(0xf06a1a)); r.position.set(sg*(halfW(s)-0.08),DECK+0.8,-s); r.rotation.y=Math.PI/2; shipG.add(r); }
+  for (const x of [-5,5]) { box(0.6,0.7,0.2,M.red,x,DECK+1.3,-35.3); cyl(0.1,0.1,0.5,M.red,x+0.6,DECK+0.25,-35.25); }
+  for (const x of [-2.6,2.6]) { cyl(0.3,0.3,1.2,M.white,x,DECK+0.6,59.6); const cap=new THREE.Mesh(new THREE.SphereGeometry(0.42,10,6,0,Math.PI*2,0,Math.PI/2),M.white); cap.position.set(x,DECK+1.2,-59.6); shipG.add(cap); }
+  for (const [x,s] of [[-8,-51.4],[-1.4,-57]]) { const c=new THREE.Mesh(new THREE.TorusGeometry(0.55,0.17,6,18),lam(0xd8c79a)); c.rotation.x=Math.PI/2; c.position.set(x,DECK+0.17,-s); shipG.add(c); }
+  // 선미 국기
+  cyl(0.05,0.06,4.5,M.white,0,DECK+2.25,-57.7);
+  const fc=document.createElement('canvas'); fc.width=180; fc.height=120; const fx=fc.getContext('2d'); fx.fillStyle='#fff'; fx.fillRect(0,0,180,120);
+  fx.save(); fx.translate(90,60); fx.rotate(Math.atan2(2,3)); fx.fillStyle='#cd2e3a'; fx.beginPath(); fx.arc(0,0,30,Math.PI,0); fx.fill(); fx.fillStyle='#0047a0'; fx.beginPath(); fx.arc(0,0,30,0,Math.PI); fx.fill();
+  fx.fillStyle='#cd2e3a'; fx.beginPath(); fx.arc(-15,0,15,0,Math.PI*2); fx.fill(); fx.fillStyle='#0047a0'; fx.beginPath(); fx.arc(15,0,15,0,Math.PI*2); fx.fill(); fx.restore();
+  fx.fillStyle='#000'; for (const [cx,cy,r] of [[34,24,-0.98],[146,24,0.98],[34,96,0.98],[146,96,-0.98]]) { fx.save(); fx.translate(cx,cy); fx.rotate(r); for (let i=0;i<3;i++) fx.fillRect(-14,-9+i*7,28,4.5); fx.restore(); }
+  const ft=new THREE.CanvasTexture(fc); ft.colorSpace=THREE.SRGBColorSpace;
+  const flag=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1,6,1), new THREE.MeshLambertMaterial({map:ft, side:THREE.DoubleSide})); flag.position.set(0,DECK+3.9,57.7+0.76); flag.rotation.y=Math.PI/2; shipG.add(flag); shipG.userData.flag=flag;
+})();
+/* ============================ 선교 계기 (실시간 화면) ============================ */
+function liveScreen(w,h,x,y,s,tilt=-0.5,pw=1.2,ph=0.7){
+  const c=document.createElement('canvas'); c.width=w; c.height=h; const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(pw,ph), new THREE.MeshBasicMaterial({map:t})); m.position.set(x,y,-s); m.rotation.x=tilt; m.rotation.order='YXZ'; shipG.add(m);
+  return {c, x:c.getContext('2d'), t, m};
+}
+const BY=DECK+10;
+const SCR = {
+  ecdis: liveScreen(384,224,-1.75,BY+1.24,-39.3,-0.95,1.0,0.58),
+  ap:    liveScreen(384,224,0,BY+1.24,-39.3,-0.95,1.0,0.58),
+  conn:  liveScreen(384,224,1.75,BY+1.24,-39.3,-0.95,1.0,0.58),
+  radar: liveScreen(320,320,-4.7,BY+1.3,-39.6,-0.95,0.95,0.95),
+  over:  liveScreen(512,128,0,BY+2.76,-38.5,0.2,1.6,0.4),
+};
+SCR.over.m.rotation.y=0;
+// 조타륜 받침 + 조타륜, 텔레그래프 레버, BNWAS, VHF, 경사계, 커튼
+box(0.4,0.95,0.3,M.console,0,BY+0.47,-39.82);
+const helmWheel=new THREE.Group(); helmWheel.position.set(0,BY+1.02,39.98); helmWheel.rotation.x=-0.35; shipG.add(helmWheel);
+{ const r=new THREE.Mesh(new THREE.TorusGeometry(0.2,0.025,8,22),M.dark); helmWheel.add(r); for (let i=0;i<3;i++){ const sp=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.02,0.02),M.dark); sp.rotation.z=i*Math.PI/3; helmWheel.add(sp);} const k=new THREE.Mesh(new THREE.SphereGeometry(0.03,6,4),M.red); k.position.y=0.2; helmWheel.add(k); }
+box(0.36,0.16,0.55,M.dark,2.75,BY+1.13,-39.2);
+const teleLever=new THREE.Group(); teleLever.position.set(2.75,BY+1.2,-39.2); shipG.add(teleLever);
+{ const l=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.45,0.06),steelM); l.position.y=0.22; teleLever.add(l); const kn=new THREE.Mesh(new THREE.SphereGeometry(0.06,8,6),M.red); kn.position.y=0.46; teleLever.add(kn); }
+box(0.4,0.25,0.3,lam(0x30343a),-2.6,BY+1.18,-38.95);
+const bnwasLamp=navLight(0xff3020,0.02); bnwasLamp.material.sizeAttenuation=true; bnwasLamp.scale.set(0.18,0.18,1); bnwasLamp.position.set(-2.6,BY+1.36,38.95); bnwasLamp.visible=false; shipG.add(bnwasLamp);
+const bnwasBtn=box(0.12,0.05,0.12,lam(0xffc23a),-2.6,BY+1.33,-39.0);
+for (const x of [-1.2,1.2]) { box(0.5,0.2,0.25,M.dark,x,BY+2.62,-38.35); box(0.06,0.14,0.04,M.red,x+0.18,BY+2.62,-38.21); }
+const clino=new THREE.Group(); clino.position.set(-6.2,BY+2.2,38.15); shipG.add(clino);
+{ const face=new THREE.Mesh(new THREE.CircleGeometry(0.22,20),M.white); face.rotation.y=Math.PI; clino.add(face); const nd=new THREE.Mesh(new THREE.BoxGeometry(0.02,0.2,0.01),M.red); nd.position.y=-0.1; const piv=new THREE.Group(); piv.add(nd); piv.position.z=-0.01; clino.add(piv); clino.userData.piv=piv; }
+const curtain=new THREE.Mesh(new THREE.PlaneGeometry(3.4,2.2), new THREE.MeshLambertMaterial({color:0x1b2026, side:THREE.DoubleSide})); curtain.position.set(5.3,BY+1.75,44.4); shipG.add(curtain);
+box(1.5,1.0,0.25,lam(0x8b2a2a),5.6,BY+1.9,-46.8); // 화재탐지반
+wallPlane(1.3,0.5,textTex(['FIRE DETECTION','ZONE 1–12 NORMAL'],512,200,'#3a1414','#ffd2c2',40),5.6,BY+1.9,-46.66,'fwd');
+wallPlane(2.2,0.55,textTex(['M/V 세계로호 · 선교'],600,150,'#1c2b3a','#f2b544',54),-2.5,BY+2.45,-46.83,'fwd');
+
+function drawScreens(){
+  // 오토파일럿
+  { const {x,c,t}=SCR.ap; x.fillStyle='#05080a'; x.fillRect(0,0,c.width,c.height);
+    x.fillStyle='#ffb000'; x.font='700 22px monospace'; x.fillText('AUTOPILOT',14,30); x.textAlign='right';
+    x.fillStyle=ship.mode==='HAND'?'#ff6a55':'#5dff9b'; x.fillText(ship.auto?'PILOT':ship.mode,370,30); x.textAlign='left';
+    x.fillStyle='#ffb000'; x.font='700 56px monospace'; x.fillText(ship.heading.toFixed(1).padStart(5,'0')+'°',14,98);
+    x.font='600 22px monospace'; x.fillText('HDG',300,98); x.fillText('SET '+String(Math.round(ship.set)).padStart(3,'0')+'°',14,140);
+    x.fillText('ROT '+(ship.rot*60/TS*20).toFixed(0)+'°/min',200,140);
+    x.strokeStyle='#ffb000'; x.strokeRect(14,170,356,26); const rx=192+ship.rudder/35*176; x.fillStyle=ship.rudder>=0?'#30ff70':'#ff3a2a'; x.fillRect(Math.min(192,rx),172,Math.abs(rx-192),22);
+    x.fillStyle='#ffb000'; x.font='600 16px monospace'; x.fillText('P 35',16,214); x.textAlign='right'; x.fillText('S 35',370,214); x.textAlign='center'; x.fillText('RUDDER '+(ship.rudder>=0?'S':'P')+Math.abs(ship.rudder).toFixed(0),192,214); x.textAlign='left'; t.needsUpdate=true; }
+  // 코닝
+  { const {x,c,t}=SCR.conn; x.fillStyle='#071019'; x.fillRect(0,0,c.width,c.height); x.fillStyle='#8fd7ff'; x.font='700 20px monospace'; x.fillText('CONNING',14,28);
+    const rows=[['SOG',Math.abs(ship.speed).toFixed(1)+' kn'],['ENGINE',TELE[ship.tele].k+'  '+Math.round(Math.max(0,ship.speed)*7)+' rpm'],['WIND','NE 12 kn'],['DEPTH',(G.PORT && ship.pos.distanceTo(G.PORT.A)<3*NM ? 30.4 : 68.2).toFixed(1)+' m'],['UTC+9',hhmm(G.t)]];
+    x.font='600 22px monospace'; rows.forEach(([k,v],i)=>{ x.fillStyle='#6b8aa0'; x.fillText(k,14,64+i*36); x.fillStyle='#e8f4ff'; x.textAlign='right'; x.fillText(v,370,64+i*36); x.textAlign='left'; }); t.needsUpdate=true; }
+  // ECDIS
+  { const {x,c,t}=SCR.ecdis, W=c.width, H=c.height, sc=1/22; x.fillStyle='#b9dff2'; x.fillRect(0,0,W,H);
+    x.strokeStyle='rgba(60,110,150,.25)'; for (let i=0;i<W;i+=32){ x.beginPath(); x.moveTo(i,0); x.lineTo(i,H); x.stroke(); } for (let i=0;i<H;i+=32){ x.beginPath(); x.moveTo(0,i); x.lineTo(W,i); x.stroke(); }
+    const P2=(p)=>[W/2+(p.x-ship.pos.x)*sc, H/2+(p.z-ship.pos.z)*sc];
+    for (const isl of islands) if (isl.visible){ const [X,Y]=P2(isl.position); x.fillStyle='#e8d38c'; x.beginPath(); x.arc(X,Y,280*sc,0,7); x.fill(); }
+    if (G.PORT && port.visible){ const P0=G.PORT; const pts=[P0.Q.clone().addScaledVector(P0.f,-700),P0.Q.clone().addScaledVector(P0.f,700)]; pts.push(pts[1].clone().addScaledVector(P0.r,1500),pts[0].clone().addScaledVector(P0.r,1500)); x.fillStyle='#e8d38c'; x.beginPath(); pts.forEach((p,i)=>{ const [X,Y]=P2(p); i?x.lineTo(X,Y):x.moveTo(X,Y); }); x.fill(); const [ax,ay]=P2(P0.A); x.strokeStyle='#c2189b'; x.beginPath(); x.arc(ax,ay,0.3*NM*sc,0,7); x.stroke(); }
+    const pf=fwd(G.plan); x.strokeStyle='#c2189b'; x.lineWidth=3; x.setLineDash([10,6]); x.beginPath(); x.moveTo(W/2-pf.x*900,H/2-pf.z*900); x.lineTo(W/2+pf.x*900,H/2+pf.z*900); x.stroke(); x.setLineDash([]); x.lineWidth=1;
+    for (const tg of targets){ const [X,Y]=P2(tg.pos); const f=fwd(tg.heading); x.fillStyle='#2a8a3a'; x.beginPath(); x.moveTo(X+f.x*9,Y+f.z*9); x.lineTo(X-f.z*5,Y+f.x*5); x.lineTo(X+f.z*5,Y-f.x*5); x.fill(); }
+    const f=fwd(ship.heading); x.fillStyle='#111'; x.beginPath(); x.moveTo(W/2+f.x*13,H/2+f.z*13); x.lineTo(W/2-f.z*6-f.x*6,H/2+f.x*6-f.z*6); x.lineTo(W/2+f.z*6-f.x*6,H/2-f.x*6-f.z*6); x.fill();
+    x.strokeStyle='#111'; x.beginPath(); x.moveTo(W/2,H/2); x.lineTo(W/2+f.x*60,H/2+f.z*60); x.stroke();
+    x.fillStyle='rgba(10,30,50,.85)'; x.fillRect(0,0,W,26); x.fillStyle='#fff'; x.font='600 16px monospace'; x.fillText(`ECDIS  HDG ${ship.heading.toFixed(0).padStart(3,'0')}  SOG ${Math.abs(ship.speed).toFixed(1)}  ROUTE 045`,8,18); t.needsUpdate=true; }
+  // 레이더 (실제 콘솔 레이더와 같은 그림)
+  drawRadar(SCR.radar.c, false); SCR.radar.t.needsUpdate=true;
+  // 오버헤드: 타각·선회율·시계
+  { const {x,c,t}=SCR.over; x.fillStyle='#0b0f14'; x.fillRect(0,0,512,128); x.fillStyle='#9fb0bd'; x.font='600 20px monospace'; x.fillText('RUDDER',16,26); x.fillText('ROT',360,26);
+    x.strokeStyle='#3a4652'; x.lineWidth=2; x.beginPath(); x.arc(160,120,90,Math.PI,0); x.stroke(); const a=-Math.PI/2+ship.rudder/35*1.2; x.strokeStyle=ship.rudder>=0?'#30ff70':'#ff3a2a'; x.lineWidth=5; x.beginPath(); x.moveTo(160,120); x.lineTo(160+Math.cos(a)*85,120+Math.sin(a)*85); x.stroke();
+    x.fillStyle='#e8f4ff'; x.font='700 30px monospace'; x.fillText((ship.rudder>=0?'S ':'P ')+Math.abs(ship.rudder).toFixed(0)+'°',16,70); x.fillText((ship.rot*60/TS*20>=0?'+':'')+(ship.rot*60/TS*20).toFixed(0)+'°/m',360,70);
+    x.font='700 34px monospace'; x.fillStyle='#ffb000'; x.fillText(hhmm(G.t),360,112); t.needsUpdate=true; }
+}
+let screenT=0;
+function updateBridge(dt){
+  helmWheel.rotation.z = -ship.rudder/35*2.4;
+  teleLever.rotation.x = lerp(teleLever.rotation.x, -(ship.tele-2)/4*0.9, Math.min(1,dt*6));
+  clino.userData.piv.rotation.z = shipG.rotation.z*8;
+  bnwasLamp.visible = !!G.bnwas?.alarm && Math.floor(performance.now()/300)%2===0;
+  curtain.visible = G.night;
+  if (player.area==='bridge'){ screenT-=dt; if (screenT<=0){ screenT=0.25; if (G.black){ for (const k in SCR){ const S=SCR[k]; S.x.fillStyle='#000'; S.x.fillRect(0,0,S.c.width,S.c.height); S.t.needsUpdate=true; } } else drawScreens(); } }
+}
+
+/* ============================ BNWAS (당직 졸음 방지 경보) ============================ */
+function bnwasTick(){
+  const w=G.watch; if (!w?.relieved || w.handed || w.cancelled || w.kind==='anchor'){ G.bnwas=null; return; }
+  const b = G.bnwas ||= {next:G.t+12*60, alarm:false};
+  if (!b.alarm && G.t>=b.next){ b.alarm=true; b.t0=G.t; toast('🔔 BNWAS 경보 — 리셋 버튼을 누르세요','bad'); tip('bnwas'); }
+  if (b.alarm && G.t-b.t0>3*60){ addRep(-3,'BNWAS 미확인 — 선장실까지 경보'); say('선장 박','(전화) 3항사! BNWAS 왜 안 눌러? 졸고 있는 거 아니지?'); b.alarm=false; b.next=G.t+12*60; }
+}
+function bnwasReset(quiet){ const b=G.bnwas; if (!b) return; if (b.alarm && !quiet) toast('BNWAS 리셋 · 당직 확인','good'); b.alarm=false; b.next=G.t+12*60; }
+
+const camTray = makeTray(); camTray.position.set(0.05,-0.42,-0.72); camTray.rotation.x=0.55; camTray.visible=false; camera.add(camTray); scene.add(camera);
 
 /* ============================ 사람 ============================ */
 function makePerson(o){
@@ -465,20 +655,58 @@ function nameTag(text){
 /* ============================ 선내 구역 ============================ */
 const DECK_OBST = [
   [-8.6,8.6,-50.6,-35.4], [-6.7,6.7,-32.6,-15.4],[-6.7,6.7,-12.6,4.6],[-6.7,6.7,7.4,24.6],[-6.7,6.7,27.4,44.6],
-  [-1.1,1.1,-15,-13],[-1.1,1.1,5,7],[-1.1,1.1,25,27],[-0.6,0.6,47.4,48.6],[1.5,4.5,51.8,54.2],[-4.5,-1.5,51.8,54.2],[3.5,6.5,-55,-53],[-6.5,-3.5,-55,-53]];
+  [-1.1,1.1,-15,-13],[-1.1,1.1,5,7],[-1.1,1.1,25,27],[-0.6,0.6,47.4,48.6],[1.5,4.5,51.8,54.2],[-4.5,-1.5,51.8,54.2],[3.5,6.5,-55,-53],[-6.5,-3.5,-55,-53],[-3,-2.2,59.2,60],[2.2,3,59.2,60]];
 const AREAS = {
   deck:  {name:'상갑판', y:DECK, indoor:false, walk:(x,s)=> s>=-57.3 && s<=62 && Math.abs(x) <= halfW(s)-0.75, obst:DECK_OBST},
-  mess:  {name:'식당 (A데크)', y:DECK, indoor:true, walk:(x,s)=> x>=-7.9&&x<=7.9&&s>=-49.9&&s<=-36.1, obst:[[-4.5,-2.5,-46.6,-39.4],[2.5,4.5,-46.6,-39.4],[-3.1,3.1,-50.3,-49.1],[7.2,8.1,-45.1,-42.9]]},
+  mess:  {name:'식당 (A데크)', y:DECK, indoor:true, walk:(x,s)=> x>=-7.9&&x<=7.9&&s>=-49.9&&s<=-36.1, obst:[[-4.5,-2.5,-46.6,-39.4],[2.5,4.5,-46.6,-39.4],[-3.1,3.1,-50.3,-49.1],[7.2,8.1,-45.1,-42.9],[5.1,7.9,-50.4,-49.2],[-7.95,-7.25,-38,-37.2],[7.05,7.95,-38,-36.9],[-7.95,-7.25,-44.3,-42.7],[7.2,7.8,-36.9,-36.2]]},
   cabin: {name:'3항사 선실 (B데크)', y:DECK+3.5, indoor:true, walk:(x,s)=> x>=-3.75&&x<=3.75&&s>=-46.75&&s<=-41.25, obst:[[-3.95,-1.85,-46.95,-43.85],[2.25,3.95,-43.05,-41.15],[2.75,3.95,-46.95,-45.25]]},
-  bridge:{name:'선교 (항해 갑판)', y:DECK+10, indoor:true, walk:(x,s)=> (x>=-8.1&&x<=8.1&&s>=-46.55&&s<=-38.4) || (Math.abs(x)<=12.15&&s>=-41.75&&s<=-38.4), obst:[[-3.05,3.05,-39.7,-38.3],[-5.75,-3.65,-39.9,-38.3],[3.8,6.9,-46.45,-44.55],[5.55,6.45,-40.05,-39.15]]},
+  bridge:{name:'선교 (항해 갑판)', y:DECK+10, indoor:true, walk:(x,s)=> (x>=-8.1&&x<=8.1&&s>=-46.55&&s<=-38.4) || (Math.abs(x)<=12.15&&s>=-41.75&&s<=-38.4), obst:[[-3.05,3.05,-39.7,-38.3],[-0.25,0.25,-40.0,-39.6],[-5.75,-3.65,-39.9,-38.3],[3.8,6.9,-46.45,-44.55],[5.55,6.45,-40.05,-39.15]]},
 };
 const PR = 0.33;
 function canWalk(area,x,s){ const A=AREAS[area]; if(!A.walk(x,s)) return false; for (const o of A.obst) if (x>o[0]-PR&&x<o[1]+PR&&s>o[2]-PR&&s<o[3]+PR) return false; return true; }
 
+/* ============================ 소화·구명 설비 점검 (탐험 퀘스트) ============================ */
+const SAFETY = [
+  {area:'mess',  x:-7.3, s:-39.4, name:'소화기 (식당)', mesh:[-7.85,-39.4], defect:'게이지 바늘이 빨간 구간 — 압력 부족!'},
+  {area:'bridge',x:7.4,  s:-45.9, name:'소화기 (선교)', mesh:[7.95,-46.3]},
+  {area:'cabin', x:-3.0, s:-41.8, name:'소화기 (선실 B데크)', mesh:[-3.75,-41.5]},
+  {area:'deck',  x:5,    s:-34.6, name:'소화전 · 호스 박스', mesh:null},
+  {area:'deck',  x:-4.8, s:46,    name:'소화기 (선수)', mesh:[-4.8,46.2]},
+  {area:'deck',  x:9.6,  s:-20,   name:'구명부환 (우현)', mesh:null, defect:'자기점화등 배터리 유효기간이 지났다.'},
+  {area:'deck',  x:-9.4, s:-43.5, name:'구명정 (좌현)', mesh:null},
+  {area:'cabin', x:2.2,  s:-45.5, name:'구명조끼 (내 선실)', mesh:null},
+  {area:'bridge',x:11.4, s:-40.8, name:'EPIRB (우현 윙)', mesh:[12.0,-41.3], defect:'정수압 이탈장치 교체일이 지났다.'},
+  {area:'bridge',x:5.6,  s:-44.2, name:'화재탐지반 · SART', mesh:null},
+];
+const sparkle=[];
+for (const it of SAFETY){
+  const y=AREAS[it.area].y;
+  if (it.mesh && it.name.startsWith('소화기')){ cyl(0.13,0.13,0.55,M.red,it.mesh[0],y+0.75,it.mesh[1]); cyl(0.04,0.04,0.12,M.dark,it.mesh[0],y+1.08,it.mesh[1]); }
+  if (it.name.startsWith('EPIRB')){ box(0.25,0.45,0.25,lam(0xff8a1a),it.mesh[0],y+1.3,it.mesh[1]); }
+  const sp=navLight(0xffe28a,0.02); sp.material.sizeAttenuation=true; sp.scale.set(0.5,0.5,1); sp.position.set(it.x,y+1.6,-it.s); sp.visible=false; shipG.add(sp); sparkle.push(sp);
+}
+function checkSafety(i){
+  const st=G.quests.safety, it=SAFETY[i]; st.chk[i]=true;
+  if (it.defect) ask('점검: '+it.name, it.defect, [
+    {t:'점검표에 결함 기록 + 1항사에게 교체 요청', fn:()=>{ st.found=(st.found||0)+1; addRep(2,'결함 발견·기록 ('+it.name+')'); say('나 (3항사)','(점검표) '+it.name+' — 결함. 교체 요청.'); safetyDone(); }},
+    {t:'그냥 "양호"에 체크한다', fn:()=>{ addRep(-3,'결함 은폐 — PSC 점검이면 출항 정지감'); say('나 (3항사)','…괜찮겠지. (찜찜하다)'); safetyDone(); }}]);
+  else { toast('✔ '+it.name+' 이상 없음','good'); sfx.ding(); safetyDone(); }
+}
+function safetyDone(){ const st=G.quests.safety; const n=st.chk.filter(Boolean).length; if (n===SAFETY.length) say('나 (3항사)','전부 점검했다! 1항사님께 점검표 보고하자.'); }
+function safetyObjective(){
+  const st=G.quests.safety; if (st.state!=='active') return null; const n=st.chk.filter(Boolean).length;
+  if (n===SAFETY.length) return {t:'1항사에게 점검표 보고', s:'소화·구명 설비 점검 완료', m:NPC.co.area!=='off'&&NPC.co.area!=='engine'?{area:NPC.co.area,x:NPC.co.x,s:NPC.co.s}:null};
+  const left={}; SAFETY.forEach((it,i)=>{ if (!st.chk[i]) left[AREAS[it.area].name.split(' ')[0]]=(left[AREAS[it.area].name.split(' ')[0]]||0)+1; });
+  let near=null, nd=1e9; SAFETY.forEach((it,i)=>{ if (!st.chk[i] && it.area===player.area){ const d=Math.hypot(it.x-player.x,it.s-player.s); if (d<nd){ nd=d; near=it; } } });
+  return {t:`소화·구명 설비 찾아서 점검 ${n}/${SAFETY.length}`, s:'남은 곳: '+Object.entries(left).map(([a,c])=>a+' '+c).join(' · ')+' · 반짝이는 장비를 찾아 E', m: near?{area:near.area,x:near.x,s:near.s}:null};
+}
+function updateSparkle(){ const st=G.quests.safety; const on=st.state==='active'; const p=0.4+0.25*Math.sin(performance.now()/250);
+  SAFETY.forEach((it,i)=>{ const v=on && !st.chk[i] && it.area===player.area && Math.hypot(it.x-player.x,it.s-player.s)<16; sparkle[i].visible=v; if (v) sparkle[i].scale.set(p,p,1); }); }
+
 /* ============================ 플레이어 ============================ */
 const player = { area:'cabin', x:0, s:-44, y:0, vy:0, yaw:0, pitch:0.25, face:0, v:0, mesh:makePerson({shirt:0xf4f4f0, pants:0x1b2230, rank:1}) };
 shipG.add(player.mesh);
-{ const bx=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.45,0.45), lam(0xb7894f)); bx.position.set(0,1.15,-0.38); bx.visible=false; player.mesh.add(bx); player.mesh.userData.box=bx; }
+{ const bx=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.45,0.45), lam(0xb7894f)); bx.position.set(0,1.15,-0.38); bx.visible=false; player.mesh.add(bx); player.mesh.userData.box=bx; const cup=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.05,0.12,10),M.white); cup.position.set(0.3,1.0,-0.3); cup.visible=false; player.mesh.add(cup); player.mesh.userData.cup=cup; }
 function goArea(area,x,s,yaw){ fade(()=>{ player.area=area; player.x=x; player.s=s; player.y=0; player.vy=0; if(yaw!=null){ player.yaw=yaw; player.face=yaw; } }, 260); }
 
 /* ============================ NPC ============================ */
@@ -497,7 +725,8 @@ const NPC_DEF = {
   pilot:{name:'도선사', shirt:0x2b2b2b, pants:0x2b2b2b, vest:0xff3a1a},
 };
 const NPC = {};
-for (const [id,d] of Object.entries(NPC_DEF)) { const m=makePerson(d); m.add(m.userData.tag = nameTag(d.name)); shipG.add(m); NPC[id]={id, ...d, mesh:m, area:'off', x:0, s:0, face:0, v:0, talkIdx:0, lbl:'', goal:null, path:null, lt:0}; m.visible=false; }
+for (const [id,d] of Object.entries(NPC_DEF)) { const m=makePerson(d); m.add(m.userData.tag = nameTag(d.name)); shipG.add(m); NPC[id]={id, ...d, mesh:m, area:'off', x:0, s:0, face:0, v:0, talkIdx:0, lbl:'', goal:null, path:null, lt:0, seed:Object.keys(NPC).length, jit:Math.random()*10-5, spd:2.0+Math.random()*0.5}; m.visible=false;
+  const ht=makeTray(); ht.position.set(0,1.02,-0.4); ht.visible=false; m.add(ht); NPC[id].handTray=ht; const tt=makeTray(); tt.visible=false; shipG.add(tt); NPC[id].tableTray=tt; }
 
 /* ============================ 다른 선박 / 지형 ============================ */
 function makeTargetShip(kind){
@@ -556,13 +785,13 @@ const marker = new THREE.Mesh(new THREE.ConeGeometry(0.35,0.8,4), new THREE.Mesh
 marker.rotation.x = Math.PI; marker.renderOrder = 30; shipG.add(marker);
 
 /* ============================ 게임 상태 ============================ */
-const ship = { pos:new THREE.Vector3(), heading:45, set:45, speed:14, tele:6, rot:0, rudder:0, anchored:false, auto:null, drift:null };
+const ship = { mode:'AUTO', helm:0, pos:new THREE.Vector3(), heading:45, set:45, speed:14, tele:6, rot:0, rudder:0, anchored:false, auto:null, drift:null };
 const G = {
   t:at(1,7,30), mode:null, groups:[], rep:60, morale:60, fatigue:20, bac:0, ff:1, paused:true, modal:false,
   panel:null, binoc:false, watch:null, enc:null, phase:'free', party:null, anc:null, berth:null, drag:null,
   events:[], log:[], done:{}, quests:newQuests(), carry:false, drill:null, plan:45, PORT:null, missionDone:false, flags:{}, meals:{}, lastAway:0,
 };
-function addRep(n, why){ G.rep=clamp(G.rep+n,0,100); toast((n>=0?'+':'')+n+' 신뢰도 · '+why, n>=0?'good':'bad'); G.log.push({t:G.t,n,why}); }
+function addRep(n, why){ G.rep=clamp(G.rep+n,0,100); try { (n>=0?sfx.ding:sfx.bad)(); } catch(_){} toast((n>=0?'+':'')+n+' 신뢰도 · '+why, n>=0?'good':'bad'); G.log.push({t:G.t,n,why}); }
 function addMor(n, why){ G.morale=clamp(G.morale+n,0,100); if (why) toast((n>=0?'+':'')+n+' 사기 · '+why, n>=0?'good':'bad'); }
 
 /* ============================ UI 유틸 ============================ */
@@ -596,23 +825,45 @@ document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closePanel())
 const teleEl=$('tele');
 TELE.forEach((t,i)=>{ const b=document.createElement('button'); b.innerHTML=`${t.n}<br>${t.k}`; b.onclick=()=>setTele(i); teleEl.append(b); });
 [...teleEl.children].reverse().forEach(b=>teleEl.append(b));
-function setTele(i){ if (ship.auto) { toast('도선사/선장이 조선 중입니다'); return; } if(ship.anchored){ toast('투묘 중에는 기관 사용 불가'); return; } ship.tele=clamp(i,0,6); }
+function setTele(i){ if (G.black){ toast('정전 — 엔진 사용 불가'); return; } if (ship.auto) { toast('도선사/선장이 조선 중입니다'); return; } if(ship.anchored){ toast('투묘 중에는 기관 사용 불가'); return; } ship.tele=clamp(i,0,6); }
 function changeSet(d){ if (ship.auto) { toast('도선사/선장이 조선 중입니다'); return; } if(ship.anchored) return; ship.set=norm360(Math.round(ship.set+d)); }
 document.querySelectorAll('#nav [data-c]').forEach(b=>b.onclick=()=>changeSet(+b.dataset.c));
+$('mAuto').onclick=()=>setMode('AUTO'); $('mHand').onclick=()=>setMode('HAND');
+document.querySelectorAll('#handRow [data-h]').forEach(b=>b.onclick=()=>{ ship.helm=+b.dataset.h; });
+$('recBtn').onclick=()=>recommend(); $('emgBtn').onclick=()=>emgAct();
+function setMode(m){ if (ship.auto) return; ship.mode=m; ship.helm=0; if (m==='HAND') tip('hand'); }
+function recommend(){
+  const e=G.enc, E=G.emg, R=G.rev;
+  if (E?.type==='mob' && E.stage===1) return emgAct();
+  if (E?.type==='mob' && E.stage===2){ setMode('AUTO'); const dev=adiff(ship.heading,E.h0); ship.set=norm360(dev<150 ? ship.heading+60 : E.h0+180); toast('추천: 오른쪽으로 크게 계속 돌기 → '+String(Math.round(norm360(E.h0+180))).padStart(3,'0')+'°'); return; }
+  if (E && E.stage===1) return emgAct();
+  if (e){ setMode('AUTO'); const dev=adiff(ship.set,e.h0);
+    if (e.type==='overtaking'){ ship.set=G.plan; ship.tele=6; toast('추천: 그대로 유지! 추월하는 배가 피해야 해요'); return; }
+    const want = e.type==='headon'?30:e.type==='fishing'?40:35; if (dev<want){ ship.set=norm360(e.h0+want); } toast(`추천: 오른쪽으로 ${want}° 크게 변침 → ${String(Math.round(ship.set)).padStart(3,'0')}°`); return; }
+  if (G.anc?.step==='approach'){ setMode('AUTO'); const A=G.PORT.A, d=ship.pos.distanceTo(A)/NM; ship.set=Math.round(bearing(A.x-ship.pos.x,A.z-ship.pos.z)); ship.tele = d>1.3?5 : d>0.7?4 : d>0.4?3 : 2; toast(`추천: 목표 방향 ${String(ship.set).padStart(3,'0')}° · ${TELE[ship.tele].n} (남은 ${d.toFixed(2)}마일) — 계속 눌러 조정`); return; }
+  if (R?.type==='fog'){ ship.tele=Math.min(ship.tele,4); toast('추천: 미속으로 감속'); return; }
+  if (R?.type==='debris'){ ship.set=norm360(ship.set-15); toast('추천: 왼쪽으로 15° 살짝 비켜 가기'); return; }
+  if (!ship.anchored && !ship.auto && Math.abs(adiff(ship.set,G.plan))>2){ setMode('AUTO'); ship.set=G.plan; ship.tele=6; toast('추천: 원래 항로 '+String(G.plan).padStart(3,'0')+'°로 복귀'); return; }
+  toast('지금은 그대로 유지! 바다를 지켜보세요');
+}
 const navPanel = { name:'nav', el:$('nav'),
-  open(){ player.yaw=0; player.pitch=0.05; },
+  open(){ player.yaw=0; player.pitch=0.05; tip('nav'); bnwasReset(true); },
   key(e){ const k=e.key.toLowerCase(); const big=e.shiftKey?10:1;
+    if (k==='r'){ recommend(); return true; }
+    if (ship.mode==='HAND' && (k==='a'||k==='arrowleft'||k==='d'||k==='arrowright')){ ship.helm=clamp(ship.helm+(k==='a'||k==='arrowleft'?-1:1)*(e.shiftKey?20:10),-35,35); return true; }
     if (k==='a'||k==='arrowleft'){ changeSet(-big); return true; } if (k==='d'||k==='arrowright'){ changeSet(big); return true; }
     if (k==='w'||k==='arrowup'){ setTele(ship.tele+1); return true; } if (k==='s'||k==='arrowdown'){ setTele(ship.tele-1); return true; } },
-  update(){ drawRadar(); }
+  update(){ drawRadar(); bnwasReset(true);
+    $('mAuto').classList.toggle('on',ship.mode==='AUTO'); $('mHand').classList.toggle('on',ship.mode==='HAND'); $('setRow').hidden=ship.mode==='HAND'; $('handRow').hidden=ship.mode!=='HAND'; $('handRow').style.display=ship.mode==='HAND'?'grid':'';
+    const E=G.emg, eb=$('emgBtn'); eb.hidden=!(E && E.stage===1); if (E) eb.textContent = E.type==='mob'?'🆘 MOB 버튼 + 구명부환 투하':'🚨 비상 대응'; }
 };
 function cpaOf(t){ const r=new THREE.Vector3().subVectors(t.pos, ship.pos); const vo=fwd(ship.heading).multiplyScalar(ship.speed*KN); const vt=fwd(t.heading).multiplyScalar(t.speed*KN); const v=vt.sub(vo); const vv=v.lengthSq(); const tc= vv<1e-6?0: -r.dot(v)/vv; const c=r.clone().addScaledVector(v,Math.max(tc,0)); return {dist:r.length(), brg:bearing(r.x,r.z), cpa:c.length(), tcpa:tc}; }
-function drawRadar(){
-  const c=$('radar'), x=c.getContext('2d'), W=c.width, R=W/2-6, sc=R/(8*NM);
+function drawRadar(c=$('radar'), dom=true){
+  const x=c.getContext('2d'), W=c.width, R=W/2-6, sc=R/(8*NM);
   x.clearRect(0,0,W,W); x.save(); x.translate(W/2,W/2);
   x.fillStyle='#03130e'; x.beginPath(); x.arc(0,0,R,0,7); x.fill();
   x.strokeStyle='rgba(60,220,140,.25)'; x.lineWidth=1.5; for (let i=1;i<=4;i++){ x.beginPath(); x.arc(0,0,R*i/4,0,7); x.stroke(); }
-  x.fillStyle='rgba(120,240,170,.7)'; x.font='bold 18px JetBrains Mono, monospace'; x.textAlign='center';
+  x.fillStyle='rgba(120,240,170,.7)'; x.font=`bold ${Math.round(W/28)}px JetBrains Mono, monospace`; x.textAlign='center';
   for (let d=0; d<360; d+=30){ const a=d*D2R; x.fillText(String(d).padStart(3,'0'), Math.sin(a)*(R-16), -Math.cos(a)*(R-16)+6); }
   const sw=(performance.now()/1000*1.6)%(Math.PI*2); const gr=x.createConicGradient(sw-Math.PI/2-0.6,0,0); gr.addColorStop(0,'rgba(60,255,150,0)'); gr.addColorStop(.09,'rgba(60,255,150,.22)'); gr.addColorStop(.1,'rgba(60,255,150,0)'); x.fillStyle=gr; x.beginPath(); x.arc(0,0,R,0,7); x.fill();
   if (G.PORT && port.visible){ const P0=G.PORT; x.strokeStyle='rgba(240,200,90,.8)'; x.lineWidth=3; const a=P0.Q.clone().addScaledVector(P0.f,-700), b=P0.Q.clone().addScaledVector(P0.f,700); const a2=a.clone().addScaledVector(P0.r,1400), b2=b.clone().addScaledVector(P0.r,1400);
@@ -628,7 +879,7 @@ function drawRadar(){
     const v=fwd(t.heading).multiplyScalar(t.speed*KN*6*60/TS*sc); x.strokeStyle=x.fillStyle; x.beginPath(); x.moveTo(X,Y); x.lineTo(X+v.x,Y+v.z); x.stroke();
     x.font='bold 15px JetBrains Mono, monospace'; x.fillText(t.id,X,Y-12);
     lines.push(`<div class="${danger?'warn':''}">${t.id} 방위 ${k.brg.toFixed(0).padStart(3,'0')}° 거리 ${(k.dist/NM).toFixed(1)}NM · CPA ${(k.cpa/NM).toFixed(2)}NM · TCPA ${k.tcpa>0?Math.round(k.tcpa*TS/60)+'분':'-'}</div>`); }
-  x.restore();
+  x.restore(); if (!dom) return;
   $('targets').innerHTML = lines.join('') || '<div>탐지 물표 없음</div>';
   $('nHdg').textContent=ship.heading.toFixed(1).padStart(5,'0')+'°'; $('nSet').textContent=String(Math.round(ship.set)).padStart(3,'0')+'°';
   $('nSog').textContent=Math.abs(ship.speed).toFixed(1)+' kn'+(ship.speed<-0.05?' (후진)':''); $('nRud').textContent=(ship.rudder>=0?'우 ':'좌 ')+Math.abs(ship.rudder).toFixed(0)+'°';
@@ -638,12 +889,16 @@ function drawRadar(){
 /* ============================ 상호작용 ============================ */
 const INTER = [
   ...HATCH_CP.map(([x,s],i)=>({id:'hatch'+i, area:'deck', x, s, r:1.7, cond:()=>G.quests.hatch.state==='active' && !G.quests.hatch.cp[i], label:()=>'해치커버 점검 #'+(i+1), act:()=>checkHatch(i)})),
+  {id:'bnwas', area:'bridge', x:-2.6, s:-40.2, r:1.0, cond:()=>!!G.bnwas?.alarm, label:()=>'BNWAS 리셋 버튼', act:()=>bnwasReset()},
+  {id:'coffeeM', area:'mess', x:-7.0, s:-43.5, r:1.5, cond:()=>G.rev?.type==='coffee' && !G.coffee, label:()=>'커피머신: 커피 내리기', act:()=>{ G.coffee=true; player.mesh.userData.cup.visible=true; say('나 (3항사)','블랙 한 잔 완성. 식기 전에 가져가자.'); }},
+  {id:'drum', area:'deck', x:0, s:0, r:1.8, cond:()=>G.rev?.type==='drum' && !G.rev.done, dyn:()=>G.rev.spot, label:()=>'드럼통 고박하기', act:()=>{ fade(()=>{ G.t+=4*60; },400,'라싱 벨트로 고박 중…'); const R0=G.rev; R0.done=true; addRep(3,'갑판 위험물 고박'); say('갑판장 김','감사합니다! 파도 치면 큰일 날 뻔했네요.'); setTimeout(()=>{ if (G.rev===R0) endRev(); },500); }},
+  ...SAFETY.map((it,i)=>({id:'safe'+i, area:it.area, x:it.x, s:it.s, r:1.6, cond:()=>G.quests.safety.state==='active' && !G.quests.safety.chk[i], label:()=>'점검: '+it.name, act:()=>checkSafety(i)})),
   {id:'foodPick', area:'deck', x:-9.3, s:-52.4, r:1.6, cond:()=>G.quests.food.state==='active' && !G.carry, label:()=>'부식 창고: 식재료 박스 들기', act:()=>foodPick()},
   {id:'foodDrop', area:'mess', x:1.8, s:-48.3, r:1.9, prio:true, cond:()=>G.carry, label:()=>'식재료 내려놓기', act:()=>foodDrop()},
   {id:'engDoor', area:'deck', x:-6.6, s:-51.2, r:1.3, label:()=>'기관실 출입구', act:()=>say('기관실','쿵쿵쿵— 메인엔진 소리. 기관부 구역이다. (기관장: "볼일 있으면 미리 연락해!")')},
   {id:'deckDoor', area:'deck', x:0, s:-34.7, r:1.9, label:()=>'거주구역 출입문 (식당)', act:()=>goArea('mess',0,-37,180)},
-  {id:'messDoor', area:'mess', x:0, s:-36.6, r:1.4, label:()=>'갑판으로 나가기', act:()=>goArea('deck',0,-34.4,0)},
-  {id:'messStairs', area:'mess', x:-7, s:-49.3, r:1.7, label:()=>'계단', act:()=>stairs('mess')},
+  {id:'messDoor', area:'mess', x:0, s:-36.6, r:1.4, label:()=>'갑판으로 나가기', act:()=>{ if (trayBlock()) return; goArea('deck',0,-34.4,0); }},
+  {id:'messStairs', area:'mess', x:-7, s:-49.3, r:1.7, label:()=>'계단', act:()=>{ if (trayBlock()) return; stairs('mess'); }},
   {id:'cabinDoor', area:'cabin', x:0.8, s:-46.4, r:1.4, label:()=>'선실 문 · 계단', act:()=>stairs('cabin')},
   {id:'bridgeStairs', area:'bridge', x:-7.4, s:-46.1, r:1.7, label:()=>'계단', act:()=>stairs('bridge')},
   {id:'bed', area:'cabin', x:-1.4, s:-45, r:1.7, label:()=>'침대 (잠자기)', act:()=>sleepMenu()},
@@ -658,7 +913,9 @@ const INTER = [
   {id:'winch', area:'deck', x:2.4, s:-51.6, r:1.4, cond:()=>G.berth?.order==='heave', label:()=>'계류 윈치 조작', act:()=>openWinch()},
   {id:'grill', area:'mess', x:-3.5, s:-43, r:2.3, cond:()=>G.phase==='party', label:()=>'삼겹살 굽기', act:()=>grill()},
   {id:'karaoke', area:'mess', x:6.6, s:-44, r:1.6, cond:()=>G.phase==='party', label:()=>'노래방 기계', act:()=>karaoke()},
-  {id:'meal', area:'mess', x:0, s:-48.4, r:1.7, cond:()=>mealNow()!=null && G.phase!=='party', label:()=>'배식대 (식사)', act:()=>eat()},
+  {id:'buffet', area:'mess', x:-1.4, s:-48.3, r:1.7, cond:()=>mealNow()!=null && !G.tray && !G.carry && G.phase!=='party', label:()=>'배식대: 식판 들고 밥 뜨기', act:()=>takeTray()},
+  {id:'mySeat', area:'mess', x:-5.1, s:-45, r:1.5, cond:()=>G.tray==='full', label:()=>'빈자리에 앉아 식사하기', act:()=>eatSeat()},
+  {id:'dishReturn', area:'mess', x:6.4, s:-48.7, r:1.7, cond:()=>G.tray==='empty', label:()=>'퇴식구에 식판 반납', act:()=>returnTray()},
 ];
 function stairs(from){
   const all = [['mess','식당 · A데크'],['cabin','3항사 선실 · B데크'],['bridge','선교 · 항해 갑판']].filter(a=>a[0]!==from);
@@ -667,7 +924,7 @@ function stairs(from){
 let nearest=null;
 function findInteract(){
   let best=null, bd=1e9;
-  for (const it of INTER){ if (it.area!==player.area) continue; if (it.cond && !it.cond()) continue; const d=Math.hypot(it.x-player.x, it.s-player.s); if (d<it.r && d<bd){ bd=d; best={kind:'obj', it, label:it.label()}; } }
+  for (const it of INTER){ if (it.area!==player.area) continue; if (it.cond && !it.cond()) continue; if (it.dyn){ [it.x,it.s]=it.dyn(); } const d=Math.hypot(it.x-player.x, it.s-player.s); if (d<it.r && d<bd){ bd=d; best={kind:'obj', it, label:it.label()}; } }
   if (best?.it?.prio || (best && best.it.cond)) return best;
   for (const n of Object.values(NPC)){ if (n.area!==player.area) continue; const d=Math.hypot(n.x-player.x, n.s-player.s); if (d<2.1 && d<bd+0.2){ bd=d; best={kind:'npc', n, label:'대화: '+n.name}; } }
   return best;
@@ -696,6 +953,9 @@ const EVENTS = [
   {id:'drill', g:'drill', t:at(1,15,0), fn:()=>drillStart()},
   {id:'drillTO', g:'drill', t:at(1,15,40), fn:()=>drillTimeout()},
   ...[1,2].flatMap(d=>[[7,0,'아침'],[11,30,'점심'],[17,0,'저녁']].map(([h,m,n])=>({id:'meal'+d+h, g:'life', t:at(d,h,m), fn:()=>{ say('선내 방송',`${n} 식사 시간입니다. 당직자는 교대로 식사 바랍니다.`); }}))),
+  {id:'emMob', g:'day', t:at(1,10,55), fn:()=>emgStart('mob')},
+  {id:'emBlack', g:'day', t:at(1,9,5), fn:()=>emgStart('black')},
+  {id:'emFire', g:'night', t:at(1,23,10), fn:()=>emgStart('fire')},
   {id:'ptCall',  g:'party', t:at(1,18,15), fn:()=>{ say('선내 방송','오늘 18시 30분 식당에서 선장님 주최 회식이 있습니다. 전 선원 참석 바랍니다.'); }},
   {id:'ptStart', g:'party', t:at(1,18,30), fn:()=>partyStart()},
   {id:'ptCheck', g:'party', t:at(1,19,0), fn:()=>{ if (G.party && !G.party.attended){ addMor(-12,'회식 불참'); say('갑판장 김','3항사님 안 오십니까? 다들 기다리는데…'); } }},
@@ -711,7 +971,7 @@ const EVENTS = [
   {id:'brStart', g:'berth', t:at(2,13,0), fn:()=>berthStart()},
 ];
 const SCHED_VIEW = [
-  [at(1,8),'데이워치 08–12 (1항사 → 3항사 → 2항사)','dwEnd'],[at(1,13),'협업: 해치 점검·식재료 운반·해도 소개정','sideDone'],[at(1,15),'비상 소집 훈련','drillDone'],[at(1,18,30),'선상 회식 · 식당','ptEnd'],[at(1,20),'나이트워치 20–24','nwEnd'],
+  [at(1,8),'데이워치 08–12 (1항사 → 3항사 → 2항사)','dwEnd'],[at(1,13),'협업: 설비 점검·해치 점검·식재료 운반·해도 소개정','sideDone'],[at(1,15),'비상 소집 훈련','drillDone'],[at(1,18,30),'선상 회식 · 식당','ptEnd'],[at(1,20),'나이트워치 20–24','nwEnd'],
   [at(2,5,40),'묘박지 A-3 앵커링','ancDone'],[at(2,8),'정박 당직 08–12','awEnd'],[at(2,13),'입항 · 접안 (선미 스테이션)','brDone']];
 function runEvents(){ for (const e of EVENTS){ if (G.done[e.id] || !G.groups.includes(e.g)) continue; if (G.t>=e.t){ G.done[e.id]=true; e.fn(); } } }
 function nextEventTime(){ let best=null; for (const e of EVENTS){ if (G.done[e.id] || !G.groups.includes(e.g)) continue; if (e.t>G.t && (best==null || e.t<best)) best=e.t; } return best; }
@@ -719,6 +979,7 @@ function nextEventTime(){ let best=null; for (const e of EVENTS){ if (G.done[e.i
 /* ============================ 당직 ============================ */
 const WATCH_DEF = { day:{day:1,h:8,name:'데이워치'}, night:{day:1,h:20,name:'나이트워치'}, anchor:{day:2,h:8,name:'정박 당직'} };
 function beginWatch(kind){
+  setTimeout(()=>tip('watch'),1500);
   if (G.watch && !G.watch.relieved && !G.watch.cancelled) addRep(-15,G.watch.name+' 무단 불참');
   const d=WATCH_DEF[kind]; const st=at(d.day,d.h);
   G.watch={kind, name:d.name, startT:st, endT:st+4*3600, relieved:false, handed:false, logs:{}, miss:{}, away:0, orders: kind==='night'?false:true, cancelled:false, lateP:false};
@@ -734,7 +995,7 @@ function relieve(){
      `침로 ${String(Math.round(ship.set)).padStart(3,'0')}, ${TELE[ship.tele].n} ${ship.speed.toFixed(0)}노트, 오토파일럿. 주변 통항선 없음.`;
   say('1항사 최', `인계한다. ${sitrep}${w.kind==='night'?' 야간지시부 서명 잊지 말고.':''} 수고해.`, 6);
   say('나 (3항사)', '인수했습니다. 수고하셨습니다!');
-  w.logs[Math.floor(G.t/3600)]=true;
+  w.logs[Math.floor(G.t/3600)]=true; setTimeout(()=>tip('log'),2500);
 }
 function handover(){
   const w=G.watch; w.handed=true; w.endedAt=G.t;
@@ -773,6 +1034,7 @@ function chartTable(){
   say('해도대','해도와 항해일지가 놓여 있다. 계획 침로 045°, 목적항 목포신항.');
 }
 function phoneCaptain(){
+  if (G.rev?.type==='debris' && !G.rev.reported){ G.rev.reported=true; addRep(4,'표류물 즉시 보고'); say('선장 박','잘 봤다. 항행경고로 VTS에 알리고, 넉넉히 피해서 가.'); return; }
   if (G.phase==='drill') return G.drill?.called ? {t:'인원 점검 중', s:'선장 지시 대기', m:null} : {t:'비상 소집! 좌현 집합 장소로', s:'단음 7회 + 장음 1회 · 구명동의 착용', m:at_('deck',-9.4,-17.5)};
   if (G.drag?.active && !G.drag.reported){
     ask('선내 전화','선장님께 무엇을 보고할까?', [
@@ -783,10 +1045,10 @@ function phoneCaptain(){
   ask('선내 전화','선장실로 전화할까?', [{t:'안부 보고: "당직 이상 없습니다."', fn:()=>say('선장 박', G.watch?'그래, 수고해. 통항선 조심하고.':'당직도 아닌데 왜 전화했어? 쉬어 둬.')},{t:'끊기'}]);
 }
 function captainVisit(){
-  if (!G.watch?.relieved || G.watch.cancelled) return;
+  if (!G.watch?.relieved || G.watch.cancelled || G.emg) return;
   G.flags.captOnBridge = G.t + 25*60;
   if (player.area!=='bridge'){ addRep(-5,'선장 순시 때 선교 부재'); say('선장 박','(무전) 3항사, 당직자가 왜 선교에 없어?'); return; }
-  setTimeout(()=>quiz('선장 박'), 1400);
+  setTimeout(()=>{ if (!G.emg && !G.modal) quiz('선장 박'); }, 1400);
 }
 const QUIZ = [
   {q:'제한된 시계에서 대수속력이 있는 동력선의 음향신호는?', a:['2분 이내 간격으로 장음 1회','1분 간격으로 단음 1회','2분 이내 간격으로 장음 2회','장음 1회 + 단음 2회'], c:0, ex:'국제해상충돌예방규칙 35조: 대수속력이 있으면 2분을 넘지 않는 간격으로 장음 1회.'},
@@ -811,6 +1073,7 @@ function encounter(type){
   else if (type==='overtaking'){ ship.set=G.plan; th=G.plan; ts=sp+9; start=Po.clone().addScaledVector(fwd(G.plan),-1.5*NM).addScaledVector(stbd(G.plan),-0.85*NM); }
   else { th=rand(0,360); ts=0.6; start=Po.clone().addScaledVector(fwd(h),4.4*NM).addScaledVector(stbd(h),rand(-30,30)); }
   const tg = addTarget(type, start, th, ts);
+  setTimeout(()=>{ tip('enc'); if (night) tip('night'); },1200);
   G.enc = {type, night, tg, h0:h, sp0:ship.speed, minD:1e9, maxDev:0, minDev:0, start:G.t, intervened:false, reported:!night, ident:false};
   G.ff=1;
   const rel = adiff(bearing(start.x-Po.x, start.z-Po.z), h);
@@ -865,13 +1128,13 @@ function identLights(){
 
 /* ============================ 회식 ============================ */
 const SEATS = { capt:[-1.9,-41,270], co:[-5.1,-41,90], so:[-5.1,-43,90], ce:[-1.9,-43,270], bosun:[1.9,-41,90], ab:[5.1,-41,270], cook:[1.9,-43,90] };
-function partyStart(){ G.phase='party'; G.party={attended:false, drinks:0, refused:0, talked:{}, speech:false, grill:0, song:false}; say('선내 방송','회식 시작합니다. 식당으로 모여 주세요!'); }
+function partyStart(){ setTimeout(()=>tip('party'),1500); G.phase='party'; G.party={attended:false, drinks:0, refused:0, talked:{}, speech:false, grill:0, song:false}; say('선내 방송','회식 시작합니다. 식당으로 모여 주세요!'); }
 function partyEnter(){
   const p=G.party; if (!p || p.attended) return; p.attended=true; addMor(5,'회식 참석');
   if (G.t > at(1,18,45)) say('선장 박','늦었구만. 앉아, 앉아.');
   setTimeout(()=>{ ask('선장 박','자, 막내 항해사 3항사가 건배사 한번 해 봐!', [
     {t:'"안전 항해를 위하여! 선장님 감사합니다!"', fn:()=>{ addMor(6,'건배사 대성공'); addRep(3,'분위기 메이커'); say('모두','위하여!!'); }},
-    {t:'"한바다호! (한마음) 바다로! (안전하게)"', fn:()=>{ addMor(8,'센스 있는 건배사'); say('모두','한마음! 안전하게!'); }},
+    {t:'"세계로호가! (세계로!) 안전하게! (나아가자!)"', fn:()=>{ addMor(8,'센스 있는 건배사'); say('모두','세계로! 나아가자!'); }},
     {t:'"저… 그냥 짠 하시죠."', fn:()=>{ addMor(-2); say('갑판장 김','에이~ 막내가 그러면 안 되지!'); }},
   ]); }, 1200);
 }
@@ -910,18 +1173,18 @@ function anchoringStart(){
   G.phase='anchoring'; ship.tele=5; ship.set=Math.round(ship.heading);
   G.anc={step:'approach', minD:1e9, t0:G.t, shackles:0, target:5, running:false};
   say('선장 박','(전화) 3항사, 묘박지 A-3 접근 중이다. 선교로 올라와. 이번 접근은 네가 해 봐.', 5);
-  banner('앵커링','묘박지 A-3 · 수심 30m',2.6);
+  banner('앵커링','묘박지 A-3 · 수심 30m',2.6); setTimeout(()=>tip('anchor'),1500);
 }
 function ancTick(dtg){
   const a=G.anc; if(!a) return;
   if (a.step==='approach'){
     const d=ship.pos.distanceTo(G.PORT.A); a.minD=Math.min(a.minD,d);
-    if (d<0.35*NM && Math.abs(ship.speed)<=2.5){ a.step='letgo'; ship.tele=2; say('선장 박','좋아, 위치 좋다! 선수로 가서 렛고 준비해. 갑판장이 기다린다.'); addRep(6,'묘박지 정확히 접근'); G.done.ancApproach=true; return; }
-    if (d<0.35*NM && ship.speed>2.5 && !a.fastWarn){ a.fastWarn=true; say('선장 박','속력 너무 빨라! 기관 정지, 필요하면 후진!'); }
+    if (d<0.45*NM && Math.abs(ship.speed)<=2.5){ a.step='letgo'; ship.tele=2; say('선장 박','좋아, 위치 좋다! 선수로 가서 렛고 준비해. 갑판장이 기다린다.'); addRep(6,'묘박지 정확히 접근'); G.done.ancApproach=true; return; }
+    if (d<0.45*NM && ship.speed>2.5 && !a.fastWarn){ a.fastWarn=true; say('선장 박','속력 너무 빨라! 기관 정지, 필요하면 후진!'); }
     if ((a.minD<0.8*NM && d>a.minD+0.35*NM) || G.t-a.t0>90*60){ ship.pos.copy(G.PORT.A).addScaledVector(fwd(ship.heading),-20); ship.speed=1.5; ship.tele=2; a.step='letgo'; addRep(-8,'묘박지 접근 실패 — 선장이 조선 인수'); say('선장 박','내가 맞춘다. 됐다, 선수로 가!'); }
   }
 }
-function openWindlass(){
+function openWindlass(){ tip('windlass');
   const a=G.anc; const el=$('mg');
   const render=()=>{ el.innerHTML=`<div class="ph"><b>양묘기</b><span>수심 30m · 저질 펄(Mud) · 기상 양호</span><button data-x>닫기</button></div>
     <div style="display:flex;gap:16px;align-items:end"><div><div class="big-num" id="shk">${a.shackles.toFixed(1)}</div><div style="color:var(--dim);font-size:12px">샤클 (1샤클 = 27.5m)</div></div>
@@ -966,7 +1229,7 @@ function berthStart(){
     G.phase='berthing'; berthPose();
     for (const t of [...targets]) removeTarget(t);
     say('도선사','(선교) 도선사입니다. 우현 접안, 예선 2척 대기. 선미, 준비되면 알려 주세요.', 4);
-    banner('접안','목포신항 3번 선석 · 우현 접안',2.6);
+    banner('접안','목포신항 3번 선석 · 우현 접안',2.6); setTimeout(()=>tip('berth'),1500);
   }, 600, '양묘 완료 · 도선사 승선');
 }
 function berthPose(){ const b=G.berth, P0=G.PORT; ship.pos.copy(P0.berth).addScaledVector(P0.f,b.D).addScaledVector(P0.r,-b.L); }
@@ -997,12 +1260,12 @@ function lineSent(){
 function openThrow(){
   const b=G.berth; const el=$('mg'); let pos=0, dir=1, thrown=false;
   el.innerHTML=`<div class="ph"><b>히빙라인</b><span>${b.order==='stern'?'스턴라인':'스프링 라인'} · 안벽 라인맨에게</span><button data-x>닫기</button></div>
-   <div class="meter" style="height:30px"><div class="zone" style="left:62%;width:18%"></div><div class="needle" id="nd"></div></div>
+   <div class="meter" style="height:30px"><div class="zone" style="left:58%;width:24%"></div><div class="needle" id="nd"></div></div>
    <div class="mgbtns"><button class="pri" id="thr">던지기 (E)</button></div><p class="hint">바늘이 초록 구간에 있을 때 던지세요.</p>`;
   el.querySelector('[data-x]').onclick=()=>closePanel();
-  const throwIt=()=>{ if (thrown) return; if (pos>=62 && pos<=80){ thrown=true; addRep(3,'히빙라인 명중'); say('라인맨','받았습니다~!'); closePanel(); lineSent(); } else { toast(pos<62?'짧았다! 다시 감아서 던지자':'너무 멀리 날아갔다! 다시','bad'); G.rep=clamp(G.rep-1,0,100); pos=0; dir=1; } };
+  const throwIt=()=>{ if (thrown) return; if (pos>=58 && pos<=82){ thrown=true; addRep(3,'히빙라인 명중'); say('라인맨','받았습니다~!'); closePanel(); lineSent(); } else { toast(pos<62?'짧았다! 다시 감아서 던지자':'너무 멀리 날아갔다! 다시','bad'); G.rep=clamp(G.rep-1,0,100); pos=0; dir=1; } };
   el.querySelector('#thr').onclick=throwIt;
-  openPanel({name:'throw', el, onE:throwIt, update(dt){ pos+=dir*dt*110; if(pos>100){pos=100;dir=-1;} if(pos<0){pos=0;dir=1;} const n=el.querySelector('#nd'); if(n) n.style.left=pos+'%'; }});
+  openPanel({name:'throw', el, onE:throwIt, update(dt){ pos+=dir*dt*80; if(pos>100){pos=100;dir=-1;} if(pos<0){pos=0;dir=1;} const n=el.querySelector('#nd'); if(n) n.style.left=pos+'%'; }});
 }
 function openWinch(){
   const b=G.berth; const el=$('mg'); let hold=false;
@@ -1042,7 +1305,7 @@ const ROUT = {
   bosun:[[6,7,PL('deck',-9.2,-30,0,'patrol','아침 순찰',PATROL_S)],[7,8,'M'],[8,11.5,PL('deck',-9.3,0,270,'work','녹 제거 (치핑)')],[11.5,12.5,'M'],[13,17,PL('deck',5.6,49.6,0,'work','선수 창고 정리')],[17,18,'M'],[18,21,PL('mess',5.6,-41.8,90,'sit','TV 시청')]],
   os:[[7,8,'M'],[8,11.5,PL('deck',-9.3,2.6,270,'work','녹 제거 보조')],[11.5,12.5,'M'],[13,17,PL('deck',9.3,-5,90,'work','페인트 작업')],[17,18,'M'],[18,22,PL('mess',5.6,-40.2,90,'sit','TV 시청')]],
   cadet:[[7,8,'M'],[8,12,brg('cadet','stand','항해 실습')],[12,12.8,'M'],[13,16,PL('deck',-9.3,-2,270,'work','갑판 작업 실습')],[17,18,'M'],[18.5,19.9,PL('mess',-5.1,-45,90,'sit','해기사 공부')],[20,22,brg('cadet','stand','야간 당직 실습')]],
-  cook:[[5.5,19.5,PL('mess',0,-48.4,180,'work','조리 · 배식')]],
+  cook:[[5.5,19.5,PL('mess',4.1,-48.8,180,'work','조리 · 배식 관리')]],
   ce:[[7,8,'M'],[8,11.5,ENG('기관실 점검')],[11.5,12.5,'M'],[13,17,ENG('기관실 정비')],[17,18,'M'],[19,21,PL('mess',-1.9,-39.8,270,'sit','휴식')]],
   te:[[7,8,'M'],[8,12,ENG('기관 당직 08–12')],[12,12.8,'M'],[13,16,ENG('보일러 정비')],[17,18,'M'],[20,24,ENG('기관 당직 20–24')]],
   pilot:[],
@@ -1050,8 +1313,8 @@ const ROUT = {
 const PARTY_IDS = ['capt','so','ce','bosun','ab','cook','os','te','cadet'];
 const MUSTER = ['capt','co','ab','abk','bosun','os','cadet','cook','ce','te'];
 function routine(id){
-  const h=hourOf(G.t);
-  for (const [a,b,p] of ROUT[id]) if (h>=a && h<b) return p==='M' ? MEAL(id) : p;
+  const h=hourOf(G.t)-NPC[id].jit/60;
+  for (const [a,b,p] of ROUT[id]) if (h>=a && h<b) return p==='M' ? mealPlan(id,a,h) : p;
   return OFF(h<6||h>=21?'취침':'휴식');
 }
 function npcPlace(id){
@@ -1075,12 +1338,22 @@ function npcPlace(id){
   if (id==='ab' && w?.kind==='anchor' && w.relieved && !w.handed) return brg('helm','watch','정박 견시');
   return routine(id);
 }
+const BUFQ=[-2.3,-1.2,0,1.1,2.2];
+function mealPlan(id,a,h){
+  const n=NPC[id]; const m=(h-a)*60 - (n.seed%5)*2.2;
+  const [sx,ss,sf]=MEALSEAT[id];
+  if (m<0) return OFF('휴식');
+  if (m<2.5) return PL('mess',BUFQ[n.seed%5],-48.25,180,'serve','배식 받는 중');
+  if (m<24) return PL('mess',sx,ss,sf,'eat','식사 중');
+  if (m<27) return PL('mess',6.0+(n.seed%3)*0.5,-48.75,180,'return','식판 반납');
+  return OFF('휴식');
+}
 function mealNow(){ const h=hourOf(G.t); if (h>=7&&h<8) return 'b'; if (h>=11.5&&h<12.75) return 'l'; if (h>=17&&h<18) return 'd'; return null; }
 
 const HOP = { deck:{mess:'mess',bridge:'mess',off:'mess',engine:'engine'}, mess:{deck:'deck',bridge:'bridge',off:'off',engine:'deck'},
   bridge:{deck:'mess',mess:'mess',off:'off',engine:'mess'}, off:{deck:'mess',mess:'mess',bridge:'bridge',engine:'mess'}, engine:{deck:'deck',mess:'deck',bridge:'deck',off:'deck'} };
 const EXIT = { deck:{mess:[0,-34.8],engine:[-6.6,-51.2]}, mess:{deck:[0,-36.7],bridge:[-7,-49.2],off:[-7,-49.2]}, bridge:{mess:[-7.3,-46],off:[-7.3,-46]} };
-const ENTRY = { mess:{deck:[0,-37.2],bridge:[-6.2,-48.3],off:[-6.2,-48.3]}, deck:{mess:[0,-34.3],engine:[-6.6,-51.2]}, bridge:{mess:[-6.5,-45.3],off:[-6.5,-45.3]} };
+const ENTRY = { mess:{deck:[0,-37.4],bridge:[-6.2,-48.3],off:[-6.2,-48.3]}, deck:{mess:[0,-34.3],engine:[-6.6,-51.2]}, bridge:{mess:[-6.5,-45.3],off:[-6.5,-45.3]} };
 const WPS = { deck:[], mess:[[0,-47.8],[0,-37.8],[-6.4,-47.8],[6.4,-47.8],[-6.4,-37.8],[6.4,-37.8],[-6.4,-42.5],[6.4,-42.5],[0,-42.5]],
   bridge:[[0,-41.7],[-6,-41.7],[6,-41.7],[-6,-44.6],[0,-44.6],[3,-43.6]] };
 for (const s of [-56.2,-52.2,-51.2,-34.2,-14,6,26,45.8]) for (const sg of [-1,1]) WPS.deck.push([sg*Math.min(9.4,halfW(s)-1.05), s]);
@@ -1127,39 +1400,51 @@ function updateNPCs(dt){
       if (Math.hypot(g.x-n.x,g.s-n.s)>0.08){ if (!followPath(n, sdt)) moving=true; else { n.x=g.x; n.s=g.s; } }
     }
     if (n.area==='off'||n.area==='engine'){ n.mesh.visible=false; continue; }
-    n.mesh.visible=true; n.v=moving?2.3:0;
+    n.mesh.visible=true; n.v=moving?n.spd:0;
     const arrived=!moving;
+    if (moving && n.want!=null) n.face=norm360(n.face+clamp(adiff(n.want,n.face),-420*dt,420*dt));
     if (arrived){ const pd=Math.hypot(player.x-n.x,player.s-n.s); const tf=(pd<2.6 && player.area===n.area && g.act!=='sit' && g.act!=='work') ? Math.atan2(player.x-n.x, player.s-n.s)/D2R : (g.f??n.face); n.face=norm360(n.face+clamp(adiff(tf,n.face),-360*dt,360*dt)); }
-    const sitting = arrived && g.act==='sit';
-    n.mesh.position.set(n.x, AREAS[n.area].y-(sitting?0.42:0), -n.s); n.mesh.rotation.y=-n.face*D2R;
-    animNPC(n.mesh, n.v, dt, arrived?g.act:'walk');
+    const sitting = arrived && (g.act==='sit' || g.act==='eat');
+    const holding = (g.act==='eat' && !arrived) || (g.act==='serve' && arrived && n.serveT>1.2) || (g.act==='return' && !arrived);
+    n.serveT = (g.act==='serve' && arrived) ? (n.serveT||0)+dt*G.ff : 0;
+    n.handTray.visible=holding && n.area==='mess';
+    const tt=n.tableTray; tt.visible = g.act==='eat' && arrived && n.area==='mess';
+    if (tt.visible){ const f=n.face*D2R; tt.position.set(n.x+Math.sin(f)*0.72, DECK+0.9, -(n.s+Math.cos(f)*0.72)); tt.rotation.y=-n.face*D2R+Math.PI; }
+    const bob = moving ? Math.abs(Math.sin(n.mesh.userData.phase))*0.035 : 0;
+    n.mesh.position.set(n.x, AREAS[n.area].y-(sitting?0.42:0)+bob, -n.s);
+    n.mesh.rotation.y=-n.face*D2R + (arrived && g.act==='stand' ? Math.sin(G.t/TS*0.4+n.seed)*0.06 : 0);
+    animNPC(n.mesh, n.v, dt, arrived?g.act:'walk', holding);
     const pd=Math.hypot(player.x-n.x,player.s-n.s); const tag=n.mesh.userData.tag; tag.visible = n.area===player.area && pd<18;
     if (tag.visible) tag.userData.set(n.name, n.lbl, !!questOffer(n.id));
   }
 }
 function followPath(n, sdt){
   const p=n.path; if (!p || !p.length) return true;
-  let step=2.3*sdt;
-  while (step>0 && p.length){ const [x,s]=p[0]; const dx=x-n.x, ds=s-n.s, d=Math.hypot(dx,ds); if (d<=step){ n.x=x; n.s=s; step-=d; p.shift(); } else { n.x+=dx/d*step; n.s+=ds/d*step; n.face=Math.atan2(dx,ds)/D2R; step=0; } }
+  let step=n.spd*sdt;
+  while (step>0 && p.length){ const [x,s]=p[0]; const dx=x-n.x, ds=s-n.s, d=Math.hypot(dx,ds); if (d<=step){ n.x=x; n.s=s; step-=d; p.shift(); } else { n.x+=dx/d*step; n.s+=ds/d*step; n.want=Math.atan2(dx,ds)/D2R; step=0; } }
   return p.length===0;
 }
-function animNPC(m, v, dt, act){
+function animNPC(m, v, dt, act, holding){
   const u=m.userData;
+  if (act==='eat'){ u.phase+=dt*1.6; u.legL.rotation.x=u.legR.rotation.x=-1.45; const k=Math.max(0,Math.sin(u.phase)); u.armR.rotation.x=-0.6-k*1.2; u.armL.rotation.x=-0.55; return; }
+  if (holding){ animPerson(m, v, dt); u.armL.rotation.x=u.armR.rotation.x=-1.05; return; }
+  if (act==='serve'){ u.legL.rotation.x=u.legR.rotation.x=0; u.armL.rotation.x=-0.7; u.armR.rotation.x=-0.9+Math.sin(performance.now()/400)*0.25; return; }
   if (act==='sit'){ u.legL.rotation.x=u.legR.rotation.x=-1.45; u.armL.rotation.x=u.armR.rotation.x=-0.5; return; }
   if (act==='work'){ u.phase+=dt*6; u.legL.rotation.x=u.legR.rotation.x=0; u.armR.rotation.x=-0.9+Math.sin(u.phase)*0.6; u.armL.rotation.x=-0.6+Math.sin(u.phase*0.5)*0.15; return; }
-  if (act==='watch'){ u.legL.rotation.x=u.legR.rotation.x=0; u.armL.rotation.x=u.armR.rotation.x=-0.15; return; }
+  if (act==='watch'||act==='stand'){ u.legL.rotation.x=u.legR.rotation.x=0; u.armL.rotation.x=u.armR.rotation.x=act==='watch'?-0.15:0.05; return; }
   animPerson(m, v, dt);
 }
 
 /* ============================ 협업 퀘스트 ============================ */
 const QUESTS = {
+  safety:{giver:'co', name:'소화·구명 설비 점검 (선내 탐험)', who:'1항사 최', avail:()=>!G.watch?.relieved && G.quests.hatch.state!=='active' && (G.quests.hatch.state==='done' || !inH(12.5,16)), reward:'신뢰도'},
   hatch:{giver:'co', name:'해치커버 점검 순찰', who:'1항사 최', avail:()=>inH(12.5,16) && !G.watch?.relieved, reward:'신뢰도'},
   food:{giver:'cook', name:'식재료 운반', who:'조리장 오', avail:()=>inH(12.5,17.5), reward:'사기 · 피로 회복'},
   chart:{giver:'so', name:'해도 소개정 (항행통보)', who:'2항사 이', avail:()=>inH(12.3,15.8) && NPC.so.area==='bridge', reward:'신뢰도'},
   cadet:{giver:'cadet', name:'실습생 질문 받아주기', who:'실습생 윤', avail:()=>!!G.watch?.relieved && NPC.cadet.area==='bridge' && !G.watch.cadetAsked, reward:'사기'},
 };
 function inH(a,b){ const h=hourOf(G.t); return h>=a && h<b; }
-function newQuests(){ return {hatch:{state:'none',cp:[false,false,false,false]}, food:{state:'none',n:0}, chart:{state:'none',n:0}, cadet:{state:'none'}}; }
+function newQuests(){ return {safety:{state:'none',chk:SAFETY.map(()=>false)}, hatch:{state:'none',cp:[false,false,false,false]}, food:{state:'none',n:0}, chart:{state:'none',n:0}, cadet:{state:'none'}}; }
 function questOffer(id){
   if (!G.groups.includes('side') && id!=='cadet') return null;
   for (const [k,q] of Object.entries(QUESTS)){ if (q.giver!==id) continue; const st=G.quests[k];
@@ -1167,7 +1452,7 @@ function questOffer(id){
     if (st.state==='none' && q.avail()) return k; if (st.state==='active' && questReady(k)) return k; }
   return null;
 }
-function questReady(k){ const st=G.quests[k]; if (k==='hatch') return st.cp.every(Boolean) && (!st.fixCall || st.fixed); if (k==='chart') return st.n>=3 && st.quizOk!=null; return false; }
+function questReady(k){ const st=G.quests[k]; if (k==='safety') return st.chk.every(Boolean); if (k==='hatch') return st.cp.every(Boolean) && (!st.fixCall || st.fixed); if (k==='chart') return st.n>=3 && st.quizOk!=null; return false; }
 function questTalk(k, n){
   const st=G.quests[k];
   if (k==='cadet'){ G.watch.cadetAsked=true;
@@ -1177,10 +1462,11 @@ function questTalk(k, n){
       {t:'"나중에 알려 줄게, 지금 바빠."', fn:()=>{ addMor(-2); say(n.name,'아… 네, 알겠습니다.'); }},
     ]); return; }
   if (st.state==='none'){
-    const intro={hatch:'3항사, 시간 되면 같이 해치커버 점검 돌자. 내가 따라갈게. 우현 쪽 해치 4개 클리트·고무 패킹 확인.', food:'3항사! 부식 창고(선미 좌현)에서 식재료 박스 두 개만 식당으로 날라 줄 수 있어? 저녁 회식 준비야.', chart:'3항사, 이번 주 항행통보 들어왔어. 해도 3장 소개정 같이 하자. 해도대로 와.'}[k];
+    const intro={safety:'3항사, 소화·구명 설비는 3항사 담당인 거 알지? 이번 달 정기 점검 해 와. 소화기, 호스 박스, 구명부환, 구명정, 구명조끼, EPIRB까지 총 10개. 배 구석구석 돌아다니면서 찾아봐!', hatch:'3항사, 시간 되면 같이 해치커버 점검 돌자. 내가 따라갈게. 우현 쪽 해치 4개 클리트·고무 패킹 확인.', food:'3항사! 부식 창고(선미 좌현)에서 식재료 박스 두 개만 식당으로 날라 줄 수 있어? 저녁 회식 준비야.', chart:'3항사, 이번 주 항행통보 들어왔어. 해도 3장 소개정 같이 하자. 해도대로 와.'}[k];
     ask(n.name, intro, [{t:'"네, 하겠습니다!"', fn:()=>{ st.state='active'; toast('퀘스트 시작: '+QUESTS[k].name,'good'); if(k==='hatch') say(n.name,'좋아, 1번 해치부터. 앞장서.'); }}, {t:'"지금은 어렵습니다."', fn:()=>say(n.name,'그래, 나중에 시간 나면.')}]); return; }
   if (st.state==='active' && questReady(k)){ st.state='done';
     if (k==='hatch'){ addRep(6,'해치커버 점검 완료'); addMor(2); say(n.name, st.reported?'클리트 건까지 잘 챙겼어. 화물 젖으면 큰일이거든. 수고했다.':'수고했어. 다음엔 이상 있으면 바로 조치 요청해.'); }
+    if (k==='safety'){ addRep(8,'소화·구명 설비 월간 점검 완료'); addMor(2); say(n.name, (st.found||0)>=3?'결함 3건까지 다 잡아냈네! 이게 진짜 점검이지. 교체품 바로 신청할게.':'수고했어. 다음엔 날짜·게이지까지 꼼꼼히 봐.'); }
     if (k==='chart'){ addRep(st.quizOk?5:2,'해도 소개정 완료'); say(n.name,'깔끔하네. 소개정 기록란에 통보번호 꼭 적고. 고마워!'); }
     banner('협업 완료', QUESTS[k].name, 2.4); }
 }
@@ -1205,7 +1491,7 @@ function chartWork(){
 }
 
 /* 비상 소집 훈련 */
-function drillStart(){ if (G.watch?.relieved && !G.watch.handed) return; closePanel(); G.phase='drill'; G.drill={t0:G.t, called:false}; G.ff=1;
+function drillStart(){ if (G.watch?.relieved && !G.watch.handed) return; closePanel(); setTimeout(()=>tip('drill'),1200); sfx.general(); G.phase='drill'; G.drill={t0:G.t, called:false}; G.ff=1;
   banner('비상 소집','단음 7회 + 장음 1회 · 좌현 집합 장소', 3); say('선내 방송','삐 삐 삐 삐 삐 삐 삐 — 삐————. 비상 소집 훈련! 전 선원 구명동의 착용, 좌현 집합 장소로!', 5); }
 function drillTick(){
   const d=G.drill; if (!d || G.phase!=='drill') return;
@@ -1231,10 +1517,11 @@ function talk(id){
   if (G.enc?.night && !G.enc.ident && id==='ab'){ identLights(); return; }
   if (G.phase==='party' && n.area==='mess' && PARTY_IDS.includes(id)){ partyTalk(n); return; }
   if (G.phase==='drill'){ say(n.name,'훈련 중입니다! 집합 장소로!'); return; }
+  if (G.coffee && G.rev?.type==='coffee' && G.rev.who===id){ G.rev.done=true; addMor(4,'커피 배달'); G.fatigue=clamp(G.fatigue-4,0,100); say(n.name,'오, 고마워! 이 맛에 당직 서지.'); endRev(); return; }
   const qk=questOffer(id); if (qk){ questTalk(qk,n); return; }
-  for (const [k,q] of Object.entries(QUESTS)) if (q.giver===id && G.quests[k].state==='active'){ say(n.name,{hatch:'남은 해치 점검하자. 우현 쪽, 노란 마커.', food:'선미 좌현 부식 창고에 박스 있어!', chart:'해도대에서 소개정 계속하자.'}[k]); return; }
+  for (const [k,q] of Object.entries(QUESTS)) if (q.giver===id && G.quests[k].state==='active'){ say(n.name,{safety:'점검표 다 채우면 가져와. 반짝이는 게 점검 대상이야.', hatch:'남은 해치 점검하자. 우현 쪽, 노란 마커.', food:'선미 좌현 부식 창고에 박스 있어!', chart:'해도대에서 소개정 계속하자.'}[k]); return; }
   if (id==='ab' && w?.relieved){ ask(n.name,'항사님, 커피 한 잔 타 드릴까요?', [{t:'"고마워, 블랙으로."',fn:()=>{ if(!w.coffee){ w.coffee=true; G.fatigue=clamp(G.fatigue-12,0,100); toast('커피 · 피로 -12','good'); } say(n.name,'네, 바로 가져오겠습니다!'); }},{t:'"괜찮아, 견시 잘 부탁해."',fn:()=>say(n.name,'네! 견시 철저히 하겠습니다.')}]); return; }
-  if (id==='cook' && mealNow()){ eat(); return; }
+  if (id==='cook' && mealNow()){ say(n.name, G.tray?'맛있게 먹어! 다 먹으면 식판은 퇴식구에.':'식판 들고 배식대에서 먹을 만큼 떠 가! 오늘 제육 맛있다.'); return; }
   if (id==='pilot'){ say(n.name,'선미 계류 잘 부탁합니다. 줄 보낼 때 무전 주세요.'); return; }
   const act=n.goal?.act;
   if (act==='work' && Math.random()<0.5){ say(n.name, n.lbl+' 중입니다. '+(['금방 끝납니다!','이것만 하고요.','오늘 할당량이 많네요.'][n.talkIdx++%3])); return; }
@@ -1249,6 +1536,13 @@ function talk(id){
 }
 
 /* ============================ 생활 ============================ */
+function trayBlock(){ if (G.tray){ say('조리장 오', G.tray==='full'?'밥 들고 어디 가! 앉아서 먹어.':'식판은 퇴식구에 반납하고 가야지!'); return true; } return false; }
+function takeTray(){ tip('meal'); const key=dayOf(G.t)+mealNow(); if (G.meals[key]){ say('조리장 오','아까 먹었잖아! 배 터진다.'); return; }
+  fade(()=>{ G.t+=3*60; G.tray='full'; camTray.userData.food.visible=true; }, 350, '배식 받는 중…'); say('나 (3항사)','밥, 미역국, 제육 조금 많이… 김치, 나물. 좋다.'); }
+function eatSeat(){ fade(()=>{ player.x=-5.1; player.s=-45; player.yaw=90; player.face=90; player.pitch=0.35; G.seated=true; G.t+=20*60; G.tray='empty'; camTray.userData.food.visible=false;
+    G.meals[dayOf(G.t)+mealNow()]=true; G.fatigue=clamp(G.fatigue-10,0,100); addMor(3,'든든한 식사'); }, 600, '식사 중…');
+  const near=Object.values(NPC).filter(n=>n.area==='mess' && n.goal?.act==='eat'); if (near.length) setTimeout(()=>say(near[0].name, ['3항사 오늘 당직 어땠어?','제육 맛있지? 조리장님 솜씨 최고야.','밥 많이 먹어, 당직 서려면.'][Math.floor(Math.random()*3)]),900); }
+function returnTray(){ G.tray=false; say('조리장 오','잘 먹었지? 수고해!'); }
 function eat(){ const m=mealNow(); const key=dayOf(G.t)+m; if (G.meals[key]){ say('조리장 오','아까 먹었잖아! 배 터진다.'); return; } G.meals[key]=true; G.fatigue=clamp(G.fatigue-10,0,100); addMor(3,'든든한 식사'); say('조리장 오', {b:'아침은 꼭 먹어야지. 미역국이다.', l:'점심은 제육볶음! 많이 먹어.', d:'저녁 일찍 먹고 회식 땐 고기!'}[m]); }
 function study(){ if (G.flags.study===dayOf(G.t)){ say('나 (3항사)','오늘 공부는 충분히 했다.'); return; } G.flags.study=dayOf(G.t); G.t+=45*60; G.fatigue=clamp(G.fatigue+5,0,100); addRep(2,'COLREG 복습 (45분)'); say('나 (3항사)','규칙 13~19조… 추월, 마주침, 횡단, 피항선, 유지선. 외웠다.'); }
 function sleepMenu(){
@@ -1270,36 +1564,41 @@ function toggleBinoc(){ G.binoc=!G.binoc; $('binoc').classList.toggle('hidden',!
 function objective(){
   const w=G.watch, b=G.berth, a=G.anc, e=G.enc;
   const at_=(area,x,s)=>({area,x,s});
+  const eo=emgObjective(); if (eo) return eo;
+  if (G.bnwas?.alarm) return {t:'🔔 BNWAS 경보 — 리셋 버튼 누르기', s:'콘솔 왼쪽 노란 버튼 (또는 콘솔 사용)', m:at_('bridge',-2.6,-40.2)};
   if (G.phase==='berthing' && b){
     if (b.order==='stern'||b.order==='spring') return {t:(b.order==='stern'?'스턴라인':'스프링 라인')+' 보내기', s:'선미 우현 · 히빙라인 위치', m:at_('deck',9.3,-55.7)};
     if (b.order==='heave') return {t:'윈치로 줄 감기 (텐션 유지)', s:'조작대: 스냅백 존 밖', m:at_('deck',2.4,-51.6)};
     if (b.allfast) return {t:'올 패스트 대기', s:'안벽까지 '+b.L.toFixed(0)+'m', m:null};
     return {t:'선미 계류 스테이션 대기', s:b.stage==='approach'?`선석까지 ${(-b.D).toFixed(0)}m`:`안벽까지 ${b.L.toFixed(0)}m`, m:at_('deck',6,-55)};
   }
-  if (a && a.step==='approach'){ const d=ship.pos.distanceTo(G.PORT.A)/NM; return {t:'묘박지 A-3까지 2노트 이하로 접근', s:`거리 ${d.toFixed(2)}NM · 속력 ${ship.speed.toFixed(1)}kn · 항해 콘솔 사용`, m:at_('bridge',0,-40.3)}; }
+  if (a && a.step==='approach'){ const d=ship.pos.distanceTo(G.PORT.A)/NM; return {t:'목표 지점 A-3까지 천천히 접근', s:`남은 ${d.toFixed(2)}마일 · 속력 ${ship.speed.toFixed(1)}노트 → 2노트 이하로 · 콘솔 💡추천 조치`, m:at_('bridge',0,-40.3)}; }
   if (a && a.step==='letgo') return {t:'선수 양묘기에서 투묘', s:'갑판장과 합류', m:at_('deck',0,51)};
   if (a && a.step==='ball') return {t:'정박선 형상물 게양', s:'선수 마스트', m:at_('deck',0,46.2)};
   if (G.drag?.active && !G.drag.reported) return {t:'주묘 의심! 선장에게 보고', s:'선교 선내 전화', m:at_('bridge',-7.5,-43)};
   if (e && e.night && !e.ident) return {t:'상대선 등화 식별 → 조타수에게 보고', s:'쌍안경: 우현 윙', m:at_('bridge',10.3,-39.2)};
-  if (e){ const k=cpaOf(e.tg); const role={crossing:'본선 피항선 — 크게 우현 변침',headon:'마주침 — 우현 변침',overtaking:'본선 유지선 — 침로·속력 유지',fishing:'어로선 피항'}[e.type]; return {t:role, s:`CPA ${(k.cpa/NM).toFixed(2)}NM · 거리 ${(k.dist/NM).toFixed(1)}NM`, m:at_('bridge',0,-40.3)}; }
+  if (e){ const k=cpaOf(e.tg); const role={crossing:'오른쪽에서 배가 온다 → 우리가 피해야 함',headon:'정면에서 배가 온다 → 오른쪽으로 비키기',overtaking:'뒤에서 추월하는 배 → 방향·속도 그대로!',fishing:'앞에 고기잡이 배 → 오른쪽으로 넉넉히 피하기'}[e.type]; const how={crossing:'콘솔(E)에서 ▶ 오른쪽으로 30° 이상',headon:'콘솔에서 ▶ 오른쪽으로 20° 이상',overtaking:'아무것도 안 하는 게 정답',fishing:'콘솔에서 ▶ 오른쪽으로 크게'}[e.type]; return {t:role, s:`${how} · 최근접거리 ${(k.cpa/NM).toFixed(2)}마일 (0.5↑ 안전)`, m:at_('bridge',0,-40.3)}; }
   if (w && !w.cancelled){
     if (!w.relieved){ return {t:`${hhmm(w.startT)} 당직 인수 — 1항사와 교대`, s:w.name+' · 선교', m:NPC.co.area==='bridge'?at_('bridge',NPC.co.x,NPC.co.s):at_('bridge',0,-41)}; }
     if (!w.handed && G.t>=w.endT-10*60) return {t:'2항사에게 당직 인계', s:hhmm(w.endT)+' 교대', m:at_('bridge',NPC.so.x||1.8,NPC.so.s||-40.8)};
     if (w.kind==='night' && !w.orders) return {t:'야간지시부 서명', s:'해도대', m:at_('bridge',5.3,-44.1)};
     const h=Math.floor(G.t/3600), mm=(G.t%3600)/60; if (mm<=20 && !w.logs[h] && h<w.endT/3600) return {t:'정시 항해일지 기록', s:hhmm(h*3600)+' · 해도대', m:at_('bridge',5.3,-44.1)};
-    return {t:w.name+' 중 — 견시 · 레이더 감시', s:`침로 ${String(Math.round(ship.set)).padStart(3,'0')}° · ${ship.anchored?'투묘 중':TELE[ship.tele].n} · ~${hhmm(w.endT)}`, m:at_('bridge',0,-40.3)};
+    const ro=revObjective(); if (ro) return ro;
+    return {t:w.name+' 중 — 바다 지켜보기', s:'이상 없으면 대기 (시간 자동 빨리감기) · ' + `침로 ${String(Math.round(ship.set)).padStart(3,'0')}° · ${ship.anchored?'투묘 중':TELE[ship.tele].n} · ~${hhmm(w.endT)}`, m:at_('bridge',0,-40.3)};
   }
   const qa=questObjective(); if (qa && !(w && w.relieved && !w.handed && !w.cancelled)) return qa;
   if (G.phase==='party') return G.party?.attended ? {t:'회식 즐기기 (19:40까지)', s:`술 ${G.party.drinks}잔 · 혈중알코올 ${G.bac.toFixed(3)}% · 20시 당직`, m:null} : {t:'식당 회식 참석', s:'A데크 식당', m:at_('mess',0,-40)};
   const nx=nextEventTime();
   if (G.mode==='story' && G.t>at(1,23,59) && G.t<at(2,5,30)) return {t:'선실에서 휴식', s:'침대 → 05:25까지 자기', m:at_('cabin',-1.4,-45)};
+  const ro2=revObjective(); if (ro2) return ro2;
   const offer=Object.values(NPC).find(n=>n.area!=='off'&&n.area!=='engine'&&questOffer(n.id));
-  if (offer) return {t:offer.name+'에게 부탁할 일이 있다', s:'노란 ! 표시 · 대화(E)', m:{area:offer.area,x:offer.x,s:offer.s}};
+  if (offer){ tip('quest'); } if (offer) return {t:offer.name+'에게 부탁할 일이 있다', s:'노란 ! 표시 · 대화(E)', m:{area:offer.area,x:offer.x,s:offer.s}};
   if (nx!=null){ const ev=SCHED_VIEW.find(s=>s[0]>=nx-30*60); return {t:'자유 시간', s:`다음 일정 ${hhmm(nx)}${ev?' · '+ev[1]:''} — 침대에서 시간 건너뛰기`, m:null}; }
   return {t:'자유 시간', s:'선내를 둘러보세요', m:null};
 }
 function questObjective(){
   const q=G.quests; const at_=(area,x,s)=>({area,x,s});
+  const so=safetyObjective(); if (so) return so;
   if (q.hatch.state==='active'){ const i=q.hatch.cp.findIndex(c=>!c); if (i>=0) return {t:'해치커버 점검 '+q.hatch.cp.filter(Boolean).length+'/4', s:'1항사 최 동행 · 우현 해치', m:at_('deck',...HATCH_CP[i])}; if (q.hatch.fixCall && !q.hatch.fixed) return {t:'갑판장 클리트 수리 대기', s:'3번 해치', m:at_('deck',8.6,16)}; return {t:'1항사에게 점검 결과 보고', s:'', m:at_(NPC.co.area==='off'?'deck':NPC.co.area,NPC.co.x,NPC.co.s)}; }
   if (q.food.state==='active') return G.carry ? {t:'식재료를 식당 배식대로', s:'박스 '+(q.food.n+1)+'/2', m:at_('mess',0,-48.4)} : {t:'부식 창고에서 식재료 박스 들기', s:'선미 좌현 · '+q.food.n+'/2', m:at_('deck',-9.3,-52.4)};
   if (q.chart.state==='active') return q.chart.n<3||q.chart.quizOk==null ? {t:'해도 소개정 '+q.chart.n+'/3', s:'선교 해도대', m:at_('bridge',5.3,-44.1)} : {t:'2항사에게 소개정 완료 보고', s:'', m:at_('bridge',NPC.so.x,NPC.so.s)};
@@ -1344,7 +1643,9 @@ function drawMini(){
 const keys={};
 addEventListener('keydown', e=>{
   const k=e.key.toLowerCase();
+  if (!$('intro').classList.contains('hidden')){ if (k==='enter') $('inNext')?.click(); return; }
   if (!$('title').classList.contains('hidden') || !$('ending').classList.contains('hidden')) return;
+  if (tipOpen){ if (k==='e'||k==='enter'||k==='escape'||k===' '){ showTip(); e.preventDefault(); } return; }
   if (subCur?.ask && /^[1-4]$/.test(k)){ pick(+k-1); e.preventDefault(); return; }
   if (k==='tab'){ e.preventDefault(); togglePhone(); return; }
   if (k==='escape'){ if (G.binoc) toggleBinoc(); else if (G.panel) closePanel(); else if (!$('phone').classList.contains('hidden')) togglePhone(); return; }
@@ -1376,7 +1677,7 @@ function joyMove(e){ const r=$('joy').getBoundingClientRect(); let x=(e.clientX-
 canvas.addEventListener('pointerdown', e=>{ if (e.pointerType!=='touch') return; lookT.id=e.pointerId; lookT.x=e.clientX; lookT.y=e.clientY; });
 canvas.addEventListener('pointermove', e=>{ if (e.pointerId!==lookT.id) return; look((e.clientX-lookT.x)*1.4,(e.clientY-lookT.y)*1.4); lookT.x=e.clientX; lookT.y=e.clientY; });
 canvas.addEventListener('pointerup', e=>{ if (e.pointerId===lookT.id) lookT.id=null; });
-$('tE').addEventListener('pointerdown', e=>{ e.preventDefault(); keys.e=true; if (subCur && !subCur.ask) subT=0; interact(); });
+$('tE').addEventListener('pointerdown', e=>{ e.preventDefault(); if (tipOpen){ showTip(); return; } keys.e=true; if (subCur && !subCur.ask) subT=0; interact(); });
 $('tE').addEventListener('pointerup', ()=>keys.e=false); $('tE').addEventListener('pointerleave', ()=>keys.e=false);
 $('tRun').onclick=()=>{ touchRun=!touchRun; $('tRun').style.background=touchRun?'rgba(70,198,207,.6)':''; };
 $('tFF').onclick=()=>toggleFF(); $('tTab').onclick=()=>togglePhone();
@@ -1392,24 +1693,28 @@ function togglePhone(){
     <div style="margin-top:12px;font-size:13px">${Object.entries(QUESTS).filter(([k])=>k!=='cadet').map(([k,q])=>`<div class="kv"><span>${q.name} · ${q.who}</span><b>${{none:'대기',active:'진행 중',done:'완료'}[G.quests[k].state]}</b></div>`).join('')}</div>
     <div style="margin-top:12px" class="kv"><span>신뢰도 / 사기 / 피로</span><b>${G.rep.toFixed(0)} / ${G.morale.toFixed(0)} / ${G.fatigue.toFixed(0)}</b></div>
     <div class="kv"><span>혈중알코올 (당직 기준 0.03% 미만)</span><b>${G.bac.toFixed(3)}%</b></div>
+    <details style="margin-top:10px"><summary>📖 용어 사전 (처음이라면 펼쳐 보세요)</summary><div style="font-size:13px;margin-top:6px">${GLOSSARY.map(([a,b])=>`<div class="kv"><span>${a}</span><b style="font-family:var(--f-body);font-weight:500">${b}</b></div>`).join('')}</div></details>
+    <div class="mgbtns"><button id="phFF">자동 빨리감기: ${G.autoFF===false?'끔':'켬'}</button><button id="phTip">팁 다시 보기</button></div>
     <p class="hint">3항사 당직: 08–12, 20–24 · 교대는 정시 전에 선교에서. 침대에서 잠자면 다음 일정 전까지 시간이 흐릅니다. T: 시간 4배속.</p>
     <div class="mgbtns"><button id="phT">타이틀로</button><button class="pri" id="phC">계속하기</button></div>`;
   ph.classList.remove('hidden');
   $('phX').onclick=$('phC').onclick=()=>togglePhone();
+  $('phFF').onclick=()=>{ G.autoFF = G.autoFF===false; togglePhone(); togglePhone(); };
+  $('phTip').onclick=()=>{ for (const k in tipsSeen) delete tipsSeen[k]; try{localStorage.removeItem('sgr_tips');}catch(_){} toast('팁이 다시 표시됩니다','good'); };
   $('phT').onclick=()=>{ ph.classList.add('hidden'); showTitle(); };
 }
 
 /* ============================ 미션 시작 / 종료 ============================ */
 function resetAll(){
-  closePanel(); for (const t of [...targets]) removeTarget(t); for (const ml of mooringLines) scene.remove(ml.l); mooringLines.length=0;
-  Object.assign(G, {rep:60, morale:60, fatigue:20, bac:0, ff:1, modal:false, binoc:false, watch:null, enc:null, phase:'free', party:null, anc:null, berth:null, drag:null, drill:null, carry:false, quests:newQuests(), log:[], done:{}, PORT:null, missionDone:false, flags:{}, meals:{}});
+  closePanel(); if (G.rev) endRev(); if (G.emg){ if (G.emg.mesh) scene.remove(G.emg.mesh); G.emg=null; } document.body.classList.remove('emg'); for (const t of [...targets]) removeTarget(t); for (const ml of mooringLines) scene.remove(ml.l); mooringLines.length=0;
+  Object.assign(G, {rep:60, morale:60, fatigue:20, bac:0, ff:1, modal:false, binoc:false, watch:null, enc:null, phase:'free', party:null, anc:null, berth:null, drag:null, drill:null, carry:false, tray:false, seated:false, rev:null, emg:null, black:false, coffee:false, bnwas:null, fogTarget:1, fogK:1, nextEv:0, quests:newQuests(), log:[], done:{}, PORT:null, missionDone:false, flags:{}, meals:{}});
   player.mesh.userData.box.visible=false; for (const n of Object.values(NPC)){ n.snapNext=true; n.area='off'; }
-  Object.assign(ship, {pos:new THREE.Vector3(), heading:45, set:45, speed:14, tele:6, rot:0, rudder:0, anchored:false, auto:null});
+  Object.assign(ship, {mode:'AUTO', helm:0, pos:new THREE.Vector3(), heading:45, set:45, speed:14, tele:6, rot:0, rudder:0, anchored:false, auto:null});
   port.visible=false; buoy.visible=false; islands.forEach(i=>{ i.visible=true; i.userData.placed=false; });
   shipG.userData.chain.visible=false; shipG.userData.ball.visible=false; $('binoc').classList.add('hidden'); subQ.length=0; subCur=null; $('sub').classList.add('hidden');
 }
 const MISSIONS = {
-  story:{groups:['day','party','night','anchor','aw','berth','side','drill','life'], t:at(1,7,30), area:['cabin',0,-44,0], title:'DAY 1', sub:'M/V 한바다호 · 3항사 첫 항차'},
+  story:{groups:['day','party','night','anchor','aw','berth','side','drill','life'], t:at(1,7,30), area:['cabin',0,-44,0], title:'DAY 1', sub:'M/V 세계로호 · 3항사 첫 항차'},
   day:{groups:['day'], t:at(1,7,48), area:['bridge',-6.5,-45.3,0], title:'데이워치', sub:'08–12 · 주간 통항선 피항'},
   night:{groups:['night'], t:at(1,19,48), area:['bridge',-6.5,-45.3,0], title:'나이트워치', sub:'20–24 · 등화 식별과 피항'},
   life:{groups:['side','drill','party','life'], t:at(1,12,25), area:['mess',0,-38,180], title:'선내 생활', sub:'오후 · 동료 업무 돕기 · 비상훈련 · 회식'},
@@ -1428,7 +1733,7 @@ function startMission(id){
   const [area,x,s,yaw]=m.area; player.area=area; player.x=x; player.s=s; player.yaw=yaw; player.face=yaw; player.pitch=0.25;
   $('title').classList.add('hidden'); $('ending').classList.add('hidden'); $('phone').classList.add('hidden');
   if (isTouch) $('touch').classList.remove('hidden');
-  G.paused=false; banner(m.title, m.sub, 3);
+  G.paused=false; G.nextEv=G.t+4*60; banner(m.title, m.sub, 3); audioInit();
   if (id==='story'){ say('알람','삐비빅— 07:30. 오늘 08–12 당직이다.'); say('도움말', isTouch?'왼쪽 조이스틱 이동 · 화면 드래그 시점 · E 상호작용 · ☰ 일정표':'WASD 이동 · 마우스 시점(클릭) · E 상호작용 · Tab 일정표 · T 시간 가속', 5); }
   placeIslands(true);
 }
@@ -1447,14 +1752,195 @@ function missionComplete(ok, final){
   $('enTitle').onclick=()=>showTitle();
 }
 function showTitle(){ G.paused=true; closePanel(); $('ending').classList.add('hidden'); $('title').classList.remove('hidden'); $('touch').classList.add('hidden'); }
-document.querySelectorAll('#menu [data-m]').forEach(b=>b.onclick=()=>startMission(b.dataset.m));
+document.querySelectorAll('#menu [data-m]').forEach(b=>b.onclick=()=>showIntro(b.dataset.m));
 
 function placeIslands(force){
   if (port.visible) return;
   const f=fwd(ship.heading), r=stbd(ship.heading);
   islands.forEach((g,i)=>{ const rel=new THREE.Vector3().subVectors(g.position, ship.pos); const along=rel.dot(f);
-    if (force || !g.userData.placed || along < -2600 || rel.length()>7000){ const a = force ? rand(-1500,4500) : rand(3600,5200); const side=(i%2?1:-1)*rand(1300,3200); g.position.copy(ship.pos).addScaledVector(f,a).addScaledVector(r,side); g.position.y=0; g.userData.placed=true; } });
+    if (force || !g.userData.placed || along < -2600 || rel.length()>7000 || (rel.length()<650 && G.fogK<0.5)){ const a = force ? rand(-1500,4500) : rand(3600,5200); const side=(i%2?1:-1)*rand(1300,3200); g.position.copy(ship.pos).addScaledVector(f,a).addScaledVector(r,side); g.position.y=0; g.userData.placed=true; } });
 }
+
+/* ============================ 사운드 (WebAudio 합성) ============================ */
+const SND = { ctx:null, master:null, eng:null, engG:null, sea:null };
+function audioInit(){
+  if (SND.ctx) { SND.ctx.resume?.(); return; }
+  try { const C=new (window.AudioContext||window.webkitAudioContext)(); SND.ctx=C; SND.master=C.createGain(); SND.master.gain.value=0.6; SND.master.connect(C.destination);
+    const len=C.sampleRate*2, buf=C.createBuffer(1,len,C.sampleRate), d=buf.getChannelData(0); let l=0; for (let i=0;i<len;i++){ l=(l+0.02*(Math.random()*2-1))/1.02; d[i]=l*3.5; }
+    const n=C.createBufferSource(); n.buffer=buf; n.loop=true; const lp=C.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=500; const g=C.createGain(); g.gain.value=0.09; n.connect(lp).connect(g).connect(SND.master); n.start(); SND.sea=g;
+    const o=C.createOscillator(); o.type='sawtooth'; o.frequency.value=42; const f=C.createBiquadFilter(); f.type='lowpass'; f.frequency.value=120; const eg=C.createGain(); eg.gain.value=0.0; o.connect(f).connect(eg).connect(SND.master); o.start(); SND.engG=eg; SND.eng=o;
+  } catch(_){}
+}
+function tone(freq, dur, type='square', vol=0.12, when=0){ const C=SND.ctx; if (!C) return; const t=C.currentTime+when; const o=C.createOscillator(), g=C.createGain(); o.type=type; o.frequency.value=freq; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+0.02); g.gain.setValueAtTime(vol,t+dur-0.05); g.gain.linearRampToValueAtTime(0,t+dur); o.connect(g).connect(SND.master); o.start(t); o.stop(t+dur+0.05); }
+const sfx = {
+  ding:()=>{ tone(880,0.12,'sine',0.1); tone(1320,0.18,'sine',0.08,0.1); },
+  bad:()=>{ tone(220,0.25,'square',0.07); },
+  beep:()=>{ for (let i=0;i<3;i++) tone(1800,0.12,'square',0.06,i*0.22); },
+  horn:(d=2.2)=>{ tone(98,d,'sawtooth',0.16); tone(147,d,'sawtooth',0.08); },
+  general:()=>{ for (let i=0;i<7;i++) tone(620,0.25,'square',0.1,i*0.4); tone(620,1.8,'square',0.1,2.9); },
+  alarm:()=>{ for (let i=0;i<6;i++){ tone(900,0.18,'sawtooth',0.09,i*0.4); tone(600,0.18,'sawtooth',0.09,i*0.4+0.2); } },
+  splash:()=>{ tone(180,0.4,'triangle',0.1); tone(90,0.6,'sine',0.1,0.05); },
+};
+function audioTick(){ if (!SND.ctx) return; const sp=Math.abs(ship.speed)/14; SND.engG.gain.value = G.paused?0:(G.black?0:0.025+sp*0.05); SND.eng.frequency.value=34+sp*18; SND.sea.gain.value=G.paused?0:(AREAS[player.area].indoor?0.04:0.11); }
+
+/* ============================ 작은 랜덤 이벤트 ============================ */
+const DRUM_SPOTS=[[9.3,-25],[-9.3,10],[9.3,40],[-9.3,-28],[9.3,0]];
+function makeWhale(){ const g=new THREE.Group(); const b=new THREE.Mesh(new THREE.SphereGeometry(1,14,10), lam(0x2b3642)); b.scale.set(3,2.2,11); g.add(b); const t=new THREE.Mesh(new THREE.BoxGeometry(6,0.4,2), lam(0x2b3642)); t.position.z=11; g.add(t); const sp=navLight(0xffffff,0.06); sp.material.sizeAttenuation=true; sp.scale.set(6,8,1); sp.position.set(0,5,-6); sp.material.blending=THREE.NormalBlending; sp.material.opacity=0.7; g.add(sp); g.userData.spout=sp; scene.add(g); return g; }
+function makeDolphin(){ const g=new THREE.Group(); const b=new THREE.Mesh(new THREE.SphereGeometry(0.5,10,8), lam(0x7d8a96)); b.scale.set(0.8,0.8,3.2); g.add(b); const f=new THREE.Mesh(new THREE.ConeGeometry(0.3,0.7,4), lam(0x7d8a96)); f.position.set(0,0.6,0); g.add(f); scene.add(g); return g; }
+function startRev(type){
+  const h=ship.heading, f=fwd(h), r=stbd(h), on=!!G.watch?.relieved;
+  const R = G.rev = {type, t0:G.t, meshes:[]};
+  if (type==='whale'){ const side=Math.random()<.5?1:-1; R.side=side; R.pos=ship.pos.clone().addScaledVector(f,rand(120,220)).addScaledVector(r,side*rand(70,120)); const m=makeWhale(); R.meshes.push(m); R.dur=12*60;
+    say(on?'조타수 정':'갑판장 김', (side>0?'우현':'좌현')+'에 고래다!! 고래 떴습니다!'); sfx.ding(); }
+  else if (type==='dolphins'){ for (let i=0;i<5;i++) R.meshes.push(makeDolphin()); R.dur=10*60; say(on?'조타수 정':'갑판원 유','뱃머리에 돌고래 떼! 같이 달리네요!'); sfx.ding(); }
+  else if (type==='drum'){ const sp=DRUM_SPOTS[Math.floor(Math.random()*DRUM_SPOTS.length)]; R.spot=sp; const m=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.9,12), lam(0x2a5bb8)); m.rotation.z=Math.PI/2; m.position.set(sp[0],DECK+0.35,-sp[1]); shipG.add(m); R.drum=m; R.dur=15*60;
+    say('갑판장 김','(무전) 항사님! 갑판에 드럼통 하나가 풀려서 굴러다닙니다! 고박 좀 부탁드립니다!'); sfx.beep(); }
+  else if (type==='coffee'){ const who = NPC.so.area==='bridge'?'so':NPC.co.area==='bridge'?'co':'bosun'; R.who=who; R.dur=30*60; say(NPC[who].name,'(무전) 3항사, 미안한데 커피 한 잔만 갖다 줄 수 있어? 식당 커피머신에 있어.'); sfx.beep(); }
+  else if (type==='debris'){ const m=new THREE.Mesh(new THREE.BoxGeometry(6,2.5,12), lam(0xc0392b)); m.position.copy(ship.pos).addScaledVector(f,3*NM).addScaledVector(r,0.25*NM); m.position.y=0.6; m.rotation.y=0.6; scene.add(m); R.meshes.push(m); R.dur=20*60;
+    say('조타수 정','항사님! 정선수 약간 우현, 표류 컨테이너로 보이는 물체가 떠 있습니다!'); banner('표류물 발견','선장에게 보고 · 피해서 지나가기',2.2); sfx.beep(); }
+  else if (type==='vhf'){ R.dur=1; sfx.beep(); setTimeout(()=>{ if (!G.rev || G.rev.type!=='vhf') return; tip('vhf');
+    ask('VHF 16번 채널','"세계로호, 세계로호, 여기는 그린오션호. 본선은 귀선의 좌현 쪽으로 지나가고자 합니다. 동의합니까?"', [
+      {t:'"그린오션호, 세계로호. 좌현 대 좌현 통과 동의합니다. 본선 침로 유지합니다."', fn:()=>{ addRep(4,'VHF 교신 정확'); say('그린오션호','감사합니다. 좋은 항해 되십시오. 아웃.'); endRev(); }},
+      {t:'(못 들은 척한다)', fn:()=>{ addRep(-3,'VHF 호출 무응답'); say('조타수 정','항사님… 저쪽에서 계속 부르는데요.'); endRev(); }},
+      {t:'"네? 누구세요?"', fn:()=>{ addRep(-1,'교신 절차 미숙'); say('그린오션호','…세계로호, 교신 절차를 지켜 주십시오.'); endRev(); }}]); }, 900); }
+  else if (type==='fog'){ R.dur=30*60; R.tele0=ship.tele; G.fogTarget=0.16; R.hornT=G.t; banner('안개 발생','시정 급감 — 안전한 속력으로',2.4); say('조타수 정','항사님, 안개가 갑자기 짙어집니다!'); setTimeout(()=>tip('fog'),700); }
+  G.ff=1;
+}
+function updateRev(){
+  const R=G.rev; if (!R) return; const age=G.t-R.t0;
+  if (R.type==='whale'){ const m=R.meshes[0]; R.pos.addScaledVector(fwd(ship.heading), ship.speed*KN*0.05*0.85); const ph=(age/60)%4; const up=ph<1.6; m.position.set(R.pos.x, up? -2.5+Math.sin(ph/1.6*Math.PI)*3.2 : -9, R.pos.z); m.rotation.set(up? -0.5+ph/1.6:0, -ship.heading*D2R, 0); m.userData.spout.visible = ph>0.3&&ph<0.9;
+    if (!R.seen && player.area!=='mess' && player.area!=='cabin'){ R.seenT=(R.seenT||0)+1; if (R.seenT>60){ R.seen=true; addMor(3,'고래 구경'); } } }
+  if (R.type==='dolphins'){ const f=fwd(ship.heading), r=stbd(ship.heading); R.meshes.forEach((d,i)=>{ const ph=(G.t/TS*1.3+i*0.9)%3; const y = ph<1.2 ? Math.sin(ph/1.2*Math.PI)*2.2-0.6 : -3; const p=ship.pos.clone().addScaledVector(f,75+i*6+Math.sin(G.t/TS+i)*4).addScaledVector(r,(i%2?1:-1)*(10+i*2)); d.position.set(p.x,y,p.z); d.rotation.set(ph<1.2?(0.8-ph/1.2*1.6):0,-ship.heading*D2R,0); });
+    if (!R.seen && player.area==='deck'){ R.seen=true; addMor(3,'돌고래 구경'); } }
+  if (R.type==='debris' && !R.passed){ const d=R.meshes[0].position.distanceTo(ship.pos); R.minD=Math.min(R.minD??1e9,d); if (d<70){ addRep(-6,'표류물 충돌 (선체 손상 점검)'); R.passed=true; sfx.bad(); } }
+  if (R.type==='fog'){ if (ship.tele<=5 && !R.ok){ R.ok=true; addRep(5,'안개 — 안전한 속력으로 감속 (규칙 6·19)'); }
+    if (G.t-R.hornT>2*60){ R.hornT=G.t; sfx.horn(1.8); } if (age>8*60 && !R.ok && !R.p){ R.p=true; addRep(-5,'안개 속 과속'); } }
+  if (age>R.dur) endRev(true);
+}
+function endRev(timeout){
+  const R=G.rev; if (!R) return;
+  if (timeout){ if (R.type==='drum' && !R.done) addRep(-2,'갑판 위험물 방치'); if (R.type==='coffee' && !R.done) addMor(-1); if (R.type==='debris' && !R.reported) addRep(-3,'표류물 보고 누락'); if (R.type==='debris' && !R.passed && R.minD>=70) addRep(2,'표류물 안전 통과'); }
+  for (const m of R.meshes) scene.remove(m); if (R.drum) shipG.remove(R.drum);
+  if (R.type==='fog'){ G.fogTarget=1; if (R.ok) say('조타수 정','안개 걷혔습니다. 원래 속력으로 올리셔도 되겠습니다.'); }
+  G.coffee=false; player.mesh.userData.cup && (player.mesh.userData.cup.visible=false);
+  G.rev=null; G.nextEv = G.t + rand(6,11)*60;
+}
+function revObjective(){
+  const R=G.rev; if (!R) return null; const at_=(area,x,s)=>({area,x,s});
+  if (R.type==='drum') return {t:'굴러다니는 드럼통 고박하기', s:'갑판 · 노란 화살표', m:at_('deck',R.spot[0],R.spot[1])};
+  if (R.type==='coffee') return G.coffee ? {t:NPC[R.who].name+'에게 커피 전달', s:'대화(E)', m:NPC[R.who].area!=='off'?at_(NPC[R.who].area,NPC[R.who].x,NPC[R.who].s):null} : {t:'식당 커피머신에서 커피 받기', s:NPC[R.who].name+'의 부탁', m:at_('mess',-7.0,-43.5)};
+  if (R.type==='debris') return {t:R.reported?'표류물을 피해서 지나가기':'표류 컨테이너 → 선장에게 전화 보고', s:R.reported?'콘솔에서 살짝 왼쪽/오른쪽으로 비켜 가기':'선교 왼쪽 벽 선내 전화', m:R.reported?at_('bridge',0,-40.3):at_('bridge',-7.5,-43)};
+  if (R.type==='fog') return {t:'안개! 속력을 반속 이하로', s:R.ok?'잘했어요 · 안개가 걷힐 때까지 유지':'콘솔 텔레그래프를 "반속" 이하로 · 기적은 자동', m:at_('bridge',0,-40.3)};
+  if (R.type==='whale') return {t:'고래 출현! 밖을 내다보자', s:(R.side>0?'오른쪽':'왼쪽')+' 바다 · 갑판이나 선교 윙', m:null};
+  if (R.type==='dolphins') return {t:'돌고래 떼! 갑판으로 나가 보자', s:'뱃머리 앞', m:null};
+  return null;
+}
+function evPool(){ const onW = !!G.watch?.relieved && !G.watch.handed && !G.watch.cancelled; const underway=!ship.anchored && !ship.auto;
+  const p=['whale','dolphins']; if (onW && underway) p.push('debris','vhf','fog','vhf','debris'); if (!onW) p.push('drum','coffee','drum','coffee'); return p; }
+function revTick(){
+  if (G.rev){ updateRev(); return; }
+  if (!G.groups.includes('life') || G.enc || G.emg || G.phase!=='free' || G.modal) return;
+  if (G.t < G.nextEv) return;
+  const pool=evPool(); startRev(pool[Math.floor(Math.random()*pool.length)]);
+}
+
+/* ============================ 비상 상황 (맨오버보드 · 화재 · 블랙아웃) ============================ */
+function emgStart(type){
+  if (!G.watch?.relieved || G.watch.cancelled || G.watch.handed) return;
+  if (G.rev) endRev(); closePanel(); G.ff=1;
+  const h=ship.heading;
+  G.emg={type, t0:G.t, h0:h, stage:1};
+  document.body.classList.add('emg');
+  if (type==='mob'){ const p=ship.pos.clone().addScaledVector(stbd(h),16); const g=new THREE.Group(); const ring=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.13,8,16),lam(0xff6a1a)); ring.rotation.x=Math.PI/2; g.add(ring); const head=new THREE.Mesh(new THREE.SphereGeometry(0.25,8,6),lam(0xd9a77f)); head.position.set(0.6,0.1,0); g.add(head); const lt=navLight(0xffe070,0.03); lt.position.y=0.8; g.add(lt); g.position.copy(p); scene.add(g); G.emg.mesh=g;
+    sfx.splash(); sfx.general(); banner('맨 오버보드!','갑판원 유가 우현으로 추락',3); say('조타수 정','사람이 빠졌습니다!! 우현! 갑판원 유입니다!!',4); setTimeout(()=>tip('mob'),800); }
+  if (type==='fire'){ sfx.alarm(); banner('기관실 화재 경보!','선교 화재탐지반 ZONE 7',3); say('조타수 정','항사님! 화재탐지반에 불 들어왔습니다! 기관실입니다!',4); setTimeout(()=>tip('fire'),800); }
+  if (type==='black'){ G.black=true; ship.tele=2; sfx.bad(); banner('블랙아웃!','주전원 상실 — 엔진 정지',3); say('조타수 정','어? 전기 나갔습니다! 엔진도 섰습니다!',4); setTimeout(()=>tip('black'),800); }
+}
+function emgAct(){ // 콘솔/전화에서 비상 조치
+  const E=G.emg; if (!E) return;
+  if (E.type==='mob' && E.stage===1){ E.stage=2; E.markT=G.t; addRep(4,'MOB 버튼 · 구명부환 즉시 투하'); sfx.ding(); say('나 (3항사)','MOB! 구명부환 투하! 선장님 호출!'); say('선장 박','(무전) 바로 간다! 윌리엄슨 턴 시작해! 오른쪽으로 돌려서 반대 방향으로!'); return; }
+  if (E.type==='fire' && E.stage===1){ E.stage=2; ask('기관실 화재','가장 먼저 해야 할 일은?', [
+      {t:'비상 경보 울리고 선장·기관장에게 즉시 보고', fn:()=>{ sfx.general(); addRep(6,'화재 — 경보·보고 우선'); fireStep2(); }},
+      {t:'내가 직접 기관실로 뛰어가 불을 끈다', fn:()=>{ addRep(-6,'당직자 선교 이탈 (화재 시 선교 유지가 원칙)'); say('선장 박','당직자는 선교를 지켜! 경보부터 울려!'); sfx.general(); fireStep2(); }},
+      {t:'일단 지켜본다', fn:()=>{ addRep(-8,'화재 경보 지연'); say('선장 박','뭘 기다려! 경보 울려!'); sfx.general(); fireStep2(); }}]); return; }
+  if (E.type==='black' && E.stage===1){ E.stage=2; ask('블랙아웃','배가 멈췄다. 선교에서 할 일은?', [
+      {t:'기관실 연락 + 조종불능선 표시(홍등 2개) + VHF로 주변 선박 경고', fn:()=>{ addRep(8,'블랙아웃 대응 정확 (조종불능선 표시)'); emgEnd(true,'비상발전기 가동 · 주전원 복구!'); }},
+      {t:'닻을 바로 내린다 (수심 70m)', fn:()=>{ addRep(-4,'수심이 깊어 투묘 부적절'); say('선장 박','수심 70미터에서? 기관실 연락하고 NUC 등 켜!'); emgEnd(false,'주전원 복구'); }},
+      {t:'전원이 돌아올 때까지 기다린다', fn:()=>{ addRep(-6,'블랙아웃 대응 지연'); emgEnd(false,'주전원 복구'); }}]); }
+}
+function fireStep2(){ G.emg.stage=3; const crew=['ce','te','bosun','os']; G.emg.crew=crew; say('기관장 한','(무전) 보일러 쪽 국부 화재! 소화기로 진화 중이다. 선교는 기관 정지 대비해!');
+  setTimeout(()=>{ if (!G.emg) return; ask('기관장 한','"CO2 방출이 필요할 수도 있다. 선교에서 확인할 것은?"', [
+    {t:'기관실 인원 전원 대피 확인 (CO2는 사람 있으면 절대 방출 금지)', fn:()=>{ addRep(6,'CO2 방출 전 인원 확인'); emgEnd(true,'국부 화재 진화 완료!'); }},
+    {t:'바로 CO2 방출', fn:()=>{ addRep(-10,'인원 확인 없이 CO2 방출 시도 — 치명적'); say('선장 박','안에 사람 있으면 죽어! 인원 확인부터!'); emgEnd(false,'화재 진화'); }}]); }, 6000); }
+function emgTick(){
+  const E=G.emg; if (!E) return;
+  if (E.type==='mob' && E.stage===2){ const dev=adiff(ship.heading, E.h0+180);
+    if (Math.abs(dev)<30){ E.stage=3; fade(()=>{ ship.tele=2; ship.speed=1; }, 600, '구조정 출동…'); setTimeout(()=>emgEnd(true,'갑판원 유 구조 성공!'), 2500); addRep(10,'윌리엄슨 턴 성공 — 원위치 복귀'); }
+    else if (G.t-E.markT>32*60){ E.stage=3; addRep(-6,'선회 지연 — 선장이 조선 인수'); ship.set=norm360(E.h0+180); setTimeout(()=>emgEnd(false,'갑판원 유 구조'), 2500); } }
+  if (E.stage===1 && G.t-E.t0>6*60){ addRep(-5,'비상 초동 조치 지연'); emgAct(); }
+}
+function emgEnd(ok, msg){ const E=G.emg; if (!E) return; if (E.mesh) scene.remove(E.mesh); G.black=false; document.body.classList.remove('emg'); G.emg=null; banner(ok?'위기 극복!':'상황 종료', msg, 3); if (ok) sfx.ding();
+  if (E.type==='mob' || E.type==='black') { ship.tele=6; ship.set=G.plan; say('선장 박', ok?'잘했다 3항사. 침착했어. 원침로로 복귀해.':'다음엔 더 빨리 움직여. 원침로 복귀.'); }
+  if (E.type==='fire') say('선장 박', ok?'잘 대응했다. 화재는 첫 5분이 전부야.':'절차대로 해야 사람이 산다. 명심해.');
+  G.nextEv=G.t+8*60; }
+function emgObjective(){ const E=G.emg; if (!E) return null; const at_=(area,x,s)=>({area,x,s});
+  if (E.type==='mob') return E.stage===1 ? {t:'🚨 사람이 빠졌다! 콘솔의 [MOB] 버튼', s:'선교 콘솔 · 빨간 버튼 · 구명부환 투하', m:at_('bridge',0,-40.3)} : {t:'🚨 배를 돌려 반대 방향으로 ('+String(Math.round(norm360(E.h0+180))).padStart(3,'0')+'°)', s:'콘솔에서 ▶ 오른쪽으로 계속 돌리기 · 💡추천 조치 가능', m:at_('bridge',0,-40.3)};
+  if (E.type==='fire') return {t:'🚨 기관실 화재! 콘솔에서 [비상 대응]', s:'선교를 떠나지 말 것', m:at_('bridge',0,-40.3)};
+  if (E.type==='black') return {t:'🚨 블랙아웃! 콘솔에서 [비상 대응]', s:'배가 멈춰 표류 중', m:at_('bridge',0,-40.3)};
+}
+
+/* ============================ 초보자 안내: 프롤로그 · 브리핑 · 팁 ============================ */
+const PROLOGUE = [
+  {h:'세계로호에 오신 것을 환영합니다', b:'당신은 5만 톤급 화물선 <b>세계로호</b>에 처음 승선한 신입 <b>3등 항해사(3항사)</b>입니다.<br><br>항해사는 배를 운전하고, 바다를 지켜보고, 사고를 막는 사람입니다. 지금부터 이틀 동안 진짜 배 위의 하루를 살게 됩니다.'},
+  {h:'이번 항해의 목표', b:'화물을 싣고 <b>목포신항까지 무사히 도착</b>하는 것.<br><br>그 사이 당직·닻 내리기·부두에 배 대기 같은 임무를 해내고, 위기 상황에 대처하고, 동료를 도와 <b>선장의 신뢰도</b>를 쌓으세요.<br><br>항해가 끝나면 신뢰도로 <b>S~D 등급</b>을 받습니다. <b>S 등급</b>이면 선장이 2항사 진급을 추천합니다!'},
+  {h:'이렇게만 하면 돼요', b:'• 왼쪽 위 <b>임무</b>와 노란 <b>▼ 화살표</b>를 따라가세요<br>• <b>E</b>: 사람과 대화하고 물건 사용 (폰은 E 버튼)<br>• 머리 위 노란 <b>!</b> = 도움이 필요한 동료<br>• 모르는 말은 <b>💡 팁</b>이 쉽게 알려 줘요<br>• 콘솔의 <b>💡 추천 조치</b> 버튼 = 정답 행동 도우미<br>• 조용할 땐 시간이 자동으로 빨리 흘러요'},
+  {h:'3항사의 이틀', b:'<b>DAY 1</b><br>08–12 데이워치 (낮 당직) · 오후 동료 돕기 · 15:00 비상훈련<br>18:30 선상 회식 · 20–24 나이트워치 (밤 당직)<br><br><b>DAY 2</b><br>새벽 닻 내리기(앵커링) · 13:00 부두에 배 대기(접안)<br><br>중간중간 고래, 안개, 화재, 사람이 바다에 빠지는 사고까지… 준비됐나요?'},
+];
+const BRIEF = {
+  day:{h:'데이워치 · 낮 당직 4시간', b:'<b>목표</b> 4시간 동안 배를 안전하게 운전하기<br><br>① 선교의 1항사에게 말을 걸어 당직 인수 (E)<br>② 다른 배가 다가오면 콘솔에서 피하기<br>③ 매시 정각 항해일지 쓰기 · 경보 울리면 리셋<br>④ 12시에 2항사에게 인계'},
+  night:{h:'나이트워치 · 밤 당직', b:'<b>목표</b> 깜깜한 바다에서 불빛만 보고 다른 배를 알아보고 피하기<br><br>빨간 불 = 배의 왼쪽, 초록 불 = 배의 오른쪽. 쌍안경(오른쪽 윙)으로 보고 조타수에게 보고하세요.'},
+  party:{h:'선상 회식', b:'<b>목표</b> 동료들과 친해지기 (사기 ↑)<br><br>단, 20시에 당직이 있어요! 혈중알코올 <b>0.03%</b>를 넘으면 당직을 설 수 없습니다. 소주 한 잔 ≈ 0.014%.'},
+  anchor:{h:'앵커링 · 닻 내리기', b:'<b>목표</b> 바다 위 정해진 자리(A-3)에 배를 세우기<br><br>① 선교 콘솔에서 목표 지점으로 가며 속도를 줄이기<br>② 2노트 이하로 도착하면 뱃머리로 달려가 닻 내리기'},
+  berth:{h:'접안 · 부두에 배 대기', b:'<b>목표</b> 배 뒤쪽(선미)에서 밧줄을 던지고 감아서 부두에 묶기<br><br>빨간 빗금 구역은 밧줄이 끊어지면 튕겨 나오는 위험 지역! 들어가지 마세요.'},
+  life:{h:'선내 생활 · 오후', b:'<b>목표</b> 동료를 돕고 배의 일상을 경험하기<br><br>머리 위 노란 <b>!</b> 가 있는 사람에게 말을 걸어 보세요. 15:00 비상훈련, 18:30 회식이 있어요.'},
+};
+const TIPS_TXT = {
+  watch:['당직이란?','배는 24시간 움직여서, 항해사들이 4시간씩 돌아가며 배를 운전하고 감시합니다. 이걸 <b>당직(워치)</b>이라고 해요.<br><br>3항사는 <b>08–12시, 20–24시</b> 담당. 시작 전에 선교에서 앞 당직자(1항사)에게 말을 걸어(E) 인수하세요.'],
+  nav:['항해 콘솔 사용법','• <b>◀ ▶</b> : 배가 갈 방향을 왼쪽/오른쪽으로<br>• <b>텔레그래프</b>(전속~후진) : 엔진 속도<br>• <b>레이더</b> : 가운데 흰 점 = 우리 배, 초록 점 = 다른 배, <b>빨간 점 = 위험!</b><br>• <b>CPA</b> : 그 배가 가장 가까이 올 거리. 0.5마일 이상이면 안전<br>• <b>💡 추천 조치</b> : 지금 해야 할 정답 행동을 대신 해 줘요'],
+  enc:['바다의 교통 법규','바다에도 규칙이 있어요 (국제해상충돌예방규칙).<br><br>• 다른 배가 <b>내 오른쪽</b>에서 오면 → <b>내가 피한다</b><br>• <b>정면</b>에서 오면 → 둘 다 <b>오른쪽</b>으로<br>• <b>뒤에서 추월</b>하면 → 나는 그대로 직진<br>• <b>고기잡이 배</b> → 내가 피한다<br><br>핵심: 피할 땐 <b>오른쪽으로, 크게, 일찍!</b>'],
+  night:['밤에는 불빛으로 읽어요','• <b style="color:#ff6a55">빨간 불</b> = 그 배의 왼쪽<br>• <b style="color:#5dff9b">초록 불</b> = 그 배의 오른쪽<br>• 흰 불 = 돛대 위 · 꼬리<br><br>빨간 불만 보이면 → 그 배가 오른쪽에서 가로질러 오는 중 (내가 피함)<br>빨강+초록 둘 다 → 정면으로 오는 중!'],
+  log:['항해일지','매 시 <b>정각~20분</b> 사이에 해도대(선교 오른쪽 뒤 책상)에서 E를 눌러 위치·속력을 기록하세요.'],
+  bnwas:['BNWAS (졸음 방지 경보)','당직자가 깨어 있는지 확인하는 장치예요. 경보가 울리면 <b>콘솔 왼쪽 노란 버튼</b>을 누르거나 콘솔을 사용하면 리셋됩니다. 안 누르면 선장실까지 경보가 가요!'],
+  party:['회식과 음주 규칙','20시 당직 때 <b>혈중알코올 0.03% 이상이면 당직 금지</b> (해사안전법).<br>소주 한 잔 ≈ 0.014%, 한 시간에 약 0.015%씩 깨요. "당직이라 사이다로" 해도 괜찮아요!'],
+  anchor:['앵커링(닻 내리기)이란?','부두 자리가 날 때까지 바다에 닻을 내려 배를 세워 두는 거예요.<br><br>① 콘솔에서 <b>💡 추천 조치</b>를 누르면 방향·속도를 잡아 줘요<br>② 속력 2노트 이하로 도착하면 <b>뱃머리(선수)</b>로 달려가 닻 내리기'],
+  windlass:['닻줄 길이','닻줄은 <b>샤클</b>(한 칸 27.5m) 단위로 셉니다. 보통 물 깊이의 <b>3~4배</b>를 내려요.<br>수심 30m → 약 100~120m → <b>4~5샤클</b>.'],
+  berth:['접안(부두에 배 대기)','도선사가 배를 부두로 옮기는 동안, 3항사는 <b>배 뒤쪽(선미)</b>에서 밧줄을 던지고 감아요.<br><br>• 히빙라인: 바늘이 <b>초록 칸</b>일 때 던지기<br>• 윈치: 누르고 있으면 감김, 텐션 <b>40–75</b> 유지<br>• <b>빨간 빗금</b> = 밧줄이 끊어지면 튕기는 위험 구역!'],
+  drill:['비상 소집 훈련','짧은 경보 7번 + 긴 경보 1번 = <b>비상 소집</b>! 노란 화살표를 따라 왼쪽(좌현) 갑판 집합 장소로 가세요.'],
+  quest:['동료의 부탁','머리 위에 노란 <b>!</b> 가 있는 사람은 도움이 필요해요. 다가가서 E로 말을 걸면 같이 일할 수 있어요. 도와주면 신뢰도·사기가 올라요.'],
+  meal:['배의 식사','배 식당은 <b>뷔페식</b>! 배식대에서 식판 들고(E) → 빈자리에 앉아 먹고 → 퇴식구에 반납. 피로가 풀려요.'],
+  fog:['안개 (시정 제한)','안개가 끼면 멀리 못 봐요. 규칙 6조 <b>안전한 속력</b>: 텔레그래프를 <b>반속 이하</b>로 낮추세요. 2분마다 긴 기적(무중신호)은 자동으로 울려요.'],
+  vhf:['VHF 무선 교신','배끼리는 VHF 무전기 16번 채널로 부르고 답합니다. <b>"상대 배 이름, 내 배 이름"</b> 순서로 답하는 게 기본이에요. "좌현 대 좌현" = 서로 왼쪽을 보며 지나가는 일반적인 방법.'],
+  mob:['맨 오버보드 (사람이 빠졌다!)','① 콘솔의 빨간 <b>MOB 버튼</b> → 구명부환 투하 · 위치 기록<br>② 배를 크게 돌려 <b>반대 방향</b>으로 (윌리엄슨 턴) → 빠진 사람에게 돌아가기<br>콘솔의 <b>💡 추천 조치</b>를 계속 눌러도 돼요.'],
+  fire:['선박 화재','당직자는 <b>선교를 떠나지 않고</b> 경보·보고·지휘를 합니다. 콘솔의 <b>비상 대응</b> 버튼으로 조치하세요.'],
+  black:['블랙아웃 (정전)','전기가 나가면 엔진도 멈춰요. 콘솔의 <b>비상 대응</b>에서 올바른 조치를 고르세요. 움직이지 못하는 배는 <b>조종불능선</b> 표시(빨간 불 2개)를 합니다.'],
+  hand:['수동 조타 (HAND)','<b>AUTO</b>(오토파일럿)는 정한 방향을 자동으로 유지해요.<br><b>HAND</b>(수동)는 키(타)를 직접 돌려요: 좌/우 버튼으로 타각을 주고, 원하는 방향이 되면 <b>미드십(0)</b>으로 되돌리세요.'],
+};
+const tipQ=[]; let tipOpen=false;
+function loadTips(){ try { return JSON.parse(localStorage.getItem('sgr_tips')||'{}'); } catch(_){ return {}; } }
+const tipsSeen = loadTips();
+function tip(key){ if (G.noTips || tipsSeen[key] || !TIPS_TXT[key]) return; tipsSeen[key]=1; try { localStorage.setItem('sgr_tips', JSON.stringify(tipsSeen)); } catch(_){} tipQ.push(key); if (!tipOpen) showTip(); }
+function showTip(){ const k=tipQ.shift(); if (!k){ tipOpen=false; $('tip').classList.add('hidden'); if ($('title').classList.contains('hidden') && $('ending').classList.contains('hidden') && $('phone').classList.contains('hidden')) G.paused=false; return; }
+  tipOpen=true; G.paused=true; const [h,b]=TIPS_TXT[k]; $('tip').innerHTML=`<div class="tiph">💡 ${h}</div><div class="tipb">${b}</div><button id="tipOk">알겠어요 (E)</button>`; $('tip').classList.remove('hidden'); $('tipOk').onclick=()=>showTip(); }
+function showIntro(id){
+  const pages = id==='story' ? [...PROLOGUE] : [BRIEF[id]]; let i=0;
+  const el=$('introCard'); $('title').classList.add('hidden'); $('intro').classList.remove('hidden'); audioInit();
+  const render=()=>{ const p=pages[i]; el.innerHTML=`<div class="step">${id==='story'?`${i+1} / ${pages.length}`:'미션 브리핑'}</div><h2>${p.h}</h2><p class="lead">${p.b}</p>
+    <div class="menu"><button class="pri" id="inNext">${i<pages.length-1?'다음':'출항!'} <small>${i<pages.length-1?'Enter':'시작하기'}</small></button>${i>0?'<button id="inPrev">이전</button>':''}<button id="inSkip">건너뛰기</button></div>`;
+    $('inNext').onclick=()=>{ if (i<pages.length-1){ i++; render(); } else go(); }; $('inPrev') && ($('inPrev').onclick=()=>{ i--; render(); }); $('inSkip').onclick=go; };
+  const go=()=>{ $('intro').classList.add('hidden'); startMission(id); };
+  render();
+}
+const GLOSSARY = [['선교 (브릿지)','배를 운전하는 방'],['당직 (워치)','4시간씩 돌아가며 배를 지키는 근무'],['우현 / 좌현','배의 오른쪽 / 왼쪽'],['선수 / 선미','배의 앞 / 뒤'],['침로','배가 가는 방향 (0~359°, 0=북)'],['노트(kn)','배의 속력 단위 (약 시속 1.85km)'],['마일(NM)','바다 거리 단위 (약 1.85km)'],['CPA','다른 배가 가장 가까이 올 거리'],['텔레그래프','엔진 속도 레버'],['오토파일럿','정한 방향을 자동으로 유지하는 장치'],['앵커링 / 투묘','닻을 내려 배를 세우기'],['접안','부두에 배를 대기'],['샤클','닻줄 한 칸 (27.5m)'],['BNWAS','당직자 졸음 방지 경보'],['ECDIS','전자 해도 (배의 내비게이션)']];
 
 /* ============================ 메인 루프 ============================ */
 const tmpV=new THREE.Vector3(), tmpV2=new THREE.Vector3();
@@ -1467,7 +1953,8 @@ function updateEnv(){
   const hor=new THREE.Color(0x0c1730).lerp(new THREE.Color(0xa9cfe9),dayF).lerp(new THREE.Color(0xf09050),dusk*0.65);
   skyU.top.value.copy(top); skyU.hor.value.copy(hor); skyU.sunDir.value.copy(sd); skyU.sunCol.value.setRGB(1,0.85-dusk*0.3,0.6-dusk*0.3).multiplyScalar(Math.max(0,dayF*1.1+dusk*0.5));
   const md=sd.clone().multiplyScalar(-1); md.y=Math.abs(md.y)*0.7+0.25; md.normalize(); skyU.moonDir.value.copy(md); skyU.night.value=1-dayF;
-  scene.fog.color.copy(hor); scene.fog.near = lerp(140,320,dayF); scene.fog.far = lerp(2300,3400,dayF);
+  G.fogK = lerp(G.fogK??1, G.fogTarget??1, 0.01); const fogC=hor.clone().lerp(new THREE.Color(0xb8c2c8).multiplyScalar(0.3+dayF*0.7), 1-G.fogK);
+  scene.fog.color.copy(fogC); hor.copy(fogC); scene.fog.near = lerp(140,320,dayF)*Math.max(0.2,G.fogK); scene.fog.far = lerp(2300,3400,dayF)*G.fogK;
   seaU.uFogColor.value.copy(hor); seaU.uFogNear.value=scene.fog.near; seaU.uFogFar.value=scene.fog.far;
   seaU.uDeep.value.copy(new THREE.Color(0x01040a).lerp(new THREE.Color(0x0b3554),dayF)); seaU.uSky.value.copy(hor.clone().lerp(top,0.3));
   if (dayF>0.05){ seaU.uSunDir.value.copy(sd); seaU.uSunCol.value.setRGB(1,0.9-dusk*0.3,0.75-dusk*0.4).multiplyScalar(dayF); } else { seaU.uSunDir.value.copy(md); seaU.uSunCol.value.setRGB(0.5,0.55,0.7); }
@@ -1477,7 +1964,7 @@ function updateEnv(){
   stars.material.opacity = clamp(1-dayF*2.2,0,1)*0.9;
   const lightsOn = dayF<0.55;
   for (const l of shipG.userData.lights) l.visible=lightsOn;
-  for (const p of shipG.userData.deckLamps) p.intensity = lightsOn ? 9 : 0;
+  for (const p of shipG.userData.deckLamps) p.intensity = lightsOn && !G.black ? 9 : 0;
   for (const p of (port.userData.lamps||[])) p.intensity = lightsOn ? 40 : 0;
   port.userData.lamp.visible=lightsOn;
   renderer.toneMappingExposure = lerp(1.25, 1.0, dayF);
@@ -1502,7 +1989,8 @@ function updateShip(dt){
     ship.heading=norm360(ship.heading+Math.sin(G.t/900)*0.01*dt); ship.rudder=0; }
   else {
     const tv=TELE[ship.tele].v; ship.speed += (tv-ship.speed)*Math.min(1, dt/(tv<ship.speed?9:13));
-    const err=adiff(ship.set, ship.heading); ship.rudder = clamp(err*2.2 - ship.rot*4, -35, 35);
+    if (ship.mode==='HAND'){ ship.rudder += clamp(ship.helm-ship.rudder,-4*dt,4*dt); ship.set=Math.round(ship.heading); }
+    else { const err=adiff(ship.set, ship.heading); ship.rudder = clamp(err*2.2 - ship.rot*4, -35, 35); }
     const maxRot = 3.2*clamp(Math.abs(ship.speed)/8, 0.12, 1.25);
     const want = ship.rudder/35*maxRot*(ship.speed<-0.2?-1:1);
     ship.rot += (want-ship.rot)*Math.min(1, dt*0.9);
@@ -1530,8 +2018,8 @@ function updatePlayer(dt){
   const y=player.yaw*D2R; const fx=Math.sin(y), fs=Math.cos(y), rx=Math.cos(y), rs=-Math.sin(y);
   let mxv=(fx*iz+rx*ix)*sp, msv=(fs*iz+rs*ix)*sp;
   if (G.bac>0.04){ const wob=Math.sin(performance.now()/600)*G.bac*30; mxv+=wob; }
-  const moving = l>0.05;
-  if (moving){ const nx=player.x+mxv*dt, ns=player.s+msv*dt; if (canWalk(player.area,nx,player.s)) player.x=nx; if (canWalk(player.area,player.x,ns)) player.s=ns; const tf=Math.atan2(mxv,msv)/D2R; player.face = norm360(player.face + clamp(adiff(tf,player.face),-720*dt,720*dt)); }
+  const moving = l>0.05; if (moving) G.seated=false;
+  if (moving){ const nx=player.x+mxv*dt, ns=player.s+msv*dt; const free=(x,s)=>canWalk(player.area,x,s) && !Object.values(NPC).some(n=>n.area===player.area && n.mesh.visible && Math.hypot(n.x-x,n.s-s)<0.55 && Math.hypot(n.x-x,n.s-s)<Math.hypot(n.x-player.x,n.s-player.s)); if (free(nx,player.s)) player.x=nx; if (free(player.x,ns)) player.s=ns; const tf=Math.atan2(mxv,msv)/D2R; player.face = norm360(player.face + clamp(adiff(tf,player.face),-720*dt,720*dt)); }
   player.v = moving ? sp*l : 0;
   if (player.vy!==0 || player.y>0){ player.vy-=12*dt; player.y=Math.max(0,player.y+player.vy*dt); if (player.y===0) player.vy=0; }
   const A=AREAS[player.area];
@@ -1543,14 +2031,14 @@ function updateCamera(dt){
   const A=AREAS[player.area]; const y=player.yaw*D2R; const f=new THREE.Vector3(Math.sin(y),0,-Math.cos(y));
   let eye, tgt;
   if (A.indoor || G.binoc){
-    eye=new THREE.Vector3(player.x, A.y+1.65+player.y, -player.s);
+    eye=new THREE.Vector3(player.x, A.y+(G.seated?1.2:1.65)+player.y, -player.s);
     const p=-player.pitch*0.9; tgt=eye.clone().add(new THREE.Vector3(f.x*Math.cos(p), Math.sin(p), f.z*Math.cos(p)));
   } else {
     const dist=5.6, p=clamp(player.pitch,-0.3,1.1); const head=new THREE.Vector3(player.x, A.y+1.6+player.y, -player.s);
-    const H=[13.5,1.8,1.8,1.8,1.8,11,11,11,14,2,2,2,2];
+    const H=[13.5,1.8,1.8,1.8,1.8,11,11,11,14,2,2,2,2,1.6,1.6];
     const blockedAt=e=>{ const ex=e.x, es=-e.z, ey=e.y-DECK; return DECK_OBST.some((o,i)=>ex>o[0]-0.3&&ex<o[1]+0.3&&es>o[2]-0.3&&es<o[3]+0.3&&ey<H[i]+0.3); };
-    let dd=dist; do { eye=head.clone().addScaledVector(f,-dd*Math.cos(p)); eye.y+=dd*Math.sin(p)+0.4; dd-=0.4; } while (dd>1.2 && blockedAt(eye));
-    tgt=head.clone().addScaledVector(f,1.2);
+    let dd=dist; do { eye=head.clone().addScaledVector(f,-dd*Math.cos(p)); eye.y+=dd*Math.sin(p)+0.4; dd-=0.4; } while (dd>0.25 && blockedAt(eye));
+    tgt=head.clone().addScaledVector(f,1.2); if (dd<1.3) player.mesh.visible=false;
   }
   const we=shipG.localToWorld(eye), wt=shipG.localToWorld(tgt);
   if (G.bac>0.03){ const a=performance.now()/900; we.x+=Math.sin(a)*G.bac*6; we.y+=Math.cos(a*1.3)*G.bac*4; }
@@ -1560,7 +2048,7 @@ function updateCamera(dt){
 }
 function updateHUD(){
   $('dayL').textContent='DAY '+dayOf(G.t); $('timeL').textContent=hhmm(G.t);
-  $('ff').textContent = (G.ff>1?'▶▶ 시간 ×4 · ':'') + `HDG ${ship.heading.toFixed(0).padStart(3,'0')}° · ${Math.abs(ship.speed).toFixed(1)}kn${ship.anchored?' · 투묘':''}`;
+  $('ff').textContent = (G.curFF>1?(G.ff>1?'▶▶ 시간 ×4 · ':'⏩ 조용한 시간 — 자동 빨리감기 · '):'') + `HDG ${ship.heading.toFixed(0).padStart(3,'0')}° · ${Math.abs(ship.speed).toFixed(1)}kn${ship.anchored?' · 투묘':''}`;
   $('bRep').querySelector('b').style.width=G.rep+'%'; $('bMor').querySelector('b').style.width=G.morale+'%'; $('bFat').querySelector('b').style.width=G.fatigue+'%';
   $('bac').textContent='혈중알코올 '+G.bac.toFixed(3)+'%'; $('bac').classList.toggle('warn', G.bac>=0.03);
   const n = (G.modal||G.panel) ? null : findInteract(); nearest=n;
@@ -1569,16 +2057,28 @@ function updateHUD(){
   else if (n){ pr.innerHTML=`<kbd>E</kbd>${n.label}`; pr.classList.remove('hidden'); } else pr.classList.add('hidden');
 }
 let last=performance.now(), acc=0;
+function effFF(){
+  if (G.ff>1) return G.ff;
+  if (G.autoFF===false) return 1;
+  const busy = G.enc || G.emg || G.panel || G.modal || G.phase!=='free' || G.tray || G.carry || G.bnwas?.alarm || G.binoc;
+  if (busy) return 1;
+  if (G.rev && G.rev.type!=='whale' && G.rev.type!=='dolphins') return 1;
+  const w=G.watch; if (w && (!w.relieved || (G.t>=w.endT-12*60 && !w.handed))) { const near = w.relieved ? false : G.t>=w.startT-12*60; if (near || (w.relieved && G.t>=w.endT-12*60)) return 1; }
+  if (w?.relieved && !w.handed){ const mm=(G.t%3600)/60; if (mm<=20 && !w.logs[Math.floor(G.t/3600)]) return 1; if (w.kind==='night' && !w.orders) return 1; }
+  const nx=nextEventTime(); if (nx!=null && nx-G.t<4*60) return 1;
+  if (G.drag?.active || G.quests.safety.state==='active' || G.quests.hatch.state==='active' || G.quests.food.state==='active' || G.quests.chart.state==='active') return 1;
+  return 4;
+}
 function simulate(dt){
   const run = !G.paused && !G.modal;
   const lightsOn=updateEnv();
   if (run){
-    const sdt = dt*G.ff; const dtg = sdt*TS;
+    const ff = effFF(); G.curFF=ff; const sdt = dt*ff; const dtg = sdt*TS;
     G.t += dtg;
     G.bac=Math.max(0, G.bac-0.015*dtg/3600);
     G.fatigue=clamp(G.fatigue+dtg/3600*(G.watch?.relieved?3.5:2.5),0,100);
-    updateShip(sdt); updateTargets(sdt, lightsOn); runEvents(); watchTick(dtg); encTick(sdt); ancTick(dtg); dragTick(); drillTick();
-    if (['hatch','food','chart'].every(k=>G.quests[k].state==='done')) G.done.sideDone=true;
+    updateShip(sdt); updateTargets(sdt, lightsOn); runEvents(); watchTick(dtg); encTick(sdt); ancTick(dtg); dragTick(); drillTick(); revTick(); emgTick(); bnwasTick();
+    if (['hatch','food','chart','safety'].every(k=>G.quests[k].state==='done')) G.done.sideDone=true;
     placeIslands(false);
     updateNPCs(dt);
   }
@@ -1595,7 +2095,12 @@ function frame(now){
   simulate(dt);
   seaU.uTime.value = G.t/TS;
   sea.position.set(Math.round(camera.position.x/50)*50, 0, Math.round(camera.position.z/50)*50);
-  indoorLight.intensity = AREAS[player.area].indoor ? (G.night?1.1:0.7) : 0;
+  indoorLight.intensity = AREAS[player.area].indoor ? (G.black?0.15:(G.night?1.1:0.7)) : 0;
+  for (const m of shipG.userData.bridgeShell) m.visible = player.area!=='bridge';
+  updateBridge(dt); audioTick(); updateSparkle();
+  camTray.visible = !!G.tray && AREAS[player.area].indoor && !G.binoc && !G.seated;
+  partyDecor.visible = G.phase==='party'; drawClock();
+  const fl=shipG.userData.flag; fl.rotation.y=Math.PI/2+Math.sin(G.t/TS*2.2)*0.18; fl.rotation.x=Math.sin(G.t/TS*3.1)*0.05;
   updateCamera(dt); sky.position.copy(camera.position); stars.position.copy(camera.position);
   updateObjective(); updateHUD(); drawMini();
   renderer.render(scene,camera);
@@ -1604,7 +2109,7 @@ requestAnimationFrame(frame);
 placeIslands(true);
 
 // 테스트·디버그용 핸들
-window.__game = { advance:(sec)=>{ for(let i=0;i<sec/0.05;i++){ simulate(0.05); updateObjective(); } }, useAt:(id)=>{ const it=INTER.find(i=>i.id===id); player.area=it.area; player.x=it.x; player.s=it.s; const n=findInteract(); if(!n||n.it?.id!==id) return 'not-found:'+(n?.label); n.it.act(); return n.label; }, goNear:(npc)=>{ const n=NPC[npc]; player.area=n.area; player.x=n.x+0.8; player.s=n.s; return n.area; }, INTER, QUESTS, G, ship, player, NPC, targets, startMission, interact, talk, pick, closePanel, openPanel, findInteract, objective,
+window.__game = { scene, camera, THREE, startRev, endRev, advance:(sec)=>{ for(let i=0;i<sec/0.05;i++){ simulate(0.05); updateObjective(); } }, useAt:(id)=>{ const it=INTER.find(i=>i.id===id); player.area=it.area; player.x=it.x; player.s=it.s; const n=findInteract(); if(!n||n.it?.id!==id) return 'not-found:'+(n?.label); n.it.act(); return n.label; }, goNear:(npc)=>{ const n=NPC[npc]; player.area=n.area; player.x=n.x+0.8; player.s=n.s; return n.area; }, INTER, QUESTS, G, ship, player, NPC, targets, startMission, interact, talk, pick, closePanel, openPanel, findInteract, objective,
   setTime:t=>{G.t=t;}, at, teleport:(area,x,s)=>{player.area=area;player.x=x;player.s=s;}, keys, get panel(){return G.panel;}, get sub(){return subCur;} };
 </script>
 <!--ARTIFACT-END-->
