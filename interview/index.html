@@ -1762,6 +1762,7 @@ function renderReport(rep){
  const NVC=([
   {h:'질문',always:1,f:(r,i)=>`<td>Q${i+1} ${esc(IV[r.turn.iv].short)}${r.turn.follow?' · 꼬리':''}</td>`},
   {h:'길이',cls:'n',always:1,f:r=>`<td class="n${r.ta.P.some(p=>p.k==='long')?' bad':''}">${Math.round(r.dur)}초</td>`},
+  {h:'답변 방식',always:1,f:r=>`<td>${r.nv.typed?'타이핑':'음성'}</td>`},
   {h:'첫마디',cls:'n',show:S.turns.some(r=>!r.nv.typed),f:r=>`<td class="n${r.nv.lat>4&&!r.nv.typed?' bad':''}">${r.nv.typed?'—':r.nv.lat.toFixed(1)+'초'}</td>`},
   {h:'시선 이탈',cls:'n',show:camAny,f:r=>`<td class="n${r.nv.away>.3?' bad':''}">${r.nv.faceOk?pct(r.nv.away):'—'}</td>`},
   {h:'고개 흔들림',cls:'n',show:camAny,f:r=>`<td class="n${r.nv.headStd>8?' bad':''}">${r.nv.faceOk?r.nv.headStd.toFixed(1)+'°':'—'}</td>`},
