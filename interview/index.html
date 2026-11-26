@@ -256,7 +256,7 @@ input[type=range]{padding:0;height:30px;accent-color:var(--ac);background:transp
         <b style="display:block;margin-top:14px">면접관 3인 목소리 (남자 2명 · 여자 1명)</b>
         <p class="note" style="margin:4px 0 0">남자1은 묵직한 저음, 남자2는 또렷한 중음, 여자1은 차분한 중저음으로 고정했습니다. 브라우저에 한국어 남성 음성(인준·현수·봉진 등)이 있으면 먼저 그것을 쓰고, 없으면 pitch를 낮춰 성별 느낌을 살립니다.</p>
         <div class="vroles" id="vRoles"></div>
-        <label class="lbl" for="vRate" style="margin-top:10px">면접관 말하기 속도 <b id="vRateV">1.0x</b> <span style="font-weight:400;color:var(--mute)">· 브라우저 음성 기준</span> <span style="font-weight:400;color:var(--mute)">(0.9 느리게 ~ 1.2 빠르게)</span></label>
+        <label class="lbl" for="vRate" style="margin-top:10px">면접관 말하기 속도 <b id="vRateV">1.0x</b> <span style="font-weight:400;color:var(--mute)">· 내장 음성·브라우저 음성 모두 적용</span> <span style="font-weight:400;color:var(--mute)">(0.9 느리게 ~ 1.2 빠르게)</span></label>
         <input type="range" id="vRate" min="0.9" max="1.2" step="0.05" value="1" aria-label="면접관 말하기 속도">
         <div class="vprev" id="vPrevRow">
           <button class="ghost mini" type="button" data-vp="A">▶ 1 남</button>
@@ -991,7 +991,7 @@ function setTalk(id){
  ['A','B','C'].forEach(k=>{const on=k===id;
   ['iv','pl','fc'].forEach(pre=>{const el=document.getElementById(pre+k);if(el)el.classList.toggle('talk',on)});
   const d=document.querySelector('#iv'+k+' .dim');if(d)d.style.opacity=id?(on?'0':'1'):'0';
-  const b=document.getElementById('st'+k);if(b)b.style.opacity=(on||id)?'0':(MOT_LBL[MOT[k].st]?'1':'0')});
+  const b=document.getElementById('st'+k);if(b)b.style.opacity=(on||!MOT_LBL[MOT[k].st])?'0':'1'});
 }
 
 /* ---------- media ---------- */
@@ -1138,7 +1138,8 @@ function voiceFor(iv,lang){const pick=lang==='ko'&&S.vPick&&S.vPick[iv];if(pick)
 /* 실제 발음 파라미터: 성별이 맞으면 목표 pitch, 여성 음성으로 대체되면 더 낮은 fbPitch */
 function prosodyFor(iv,v){
  const c=IV[iv],nm=v?v.name:'',ok=c.gender==='m'?isMalName(nm):isFemName(nm);
- const pitch=(v&&!ok)?c.fbPitch:c.pitch;
+ /* 기계음 방지를 위해 실제 재생과 같은 0.88~1.0 범위만 쓴다 */
+ const pitch=clamp((v&&!ok)?c.fbPitch:c.pitch,.88,1);
  const rate=c.rateM*clamp(S.rate||1,.85,1.3);
  return{pitch:+pitch.toFixed(3),rate:+rate.toFixed(3),mismatch:!!(v&&!ok),nat:!!(v&&isNatural(v))};
 }
@@ -1234,6 +1235,7 @@ function playMp3(url){
  return new Promise((res,rej)=>{
   let a;try{a=new Audio(url)}catch(e){return rej(e)}
   a.preload='auto';S.audio=a;S.talkAn=null;
+  try{a.preservesPitch=true;a.playbackRate=clamp(S.rate||1,.85,1.3)}catch(_){}
   let done=false,cap=0,wd=0;
   const poll=setInterval(()=>{if(S.aborted)fin(true)},300);
   const fin=ok=>{if(done)return;done=true;clearTimeout(cap);clearTimeout(wd);clearInterval(poll);S.talkAn=null;
