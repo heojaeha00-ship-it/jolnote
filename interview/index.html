@@ -384,13 +384,13 @@ const isMalName=nm=>!isFemName(nm)&&MAL.test(nm||'');
 /* 면접관 3인: 남자1(묵직한 임원·선장 출신) · 남자2(젠틀한 에이스 팀장) · 여자1(차분한 인사·임원)
    pitch/rateM은 「브라우저 음성」 기준값. 남성 음성을 못 찾아 여성 음성으로 대체될 때는 fbPitch로 더 낮춰 남성 톤을 낸다. */
 const IV={
- A:{name:'김정민 인사팀장',short:'인사팀장',role:'남자1',gender:'m',pitch:.77,fbPitch:.71,enPitch:.86,rateM:.94,
+ A:{name:'김정민 인사팀장',short:'인사팀장',role:'남자1',gender:'m',pitch:.84,fbPitch:.80,enPitch:.86,rateM:.94,
     el:{voice:'VR6AewLTigWG4xSOukaG',vname:'Arnold(묵직한 저음)',stability:.58,similarity_boost:.80,style:.20},
     suit:'#27344b',suit2:'#151d2c',shirt:'#f2f4f2',tie:'#6e2c2c',skin:'#e7bf9d',hair:'#332a24',x:330,look:'m1'},
- B:{name:'박태수 팀장',short:'해사팀장',role:'남자2',gender:'m',pitch:.96,fbPitch:.95,enPitch:1.0,rateM:1.03,
+ B:{name:'박태수 팀장',short:'해사팀장',role:'남자2',gender:'m',pitch:.90,fbPitch:.88,enPitch:1.0,rateM:1.03,
     el:{voice:'TX3LPaxmHKxFdv7VOQHJ',vname:'Liam(깔끔한 중음)',stability:.42,similarity_boost:.78,style:.38},
     suit:'#3c444e',suit2:'#262c34',shirt:'#e2eaf1',tie:'#2d4363',skin:'#eec9a9',hair:'#2b221c',x:600,look:'m2',glasses:true},
- C:{name:'이현주 상무',short:'임원',role:'여자1',gender:'f',pitch:.86,fbPitch:.865,enPitch:.94,rateM:.97,
+ C:{name:'이현주 상무',short:'임원',role:'여자1',gender:'f',pitch:.86,fbPitch:.84,enPitch:.94,rateM:.97,
     el:{voice:'XB0fDUnXU5powFXDhCwa',vname:'Charlotte(차분한 여성)',stability:.52,similarity_boost:.78,style:.25},
     suit:'#2c3547',suit2:'#1b2130',shirt:'#f7f2e9',tie:'#8a8770',skin:'#f2d4b6',hair:'#2c221c',x:870,look:'f1'}
 };
@@ -1138,8 +1138,8 @@ function voiceFor(iv,lang){const pick=lang==='ko'&&S.vPick&&S.vPick[iv];if(pick)
 /* 실제 발음 파라미터: 성별이 맞으면 목표 pitch, 여성 음성으로 대체되면 더 낮은 fbPitch */
 function prosodyFor(iv,v){
  const c=IV[iv],nm=v?v.name:'',ok=c.gender==='m'?isMalName(nm):isFemName(nm);
- /* 기계음 방지를 위해 실제 재생과 같은 0.88~1.0 범위만 쓴다 */
- const pitch=clamp((v&&!ok)?c.fbPitch:c.pitch,.88,1);
+ /* 기계음 방지를 위해 실제 재생과 같은 0.80~1.0 범위만 쓴다 */
+ const pitch=clamp((v&&!ok)?c.fbPitch:c.pitch,.80,1);
  const rate=c.rateM*clamp(S.rate||1,.85,1.3);
  return{pitch:+pitch.toFixed(3),rate:+rate.toFixed(3),mismatch:!!(v&&!ok),nat:!!(v&&isNatural(v))};
 }
@@ -1150,7 +1150,7 @@ function fillVoiceSel(){const l=voicesFor('ko');const box=$('#vBox');if(!box)ret
 /* 설정 패널에 세 면접관의 생김새(이름·성별·실제 잡힌 음성·pitch)를 그대로 보여 준다 */
 function renderVoiceRoles(){const box=$('#vRoles');if(!box)return;
  const l=voicesFor('ko'),hasMal=l.some(v=>isMalName(v.name)),hasFem=l.some(v=>isFemName(v.name));
- const warn=!l.length?'<p class="note" style="color:var(--bad);margin:0 0 6px">이 브라우저에는 한국어 음성이 하나도 없습니다. <b>Microsoft Edge</b>나 Chrome으로 열어 주세요.</p>':!hasMal?'<p class="note" style="color:var(--warn);margin:0 0 6px">한국어 남성 음성이 없어 면접관 1·2는 여성 음성을 0.88~1.0 pitch로 살짝 낮춰 톤을 맞춥니다. Edge를 쓰면 인준·현수 같은 남성 음성이 잡힙니다.</p>':'';
+ const warn=!l.length?'<p class="note" style="color:var(--bad);margin:0 0 6px">이 브라우저에는 한국어 음성이 하나도 없습니다. <b>Microsoft Edge</b>나 Chrome으로 열어 주세요.</p>':!hasMal?'<p class="note" style="color:var(--warn);margin:0 0 6px">한국어 남성 음성이 없어 면접관 1·2는 여성 음성을 0.80~1.0 pitch로 낮춰 톤을 맞춥니다. Edge를 쓰면 인준·현수 같은 남성 음성이 잡힙니다.</p>':'';
  box.innerHTML='<p class="note" style="margin:0 0 6px;color:var(--ok)">🎙 <b>내장 Neural 음성</b> — 질문·리액션은 남1 InJoon(저음)·남2 Hyunsu·여1 SunHi 목소리로 바로 재생되고(API 키 불필요), 즉석 꼬리질문만 아래 브라우저 음성으로 읽습니다.</p>'+warn+['A','B','C'].map(iv=>{const v=voiceFor(iv,'ko'),pr=prosodyFor(iv,v);
   return `<div class="vr"><b>${iv==='A'?'1':iv==='B'?'2':'3'}</b><span class="g ${IV[iv].gender}">${IV[iv].gender==='m'?'남':'여'}</span><span>${esc(IV[iv].name)}<br><small>${v?esc(v.name)+(isMalName(v.name)?' (남)':isFemName(v.name)?' (여)':''):'음성 없음'} · pitch ${pr.pitch} · ${pr.rate}x${pr.mismatch?' · 저음 보정':''}</small></span></div>`}).join('');
 }
@@ -1174,11 +1174,11 @@ function speakOne(t,iv,lang){return new Promise(res=>{
  if(!t)return res();
  if(!('speechSynthesis' in window)){setTimeout(res,t.length*90);return}
  const u=new SpeechSynthesisUtterance(t);const v=voiceFor(iv,lang);if(v)u.voice=v;u.lang=lang==='en'?'en-US':'ko-KR';
- /* 면접관별 고정 음색: 남자1 pitch .77 / .94x, 남자2 .96 / 1.03x, 여자1 .86 / .97x (사용자 속도 배율만 곱한다) */
+ /* 면접관별 고정 음색: 남자1 pitch .84 / .94x, 남자2 .90 / 1.03x, 여자1 .86 / .97x (사용자 속도 배율만 곱한다) */
  const mism=!!v&&!(IV[iv].gender==='m'?isMalName(v.name):isFemName(v.name));
  const pr=lang==='ko'?prosodyFor(iv,v):{pitch:+(IV[iv].enPitch*(mism?.9:1)).toFixed(3),rate:+(IV[iv].rateM*clamp(S.rate||1,.85,1.3)).toFixed(3)};
- /* 모바일에서 금속성 기계음이 나지 않도록 pitch는 0.88~1.0 사이로만 쓴다 */
- u.pitch=clamp(pr.pitch,.88,1);u.rate=pr.rate;
+ /* 모바일에서 금속성 기계음이 나지 않도록 pitch는 0.80~1.0 사이로만 쓴다 */
+ u.pitch=clamp(pr.pitch,.80,1);u.rate=pr.rate;
  let done=false;const to=setTimeout(()=>fin(),4000+t.length*220);
  const ka=v&&/Google/i.test(v.name)?setInterval(()=>{if(speechSynthesis.speaking){speechSynthesis.pause();speechSynthesis.resume()}},9000):0;
  function fin(){if(done)return;done=true;clearTimeout(to);clearInterval(ka);res()}
