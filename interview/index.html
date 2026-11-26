@@ -1240,15 +1240,18 @@ function playMp3(url){
   const poll=setInterval(()=>{if(S.aborted)fin(true)},300);
   const fin=ok=>{if(done)return;done=true;clearTimeout(cap);clearTimeout(wd);clearInterval(poll);S.talkAn=null;
    try{a.onended=null;a.onerror=null}catch(_){}
+   if(!ok){try{a.pause()}catch(_){}}          /* 재생 실패·지연 시 TTS와 겹치지 않게 멈춘다 */
    if(ok)res();else rej(new Error('mp3'))};
   a.onended=()=>fin(true);
   a.onerror=()=>fin(false);
+  /* 소리 자체는 항상 나야 하므로, 오디오 그래프가 실제로 돌고 있을 때만 분석기를 붙인다
+     (멈춘 AudioContext에 물리면 소리 없이 재생만 되는 경우가 있다) */
   if(/^https?:/.test(location.protocol)){
    const ctx=ensureAC();
-   if(ctx){try{const src=ctx.createMediaElementSource(a),an=ctx.createAnalyser();an.fftSize=512;an.smoothingTimeConstant=.55;src.connect(an);an.connect(ctx.destination);S.talkAn=an}catch(e){console.warn('webaudio',e)}}
+   if(ctx&&ctx.state==='running'){try{const src=ctx.createMediaElementSource(a),an=ctx.createAnalyser();an.fftSize=512;an.smoothingTimeConstant=.55;src.connect(an);an.connect(ctx.destination);S.talkAn=an}catch(e){console.warn('webaudio',e);S.talkAn=null}}
   }
   cap=setTimeout(()=>fin(true),90000);
-  wd=setTimeout(()=>{if(a.currentTime<.02)fin(false)},1600);
+  wd=setTimeout(()=>{if(a.currentTime<.02)fin(false)},2600);
   a.play().catch(()=>fin(false));
  });
 }
