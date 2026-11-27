@@ -254,6 +254,7 @@ input[type=range]{padding:0;height:30px;accent-color:var(--ac);background:transp
 .resumeBox{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
 .resumeBox .lbl{margin-top:0}
 .resumeBox textarea{min-height:58px;resize:vertical}
+.resumeNote{margin:8px 0 0;font-size:12.5px;line-height:1.55;color:var(--mute);word-break:keep-all}
 .pickrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
 @media(max-width:520px){.pickrow{grid-template-columns:minmax(0,1fr)}}
 .ctaRow{display:grid;gap:10px;margin-top:24px}
@@ -346,6 +347,7 @@ a.btn.sm{min-height:38px;padding:8px 13px;font-size:13.5px;border-radius:9px;fon
     <section class="resumeBox">
       <label class="lbl" for="resume">내 자소서·실습 이력 <span class="hint">(선택 — 안 써도 바로 시작됩니다. 쓰면 맞춤 질문이 들어갑니다)</span></label>
       <textarea id="resume" rows="2" placeholder="예: 실습선 승선실습 2주(갑판·당직), 컨테이너선 하역 감독 관찰, 학회장 40명 행사 기획, 토익 855, 안전관리자 교육 수료"></textarea>
+      <p class="note resumeNote">※ 기본 모드에선 적은 내용의 핵심 키워드(실습선·하역·당직·안전·리더십 등)를 인식해 관련 질문을 고릅니다. (부정 표현은 제외, AI 키 연결 시 문장 전체 반영)</p>
       <div class="reskws" id="resumeKws"></div>
     </section>
 
@@ -866,12 +868,33 @@ const RESUME_KW=[
  {k:'r_train',label:'승선실습',re:/실습선|승선실습|실습항해/gi}
 ];
 const KEY_LABEL=Object.fromEntries(RESUME_KW.map(x=>[x.k,x.label]));
+/* 부정·미완료 표현 판별 — "실습선 경험은 없습니다", "토익은 아직 안 봤습니다"처럼
+   부정문에 나온 키워드는 경험으로 치지 않는다(맞춤 질문을 잘못 고르지 않도록).
+   키워드 앞뒤 20자 이내, 같은 절(마침표·쉼표·가운뎃점 등으로 끊은 구간) 안에서만 보고,
+   그 사이에 다른 키워드가 있으면 그 키워드 몫으로 넘긴다. */
+const RESUME_BREAK=/[.!?。\n,、;:·\/~]/;
+const RESUME_NEG=/없|않|못\s|못함|못했|미경험|미이수|미참|미완|미응시|미취득|예정|준비\s*중|안\s|아직\s*(?:안|못|않|전|준비|이수|미|예정|응시)/;
+const RESUME_NEG_WIN=20;
+function resumeNegated(txt,h,prev,next){
+ let lo=0,hi=txt.length;
+ for(let i=h.at-1;i>=0;i--){if(RESUME_BREAK.test(txt[i])){lo=i+1;break}}
+ for(let i=h.end;i<txt.length;i++){if(RESUME_BREAK.test(txt[i])){hi=i;break}}
+ if(prev&&prev.end>lo&&!RESUME_BREAK.test(txt.slice(prev.end,h.at)))lo=prev.end;
+ if(next&&next.at<hi&&!RESUME_BREAK.test(txt.slice(h.end,next.at)))hi=next.at;
+ const before=txt.slice(Math.max(lo,h.at-RESUME_NEG_WIN),h.at);
+ const after=txt.slice(h.end,Math.min(hi,h.end+RESUME_NEG_WIN));
+ return RESUME_NEG.test(before)||RESUME_NEG.test(after);
+}
 function resumeKeys(){
- const txt=(S.resume||'').trim();S.kwHit=S.kwHit||{};
+ const txt=(S.resume||'').trim();S.kwHit={};
  if(!txt)return [];
- const hits=[];
- for(const it of RESUME_KW){it.re.lastIndex=0;const m=it.re.exec(txt);if(m)hits.push({k:it.k,at:m.index,w:m[0]})}
- hits.sort((a,b)=>a.at-b.at);
+ const raw=[];
+ for(const it of RESUME_KW){
+  it.re.lastIndex=0;let m;
+  while((m=it.re.exec(txt))){raw.push({k:it.k,at:m.index,end:m.index+m[0].length,w:m[0]});if(!m[0].length)it.re.lastIndex++}
+ }
+ raw.sort((a,b)=>a.at-b.at||b.end-a.end);
+ const hits=raw.filter((h,i)=>!resumeNegated(txt,h,raw[i-1],raw[i+1]));
  const out=[];
  for(const h of hits){if(out.length>=2)break;if(!out.includes(h.k)){out.push(h.k);S.kwHit[h.k]=h.w}}
  if(!out.length){S.kwHit.r_gen='직접 쓴 경험';out.push('r_gen')}
