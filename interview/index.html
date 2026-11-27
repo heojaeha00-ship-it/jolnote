@@ -30,7 +30,24 @@ h1{font-size:clamp(32px,4vw,48px);line-height:1.06;margin:0 0 6px;letter-spacing
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
 .lbl{font-weight:700;font-size:14px;margin:20px 0 8px;display:block}
 .panel>.lbl:first-child{margin-top:0}
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.modes .opt small{line-height:1.35}
+@media(max-width:560px){.modes{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.modes .opt{padding:11px 9px}.modes .opt b{font-size:15.5px}.modes .opt small{font-size:10.5px;line-height:1.3}}
+/* ---- 3. 자유 모드: 녹화 중 화면 · 다시보기·자가 점검 ---- */
+#room.free .tbar,#room.free .tbarlbl,#room.free .roster,#room.free #btnRec,#room.free #btnReplay,#room.free #btnRepeat,#room.free #btnType,#room.free #btnSkip,#room.free #btnMore,#room.free #btnEnd,#room.free #live,#room.free #prog,#room.free #khint{display:none!important}
+#room.free .cap{border:1px solid rgba(255,150,90,.5);box-shadow:0 0 0 1px rgba(0,0,0,.4) inset}
+#room.free .dock #btnDone{min-height:52px;font-size:16px;font-weight:800;padding:12px 20px}
+.recbig{width:100%;max-height:min(58vh,520px);border-radius:14px;background:#000;display:block}
+audio.recbig{max-height:none;height:62px;background:#f4f1ec;border:1.5px solid var(--line)}
+.freehead h1{font-size:clamp(24px,4vw,34px);margin:0 0 6px;letter-spacing:-.02em}
+.freetime{display:inline-flex;align-items:baseline;gap:8px;background:#fff3ec;border:1px solid #f6c9b5;color:#a3401d;border-radius:12px;padding:8px 14px;font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;margin:12px 0 0}
+.freetime small{font-size:12.5px;font-weight:600;opacity:.88}
+.fchk{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:10px}
+.fchk li{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font-size:15px;line-height:1.4;cursor:pointer}
+.fchk li[aria-pressed=true]{border-color:var(--ok);background:#f2faf5}
+.fchk li[aria-pressed=true] span{color:var(--mute)}
+.fchk input{width:20px;height:20px;margin:0;flex:0 0 auto;accent-color:var(--ok)}
+.fmemo{width:100%;min-height:96px;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:15px;line-height:1.55;resize:vertical;background:#fff}
 .opt{border:1.5px solid var(--line);border-radius:12px;padding:14px;background:#fff;text-align:left;color:var(--ink);font-weight:500}
 .opt b{display:block;font-size:17px}
 .opt small{color:var(--mute);font-weight:400;word-break:keep-all}
@@ -185,7 +202,7 @@ input[type=range]{padding:0;height:30px;accent-color:var(--ac);background:transp
 .vroles .vr small{color:var(--mute);font-size:12px}
 .vprev{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .vprev button{min-width:96px}
-/* ---- 🏆 심사위원 시연 · 선사 브리핑 카드 · 자소서 입력 ---- */
+/* ---- ⚡ 빠른 시작(시연) · 선사 브리핑 카드 · 자소서 입력 ---- */
 .brief{border:1.5px solid var(--ac);border-radius:14px;background:#fff;overflow:hidden;margin-top:12px}
 .brief-h{display:flex;justify-content:space-between;align-items:center;gap:10px;background:linear-gradient(135deg,#e8572a,#ff9354);color:#fff;padding:9px 14px;flex-wrap:wrap}
 .brief-h b{font-size:15px;letter-spacing:-.01em}
@@ -302,12 +319,13 @@ button.bigcopy.done{background:var(--ok)}
     <div class="modes" id="modeSel">
       <button class="opt" data-v="real" aria-pressed="true"><b>1. 실전</b><small>힌트 없이 끝까지</small></button>
       <button class="opt" data-v="practice" aria-pressed="false"><b>2. 연습</b><small>질문 의도·답변 가이드 표시</small></button>
+      <button class="opt" data-v="free" aria-pressed="false"><b>3. 자유</b><small>질문 없이 녹화 · 다시보기 자가 점검</small></button>
     </div>
-    <p class="note" style="margin:8px 0 0">두 모드 모두 리포트는 면접이 끝난 뒤 한 번에 나옵니다.</p>
+    <p class="note" id="modeNote" style="margin:8px 0 0">실전·연습은 면접이 끝난 뒤 리포트를 한 번에 보여 주고, 자유는 녹화를 바로 다시 봅니다.</p>
 
     <div class="ctaRow">
       <button type="button" id="btnStartNoCam" class="primaryBig">면접 시작하기<small>카메라·마이크 없이 바로 · 기본 7문항 약 15분</small></button>
-      <button type="button" id="btnDemo" class="demoBig">🏆 심사위원 빠른 시연<small>샘플 세팅(HMM · 항해 · 3문항)으로 바로 시작</small></button>
+      <button type="button" id="btnDemo" class="demoBig">⚡ 빠른 시작<small>샘플 세팅(HMM · 항해 · 3문항)으로 바로 시작</small></button>
     </div>
     <p class="note" id="startNote" style="margin:14px 0 0">화면 속 내 모습까지 점검하려면 아래 <b>세부 설정</b>에서 카메라를 켜고 시작하세요.</p>
   </section>
@@ -850,6 +868,14 @@ S.vPick=store.vp||{};
 if(store.model)$('#model').value=store.model;
 
 function group(sel,key,num){$$(sel+' .opt').forEach(b=>b.onclick=()=>{$$(sel+' .opt').forEach(x=>x.setAttribute('aria-pressed',x===b));S[key]=num?+b.dataset.v:b.dataset.v})}
+/* 연습 모드 선택에 따라 시작 버튼·안내문이 바뀐다 (3. 자유는 질문 없이 녹화) */
+const START_LABEL='면접 시작하기<small>카메라·마이크 없이 바로 · 기본 7문항 약 15분</small>';
+function updateModeNote(){
+ const free=S.mode==='free',el=$('#modeNote'),b=$('#btnStartNoCam'),sn=$('#startNote');
+ if(el)el.innerHTML=free?'<b>3. 자유</b>는 질문 없이 카메라·마이크로 녹화합니다. 1분 자기소개나 준비한 질문을 말하고 <b>녹화 종료 및 다시보기</b>를 누르면 바로 다시보기·자가 점검으로 넘어갑니다.':'실전·연습은 면접이 끝난 뒤 리포트를 한 번에 보여 주고, 자유는 녹화를 바로 다시 봅니다.';
+ if(b)b.innerHTML=free?'녹화 시작<small>카메라·마이크로 바로 녹화 · 질문 없음</small>':START_LABEL;
+ if(sn)sn.innerHTML=free?'카메라·마이크 권한을 허용하면 화면과 목소리가 함께 녹화되고, 허용하지 않아도 시간은 잴 수 있습니다.':'화면 속 내 모습까지 점검하려면 아래 <b>세부 설정</b>에서 카메라를 켜고 시작하세요.';
+}
 $$('#tagSel .opt').forEach(b=>b.onclick=()=>{const v=b.dataset.v,on=!S.tags.has(v);on?S.tags.add(v):S.tags.delete(v);b.setAttribute('aria-pressed',on)});
 function fillOrgs(){const pub=S.track==='pub';$('#company').innerHTML=ORGS[pub?'pub':'sea'].map(o=>`<option>${o}</option>`).join('');$('#companyL').textContent=pub?'지원 기관':'지원 선사';$('#shipBox').style.visibility=TRACKS[S.track].ship?'visible':'hidden';$('#eng').closest('label').style.display=S.track==='en'?'none':'';applyTrackNames();}
 $$('#trackSel .opt').forEach(b=>b.addEventListener('click',()=>{$$('#trackSel .opt').forEach(x=>x.setAttribute('aria-pressed',x===b));S.track=b.dataset.v;fillOrgs();showCoTip();}));
@@ -883,6 +909,8 @@ function showCoTip(){
 }
 $('#company').addEventListener('change',()=>{showCoTip();updateFocusNote()});
 group('#modeSel','mode');group('#styleSel','style');group('#countSel','count',true);group('#focusSel','focus');
+$$('#modeSel .opt').forEach(b=>b.addEventListener('click',()=>updateModeNote()));
+updateModeNote();
 $$('#focusSel .opt').forEach(b=>b.addEventListener('click',()=>{updateFocusNote()}));
 function updateFocusNote(){const el=$('#focusNote');if(!el)return;const f=S.focus||'all';
  if(f==='co'&&!coKey()){el.innerHTML='<b style="color:var(--bad)">선사 맞춤</b>은 위 선사 목록에 있는 회사를 골랐을 때만 쓸 수 있습니다. 선사를 고르면 맞춤 질문이 나옵니다.';return}
@@ -903,7 +931,7 @@ function setChips(sel,v){$$(sel+' .opt').forEach(b=>b.setAttribute('aria-pressed
   if(store.company){const o=[...($('#company').options||[])].find(x=>x.value===store.company);if(o)$('#company').value=store.company}
   if(store.ship)$('#ship').value=store.ship;
  }catch(e){console.warn('restore',e)}
- showCoTip();updateFocusNote();
+ showCoTip();updateFocusNote();updateModeNote();
 })();
 
 /* ---------- scene: 실사 면접실 (사진 배경 + 3인 독립 모션 레이어) ---------- */
@@ -1359,7 +1387,7 @@ function startRec(lang){
  S.listening=true;const r=new SR();
  r.lang=tag;r.continuous=true;r.interimResults=true;
  r.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)S.text+=x[0].transcript.trim()+' ';else it+=x[0].transcript}S.interim=it;renderAns()};
- r.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){S.listening=false;toast('음성 인식이 막혔습니다 — 타이핑으로 답변하세요');setTyping(true)}};
+ r.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){S.listening=false;toast('음성 인식이 막혔습니다 — 타이핑으로 답변하세요');if(!S.free)setTyping(true)}};
  r.onend=()=>{if(S.listening&&S.rec===r){try{r.lang=S.recLang||r.lang;r.start()}catch(_){}}};
  S.rec=r;try{r.start()}catch(_){}
 }
@@ -1432,6 +1460,8 @@ function buildPlan(){
 async function start(custom){
  const drill=Array.isArray(custom)&&custom.length?custom.filter(k=>BANK[k]):null;
  S.demo=!!S.demoNext;S.demoNext=false;
+ S.free=false;$('#room').classList.remove('free');
+ $('#btnDone').innerHTML='답변 완료<span class="kbd"> (Space)</span>';
  S.drill=!!drill;
  S.company=/미정/.test($('#company').value)?(S.track==='pub'?'저희 기관':'저희 회사'):$('#company').value;S.ship=$('#ship').value;
  {applyTrackNames();scene();}
@@ -1526,7 +1556,7 @@ async function endAnswer(interrupted){
  ask(nx.turn);
 }
 const ACK_KO=['네, 잘 들었습니다.','간결하게 정리해 주셨네요.','네, 알겠습니다.','좋습니다. 말씀 잘 들었습니다.'];
-/* 🏆 심사위원 빠른 시연: 매번 같은 순서·같은 대본으로 진행한다.
+/* ⚡ 빠른 시작(시연): 매번 같은 순서·같은 대본으로 진행한다.
    질문·꼬리질문·리액션이 모두 내장 음성에 있어 브라우저 TTS(다른 톤)가 끼어들지 않는다. */
 const DEMO_PLAN=['intro','r_train','r_cont','lights','last'];
 const DEMO_FOLLOW={
@@ -1886,7 +1916,7 @@ function renderReport(rep){
  window.scrollTo(0,0);
 }
 
-/* ---------- 자소서 키워드 표시 · 🏆 심사위원 빠른 시연 ---------- */
+/* ---------- 자소서 키워드 표시 · ⚡ 빠른 시작(시연) ---------- */
 function updateResumeKws(){
  S.resume=$('#resume').value;
  const box=$('#resumeKws');if(!box)return;
@@ -1908,14 +1938,129 @@ $('#btnDemo').onclick=()=>{
  /* 심사위원이 한 번만 눌러도 바로 시연이 시작되도록 확인 단계 없이 진행한다 */
  start();
 };
+/* ---------- 3. 자유 모드: 질문 없이 녹화 → 다시보기 · 자가 점검 ---------- */
+const FREE_TIP='준비한 질문이나 1분 자기소개를 자유롭게 말해보세요. 종료를 누르면 바로 다시보기로 넘어갑니다.';
+const FREE_CHK=['시선을 카메라 근처에 두고 말했나요?','목소리 크기가 충분했나요?','말이 너무 빠르거나 느리지 않았나요?','핵심 메시지를 첫 문장에 말했나요?','“음·어” 같은 군더더기가 적었나요?'];
+let freeMR=null,freeChunks=[];
+async function freeMedia(){
+ if(S.stream)return true;
+ try{S.stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'},audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:false}});S.audioOnly=false}
+ catch(e){
+  try{S.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});S.audioOnly=true}
+  catch(e2){S.stream=null;S.audioOnly=false;return false}
+ }
+ ['#prev','#pipv','#src'].forEach(s=>{const el=$(s);if(el){el.srcObject=S.stream;el.muted=true;try{el.play()}catch(_){}}});
+ const pv=$('#pipv');if(pv)pv.style.display=S.audioOnly?'none':'';
+ $('#ph').classList.add('hide');
+ return true;
+}
+function freeRecStart(){
+ freeChunks=[];freeMR=null;
+ if(!S.stream||!window.MediaRecorder)return false;
+ const withVideo=!!(S.stream.getVideoTracks&&S.stream.getVideoTracks().length);
+ const list=withVideo?['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4']:['audio/webm;codecs=opus','audio/webm','audio/mp4'];
+ let mt=null;for(const m of list){try{if(MediaRecorder.isTypeSupported(m)){mt=m;break}}catch(_){}}
+ try{freeMR=new MediaRecorder(S.stream,mt?{mimeType:mt,videoBitsPerSecond:1200000}:{});
+  freeMR.ondataavailable=e=>{if(e.data&&e.data.size)freeChunks.push(e.data)};freeMR.start(1000);return true}catch(e){console.warn('free rec',e);freeMR=null;return false}
+}
+function freeRecStop(){
+ return new Promise(res=>{
+  const mr=freeMR;freeMR=null;
+  const done=()=>res(freeChunks.length?{blob:new Blob(freeChunks,{type:(mr&&mr.mimeType)||'video/webm'}),mime:(mr&&mr.mimeType)||'video/webm'}:null);
+  if(!mr||mr.state==='inactive')return done();
+  mr.onstop=done;try{mr.stop()}catch(_){done()}
+ });
+}
+async function startFree(){
+ S.free=true;S.demo=false;S.drill=false;
+ S.company=/미정/.test($('#company').value)?(S.track==='pub'?'저희 기관':'저희 회사'):$('#company').value;
+ S.resume=$('#resume').value.trim();S.freeTyped=false;
+ try{speechSynthesis.cancel();if(S.audio)S.audio.pause()}catch(_){}
+ $('#setup').classList.add('hide');$('#report').classList.add('hide');$('#room').classList.remove('hide');$('#room').classList.add('free');
+ scene();
+ $('#fb').classList.add('hide');$('#guide').classList.add('hide');$('#guide').innerHTML='';
+ $('#who').textContent='자유 모드 · 녹화 중';
+ $('#qtext').textContent=FREE_TIP;
+ $('#prog').textContent='질문 없이 자유 연습';
+ $('#ans').innerHTML='';$('#typed').value='';$('#typed').classList.add('hide');$('#typedRow').classList.add('hide');$('.dock').classList.remove('typing');
+ $('#timer').textContent='0:00';$('#timer').classList.remove('over');
+ $('#btnDone').innerHTML='● 녹화 종료 및 다시보기';$('#btnDone').disabled=true;
+ $('#btnDone').classList.add('ac');
+ S.phase='free';S.text='';S.interim='';
+ state('카메라·마이크 준비 중…');
+ const ok=await freeMedia();
+ S.freeRec=ok&&freeRecStart();
+ const pp=$('.pip');if(pp)pp.classList.toggle('hide',!ok||!!S.audioOnly);
+ if(!ok){$('#qtext').textContent='카메라·마이크 권한이 없어 녹화 없이 진행합니다. 시간은 아래에 재고, 끝나면 스스로 점검할 수 있습니다. 권한을 허용하고 다시 시작하면 화면과 목소리가 함께 녹화됩니다.'}
+ else if(S.audioOnly){$('#qtext').textContent='카메라를 쓰지 못해 목소리만 녹음합니다. '+FREE_TIP}
+ S.fStart=performance.now();clearInterval(S.ftmr);
+ S.ftmr=setInterval(()=>{const s=(performance.now()-S.fStart)/1000;$('#timer').textContent=fmt(s)},250);
+ try{startRec('ko')}catch(_){}
+ $('#btnDone').disabled=false;
+ state(S.freeRec?'녹화 중 — 말을 마치면 [녹화 종료 및 다시보기]':(ok?'녹화를 지원하지 않는 브라우저 — 시간만 잽니다':'녹화 없이 시간만 재는 중'));
+}
+async function endFree(){
+ if(S.phase!=='free')return;
+ clearInterval(S.ftmr);
+ const dur=(performance.now()-S.fStart)/1000;
+ S.phase='freeProc';$('#btnDone').disabled=true;state('정리 중…');
+ stopRec();
+ const rec=await freeRecStop();
+ const text=((S.text||'')+' '+(S.interim||'')).replace(/\s+/g,' ').trim();
+ const audioOnly=!!S.audioOnly,recorded=!!rec;
+ try{S.stream&&S.stream.getTracks().forEach(t=>t.stop())}catch(_){}
+ S.stream=null;S.audioOnly=false;const pv=$('#pipv');if(pv)pv.style.display='';
+ $('#room').classList.add('hide');$('#room').classList.remove('free');
+ renderFreeReplay({dur,text,blob:rec?rec.blob:null,mime:rec?rec.mime:'',audioOnly,recorded});
+}
+function renderFreeReplay(r){
+ S.phase='done';
+ const R=$('#report');R.classList.remove('hide');
+ const url=r.blob?URL.createObjectURL(r.blob):'';
+ let chk=[];try{chk=JSON.parse(localStorage.getItem('aiint_freechk')||'[]')||[]}catch(_){}
+ let memo='';try{memo=localStorage.getItem('aiint_freememo')||''}catch(_){}
+ const sec=Math.max(0,Math.round(r.dur)),ext=/\.mp4$/.test(r.mime||'')?'mp4':'webm';
+ const player=url
+  ?(r.audioOnly?`<audio class="recbig" controls src="${url}"></audio>`:`<video class="recbig" controls playsinline src="${url}"></video>`)
+  :`<p class="note">${r.recorded?'이 브라우저에서는 녹화가 지원되지 않았습니다.':'카메라·마이크를 쓸 수 없어 영상 없이 진행했습니다.'}</p>`;
+ R.innerHTML=`<div class="freehead"><h1>다시보기 · 자가 피드백</h1>
+  <p class="sub" style="margin:0">질문 없이 진행한 자유 연습입니다. 녹화를 보며 아래 항목을 스스로 점검해 보세요.</p>
+  <div class="freetime"><span>${fmt(sec)}</span><small>녹화 시간${r.text?` · 말한 글자 ${r.text.length}자`:''}</small></div></div>
+ <div class="sec"><h2>녹화 다시 보기</h2>${player}
+  <p class="row" style="margin-top:12px">${url?`<a class="btn ghost" href="${url}" download="자유연습_${new Date().toISOString().slice(0,10)}.${ext}">파일로 저장</a>`:''}<button class="ghost" id="freeAgain" type="button">다시 녹화하기</button><button class="ghost" id="freeHome" type="button">처음 화면</button></p>
+  <p class="note" style="margin:6px 0 0">${r.audioOnly?'마이크만 켜서 목소리만 녹음했습니다.':(url?'면접관 쪽에서 보이는 방향(좌우 반전 없음)입니다.':'')} 녹화 파일은 이 브라우저 안에만 있고 어디로도 전송되지 않습니다.</p></div>
+ <div class="sec"><h2>말한 내용</h2>${r.text?`<div class="tr">${esc(r.text)}</div><p class="note">음성 인식으로 받아 적은 내용이라 실제 말과 다를 수 있습니다.</p>`:'<p class="note">음성 인식이 되지 않아 자막이 없습니다. 영상의 소리로 직접 확인해 보세요.</p>'}</div>
+ <div class="sec"><h2>스스로 점검</h2><ul class="fchk">${FREE_CHK.map((c,i)=>`<li aria-pressed="${!!chk[i]}" data-i="${i}"><input type="checkbox"${chk[i]?' checked':''}><span>${esc(c)}</span></li>`).join('')}</ul>
+  <p class="note" id="fchkNote" style="margin:8px 0 0"></p></div>
+ <div class="sec"><h2>메모</h2><textarea class="fmemo" id="fmemo" placeholder="다음에 고칠 점을 한 줄로 적어 두세요. 예: 첫 문장에 결론부터, 말 끝을 흐리지 않기">${esc(memo)}</textarea><p class="note" id="fmemoNote" style="margin:6px 0 0">입력하면 이 브라우저에 자동 저장됩니다.</p></div>
+ <div class="sec row" style="margin-top:32px"><button class="ac" id="freeAgain2">다시 녹화하기</button><button class="ghost" id="freeHome2">처음 화면</button></div>`;
+ const note=$('#fchkNote');
+ const saveChk=()=>{try{localStorage.setItem('aiint_freechk',JSON.stringify([...R.querySelectorAll('.fchk li')].map(x=>x.getAttribute('aria-pressed')==='true')))}catch(_){};
+  const n=R.querySelectorAll('.fchk li[aria-pressed="true"]').length;if(note)note.textContent=n?`${n}/${FREE_CHK.length}개 확인했습니다.`:`${FREE_CHK.length}개 중 스스로 확인한 항목을 눌러 체크하세요.`};
+ R.querySelectorAll('.fchk li').forEach(li=>{
+  const set=on=>{li.setAttribute('aria-pressed',on);const cb=li.querySelector('input');if(cb)cb.checked=on;saveChk()};
+  li.onclick=e=>{if(e.target!==li.querySelector('input')){e.preventDefault();set(li.getAttribute('aria-pressed')!=='true')}else set(e.target.checked)};
+ });
+ if(note)note.textContent=[...chk].filter(Boolean).length?`${[...chk].filter(Boolean).length}/${FREE_CHK.length}개 확인했습니다.`:`${FREE_CHK.length}개 중 스스로 확인한 항목을 눌러 체크하세요.`;
+ const memoEl=$('#fmemo'),memoNote=$('#fmemoNote');
+ if(memoEl)memoEl.addEventListener('input',()=>{try{localStorage.setItem('aiint_freememo',memoEl.value)}catch(_){};if(memoNote)memoNote.textContent='저장했습니다 — 이 브라우저에만 남습니다.'});
+ const again=()=>{R.classList.add('hide');startFree()};
+ const home=()=>{R.classList.add('hide');$('#setup').classList.remove('hide');S.phase='idle';window.scrollTo(0,0)};
+ ['#freeAgain','#freeAgain2'].forEach(s=>{const b=$(s);if(b)b.onclick=again});
+ ['#freeHome','#freeHome2'].forEach(s=>{const b=$(s);if(b)b.onclick=home});
+ /* 녹화 파일(webm)은 길이 정보가 없어 처음엔 duration=Infinity로 나온다 → 한 번 끝까지 감아 길이를 재운 뒤 처음으로 돌린다 */
+ const pl=R.querySelector('.recbig');
+ if(pl&&pl.tagName!=='A')pl.addEventListener('loadedmetadata',()=>{if(pl.duration===Infinity){pl.currentTime=1e7;pl.addEventListener('timeupdate',function f(){pl.removeEventListener('timeupdate',f);pl.currentTime=0})}});
+ window.scrollTo(0,0);
+}
 /* ---------- controls ---------- */
 $('#btnMedia').onclick=initMedia;
 $('#keySave').addEventListener('change',()=>{if(!$('#keySave').checked){try{const cur=JSON.parse(localStorage.getItem('aiint')||'{}');delete cur.key;delete cur.elkey;localStorage.setItem('aiint',JSON.stringify(cur))}catch(_){}}});
 $$('input[data-img]').forEach(inp=>inp.onchange=()=>{const f=inp.files[0];if(!f)return;IMG[inp.dataset.img]=URL.createObjectURL(f);scene();});
 /* 시작 버튼은 첫 화면의 [면접 시작하기] 하나로 통일 (모바일 하단 바 제거) */
-$('#btnStartNoCam').onclick=()=>start();
-$('#btnStart').onclick=()=>start();
-$('#btnDone').onclick=()=>endAnswer(false);
+$('#btnStartNoCam').onclick=()=>{S.mode==='free'?startFree():start()};
+$('#btnStart').onclick=()=>{S.mode==='free'?startFree():start()};
+$('#btnDone').onclick=()=>{if(S.phase==='free')return endFree();endAnswer(false)};
 $('#btnType').onclick=()=>{setTyping(!S.typing);if(!S.typing&&S.phase==='answer'&&S.cur)startRec(answerLang(S.cur));else setLangTag(answerLang(S.cur));};
 $('#btnRec').onclick=()=>{S.recOn=!S.recOn;$('#btnRec').textContent=S.recOn?'● 녹화 켬':'○ 녹화 끔';$('#btnRec').setAttribute('aria-pressed',S.recOn);toast(S.recOn?'다음 답변부터 녹화합니다':'녹화를 껐습니다');};
 $('#btnReplay').onclick=()=>{const r=S.lastRec;if(!r||S.phase==='answer')return;const prev=$('#fb').classList.contains('hide');
@@ -1942,7 +2087,7 @@ $('#btnSkip').onclick=async()=>{
  await clipStop();                       // 녹화를 깔끔히 정리
  S.depth=0;S.pi++;const k=S.plan[S.pi];k?ask(mkTurn(k)):finish();
 };
-$('#btnEnd').onclick=()=>{if(!S.endArm){S.endArm=true;$('#btnEnd').textContent='한 번 더 누르면 종료';setTimeout(()=>{S.endArm=false;$('#btnEnd').textContent='종료'},3000);return}finish()};
+$('#btnEnd').onclick=()=>{if(S.phase==='free')return endFree();if(!S.endArm){S.endArm=true;$('#btnEnd').textContent='한 번 더 누르면 종료';setTimeout(()=>{S.endArm=false;$('#btnEnd').textContent='종료'},3000);return}finish()};
 document.addEventListener('keydown',e=>{
  if($('#room').classList.contains('hide'))return;
  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){if(S.phase==='answer'){e.preventDefault();endAnswer(false)}return}
