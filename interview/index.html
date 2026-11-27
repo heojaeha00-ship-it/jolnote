@@ -33,7 +33,7 @@ h1{font-size:clamp(32px,4vw,48px);line-height:1.06;margin:0 0 6px;letter-spacing
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .opt{border:1.5px solid var(--line);border-radius:12px;padding:14px;background:#fff;text-align:left;color:var(--ink);font-weight:500}
 .opt b{display:block;font-size:17px}
-.opt small{color:var(--mute);font-weight:400}
+.opt small{color:var(--mute);font-weight:400;word-break:keep-all}
 .opt[aria-pressed=true]{border-color:var(--ac);box-shadow:inset 0 0 0 1.5px var(--ac)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips .opt{padding:9px 14px}
@@ -60,7 +60,6 @@ a.btn{display:inline-flex;align-items:center;min-height:44px;padding:11px 18px;b
 #btnMore{display:none}
 .ivimg{transition:filter .3s}.talk .ivimg{filter:drop-shadow(0 0 14px rgba(255,200,140,.9)) brightness(1.08)}
 .fbbar{position:sticky;bottom:-22px;margin:16px -22px -22px;padding:12px 22px;background:#fff;border-top:1px solid var(--line)}
-#mStart{display:none}
 /* 좁은 화면: 말하는 면접관으로 줌인되므로 세 사람 명패·상태는 위쪽 목록으로 항상 보여 준다 */
 .roster{display:none;position:absolute;left:10px;top:10px;z-index:4;gap:6px;flex-wrap:wrap;max-width:calc(100% - 20px)}
 .roster .rc{display:flex;flex-direction:column;background:rgba(10,12,14,.74);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:4px 9px;backdrop-filter:blur(6px);min-width:0}
@@ -71,7 +70,7 @@ a.btn{display:inline-flex;align-items:center;min-height:44px;padding:11px 18px;b
 .roster .rc.on i{color:#ffd6bd}
 @media(max-width:700px){.roster{display:flex}.pip{top:56px}}
 @media(max-height:560px){.roster{display:flex}.pip{top:10px;width:104px}.cap{max-height:44%;padding:7px 11px}.cap .q{font-size:14px}.tbarlbl{display:none!important}#khint{display:none!important}.dock{padding:6px 10px}}
-@media(max-width:860px){#mStart{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(244,244,241,.96);border-top:1px solid var(--line)}#mStart button{flex:1}#setup{padding-bottom:90px}}
+@media(max-width:860px){#setup{padding-bottom:40px}}
 @media(max-width:700px){#btnMore{display:inline-flex}.ctl:not(.more) #btnRepeat,.ctl:not(.more) #btnRec,.ctl:not(.more) #btnSkip,.ctl:not(.more) #btnType{display:none}}
 .aibox{margin-top:18px;padding:14px 16px;border:1.5px solid var(--ac);border-radius:12px;background:#fff8f4}
 details.adv{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}details.adv summary{font-weight:700;font-size:14px}
@@ -99,6 +98,9 @@ details.adv{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}de
 .timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:18px;min-width:60px;text-align:center}
 .timer.over{color:#ff7a59}
 .state{font-size:13px;color:#9aa3ab;margin-bottom:4px}
+.langTag{font-size:11.5px;font-weight:700;color:#9aa3ab;background:#232a30;border:1px solid #313941;border-radius:999px;padding:3px 8px;white-space:nowrap}
+.langTag.en{color:#ffd0a8;border-color:#4a3526;background:#2a1d14}
+.langTag:empty{display:none}
 #typed{background:#0f1215;color:#eee;border-color:#2a3036;margin-top:6px}
 @media(max-width:700px){.dock{grid-template-columns:minmax(0,1fr)}.ctl{justify-content:flex-start}.guide{width:auto;right:16px;top:auto;bottom:120px;max-height:32%}.pip{width:120px}}
 .fb{position:absolute;inset:0;background:rgba(8,10,12,.72);display:grid;place-items:center;padding:16px}
@@ -184,12 +186,6 @@ input[type=range]{padding:0;height:30px;accent-color:var(--ac);background:transp
 .vprev{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .vprev button{min-width:96px}
 /* ---- 🏆 심사위원 시연 · 선사 브리핑 카드 · 자소서 입력 ---- */
-.demoRow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:-8px 0 22px}
-#btnDemo{background:linear-gradient(135deg,#ff8a4c,#e8572a);color:#fff;border-radius:12px;padding:12px 20px;font-weight:800;font-size:17px;box-shadow:0 8px 20px rgba(232,87,42,.26);text-align:left}
-#btnDemo small{display:block;font-weight:500;font-size:12px;opacity:.92;letter-spacing:.02em}
-#btnDemo:hover{filter:brightness(1.04)}
-.democta{background:linear-gradient(135deg,#ff8a4c,#e8572a)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 0 0 3px rgba(232,87,42,.35)!important;animation:demoPulse 1.7s ease-in-out infinite}
-@keyframes demoPulse{50%{box-shadow:0 0 0 9px rgba(232,87,42,.1)}}
 .brief{border:1.5px solid var(--ac);border-radius:14px;background:#fff;overflow:hidden;margin-top:12px}
 .brief-h{display:flex;justify-content:space-between;align-items:center;gap:10px;background:linear-gradient(135deg,#e8572a,#ff9354);color:#fff;padding:9px 14px;flex-wrap:wrap}
 .brief-h b{font-size:15px;letter-spacing:-.01em}
@@ -226,134 +222,196 @@ input[type=range]{padding:0;height:30px;accent-color:var(--ac);background:transp
  .cap .who{font-size:11.5px}
 }
 @media(max-width:420px){.roster .rc small{display:none}}
+
+/* ================= 첫 화면 단순화: 필수 3개 + 두 개의 큰 버튼, 나머지는 접힌 세부 설정 ================= */
+#setup{max-width:860px}
+.setupHead{margin:0 0 20px}
+.setupHead .lead{font-size:17px;line-height:1.6;color:var(--mute);margin:8px 0 0;max-width:60ch;word-break:keep-all}
+.setupHead .lead b{color:var(--ink)}
+.startcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,3vw,28px);box-shadow:0 10px 30px rgba(21,24,28,.06)}
+.startcard .lbl{margin-top:18px}
+.startcard .pickrow .lbl,.startcard>.pickrow:first-child .lbl{margin-top:0}
+.pickrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media(max-width:520px){.pickrow{grid-template-columns:minmax(0,1fr)}}
+.ctaRow{display:grid;gap:10px;margin-top:24px}
+button.primaryBig{display:grid;gap:2px;width:100%;min-height:64px;padding:15px 20px;font-size:19px;font-weight:800;letter-spacing:-.01em;background:var(--ac);color:#fff;border-radius:14px;box-shadow:0 10px 24px rgba(232,87,42,.28);text-align:center}
+button.primaryBig small{font-size:12.5px;font-weight:500;opacity:.92;letter-spacing:0}
+button.primaryBig:hover{filter:brightness(1.03)}
+button.demoBig{display:grid;gap:2px;width:100%;min-height:52px;padding:11px 18px;font-size:16px;font-weight:700;background:#fff;color:var(--ink);border:1.5px solid var(--line);border-radius:14px;text-align:center}
+button.demoBig small{font-size:12px;font-weight:500;color:var(--mute);letter-spacing:0}
+button.demoBig:hover{border-color:var(--ac);color:#bd3f19}
+.moreSetup{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px}
+.moreSetup>summary{display:grid;gap:1px;padding:15px 18px;list-style:none}
+.moreSetup>summary::-webkit-details-marker{display:none}
+.moreSetup>summary b{font-size:15px}
+.moreSetup>summary span{font-size:12.5px;font-weight:400;color:var(--mute);line-height:1.45;word-break:keep-all}
+.moreSetup>summary::after{content:"펼치기 ▾";position:absolute;right:18px;top:18px;font-size:12px;font-weight:700;color:var(--ac)}
+.moreSetup{position:relative}
+.moreSetup[open]>summary::after{content:"접기 ▴"}
+.moreSetup[open]>summary{border-bottom:1px solid var(--line)}
+.advBody{padding:6px 18px 22px}
+.advSec{border-top:1px dashed var(--line);padding-top:14px;margin-top:14px}
+.advSec:first-child{border-top:0;padding-top:6px;margin-top:0}
+.advSec .lbl:first-child{margin-top:0}
+.hint{font-weight:400;color:var(--mute);font-size:12.5px}
+.srcBadge{display:inline-block;margin:10px 0 0;padding:6px 12px;border-radius:999px;background:#fff2ec;border:1px solid #f6c9b5;color:#a3401d;font-size:12.5px;font-weight:600;line-height:1.45}
+.srcNote{margin:8px 0 0;font-size:12.5px;color:#a3401d;font-weight:600}
+.copybox{border:1.5px solid var(--ac);border-radius:14px;padding:16px 18px;background:#fff8f4}
+.copybox h2{margin-top:0;border-top:0;padding-top:0;font-size:19px}
+button.bigcopy{width:100%;min-height:56px;font-size:17px;font-weight:800;margin-top:10px}
+button.bigcopy.done{background:var(--ok)}
+.subAdv summary{font-size:14px;line-height:1.45}
+.camWrap{max-width:420px}
+@media(max-width:520px){
+ .setupHead .lead{font-size:15.5px}
+ button.primaryBig{font-size:18px}
+ .moreSetup>summary::after{position:static;margin-top:6px;justify-self:start}
+}
 </style>
 </head>
 <body>
 <main id="setup">
-  <h1>선사 면접 연습실</h1>
-  <p class="sub">해양대생은 선사 면접(인성, 승선 생활, 해기 직무, 영어)을 실전처럼 연습할 상대가 없고, 일반 취업 면접 연습 도구는 승선 생활, 해기 직무, 선종별 질문을 다루지 않습니다. 여기서는 선사 면접관 세 명이 돌아가며 묻고 허점을 파고듭니다. 끝나면 말한 내용과 화면 속 모습(시선·자세·표정·목소리)까지 피드백합니다.</p>
-  <div class="demoRow">
-    <button type="button" id="btnDemo">🏆 심사위원 빠른 시연<small>샘플 세팅 · 3문항 · 10초면 시작</small></button>
-    <span class="note" id="demoMsg">API 키·자소서 입력 없이 <b>실사 면접실 · 남2여1 음성 · 자소서 맞춤 질문 · 리포트</b>까지 바로 체험합니다.</span>
-  </div>
-  <div class="grid">
-    <div class="panel">
-      <span class="lbl">진로 트랙</span>
-      <div class="chips" id="trackSel">
-        <button class="opt" data-v="nav" aria-pressed="true">외항선사 항해사</button>
-        <button class="opt" data-v="eng" aria-pressed="false">외항선사 기관사</button>
-        <button class="opt" data-v="cadet" aria-pressed="false">승선실습 선사</button>
-        <button class="opt" data-v="pub" aria-pressed="false">해양 공기업·기관</button>
-        <button class="opt" data-v="en" aria-pressed="false">선사 영어 면접</button>
+  <header class="setupHead">
+    <h1>선사 면접 연습실</h1>
+    <p class="srcBadge">🎙 실제 해운사 취업박람회 · 면접특강 현장에서 직접 녹음·기록한 질문과 선호를 AI로 분석해 넣었습니다</p>
+    <p class="lead">지원 선사와 직무만 고르고 시작하면 <b>면접관 3명</b>이 바로 질문합니다. 마이크 없이 <b>타이핑</b>으로 답해도 됩니다.</p>
+  </header>
+
+  <section class="startcard" aria-label="면접 기본 설정">
+    <div class="pickrow">
+      <div>
+        <label class="lbl" for="company" id="companyL">지원 선사</label>
+        <select id="company"></select>
       </div>
-      <span class="lbl">모드</span>
-      <div class="modes" id="modeSel">
-        <button class="opt" data-v="real" aria-pressed="true"><b>1. 실전</b><small>힌트 없이 끝까지. 종료 후 종합 평가</small></button>
-        <button class="opt" data-v="practice" aria-pressed="false"><b>2. 연습</b><small>질문 의도·답변 가이드, 답변마다 바로 피드백</small></button>
+      <div id="shipBox">
+        <label class="lbl" for="ship">희망 선종</label>
+        <select id="ship"><option value="lng">LNG선</option><option value="container">컨테이너선</option><option value="bulk">벌크선</option><option value="tanker">유조선</option></select>
       </div>
-      <span class="lbl">집중 연습 <span style="font-weight:400;color:var(--mute)">— 약한 파트만 골라 칠 수 있습니다</span></span>
-      <div class="chips" id="focusSel">
-        <button class="opt" data-v="all" aria-pressed="true">전체</button>
-        <button class="opt" data-v="p" aria-pressed="false">인성·압박</button>
-        <button class="opt" data-v="j" aria-pressed="false">직무·규정</button>
-        <button class="opt" data-v="en" aria-pressed="false">영어만</button>
-        <button class="opt" data-v="co" aria-pressed="false">선사 맞춤</button>
-      </div>
-      <p class="fnote" id="focusNote">전체 코스로 진행합니다 (인성·직무·영어·선사 맞춤이 섞입니다).</p>
-      <div class="grid" style="gap:12px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
-        <div><label class="lbl" for="company" id="companyL">지원 선사</label><select id="company"></select></div>
-        <div id="shipBox"><label class="lbl" for="ship">희망 선종</label><select id="ship"><option value="lng">LNG선</option><option value="container">컨테이너선</option><option value="bulk">벌크선</option><option value="tanker">유조선</option></select></div>
-      </div>
-      <div id="coTip" class="hide"></div>
-      <div class="resumebox">
-        <label class="lbl" for="resume" style="margin-top:0">내 자소서 / 실습 이력 <span style="font-weight:400;color:var(--mute)">(선택)</span></label>
+    </div>
+
+    <span class="lbl">진로 트랙</span>
+    <div class="chips" id="trackSel">
+      <button class="opt" data-v="nav" aria-pressed="true">외항선사 항해사</button>
+      <button class="opt" data-v="eng" aria-pressed="false">외항선사 기관사</button>
+      <button class="opt" data-v="cadet" aria-pressed="false">승선실습 선사</button>
+      <button class="opt" data-v="pub" aria-pressed="false">해양 공기업·기관</button>
+      <button class="opt" data-v="en" aria-pressed="false">선사 영어 면접</button>
+    </div>
+
+    <span class="lbl">연습 모드</span>
+    <div class="modes" id="modeSel">
+      <button class="opt" data-v="real" aria-pressed="true"><b>1. 실전</b><small>힌트 없이 끝까지</small></button>
+      <button class="opt" data-v="practice" aria-pressed="false"><b>2. 연습</b><small>질문 의도·답변 가이드 표시</small></button>
+    </div>
+    <p class="note" style="margin:8px 0 0">두 모드 모두 리포트는 면접이 끝난 뒤 한 번에 나옵니다.</p>
+
+    <div class="ctaRow">
+      <button type="button" id="btnStartNoCam" class="primaryBig">면접 시작하기<small>카메라·마이크 없이 바로 · 기본 7문항 약 15분</small></button>
+      <button type="button" id="btnDemo" class="demoBig">🏆 심사위원 빠른 시연<small>샘플 세팅(HMM · 항해 · 3문항)으로 바로 시작</small></button>
+    </div>
+    <p class="note" id="startNote" style="margin:14px 0 0">화면 속 내 모습까지 점검하려면 아래 <b>세부 설정</b>에서 카메라를 켜고 시작하세요.</p>
+  </section>
+
+  <details class="moreSetup" id="moreSetup">
+    <summary><b>세부 설정 (선택)</b><span>자소서·실습 이력 · 집중 연습 · 분위기·질문 수 · 카메라 점검 · AI 키</span></summary>
+    <div class="advBody">
+
+      <section class="advSec">
+        <span class="lbl">집중 연습 <span class="hint">— 약한 파트만 골라 칠 수 있습니다</span></span>
+        <div class="chips" id="focusSel">
+          <button class="opt" data-v="all" aria-pressed="true">전체</button>
+          <button class="opt" data-v="p" aria-pressed="false">인성·압박</button>
+          <button class="opt" data-v="j" aria-pressed="false">직무·규정</button>
+          <button class="opt" data-v="en" aria-pressed="false">영어만</button>
+          <button class="opt" data-v="co" aria-pressed="false">선사 맞춤</button>
+        </div>
+        <p class="fnote" id="focusNote">전체 코스로 진행합니다 (인성·직무·영어·선사 맞춤이 섞입니다).</p>
+      </section>
+
+      <section class="advSec">
+        <label class="lbl" for="resume">내 자소서 / 실습 이력 <span class="hint">(선택)</span></label>
         <textarea id="resume" rows="3" placeholder="예: 실습선 승선실습 2주(갑판·당직), 컨테이너선 하역 감독 관찰, 학회장 40명 행사 기획, 토익 855, 안전관리자 교육 수료"></textarea>
         <div class="reskws" id="resumeKws"></div>
-        <p class="note" style="margin:6px 0 0">면접관이 이 내용을 근거로 꼬리질문을 만듭니다. AI 키가 없어도 아래 키워드를 감지해 <b>맞춤 질문 1~2개</b>를 자동으로 넣습니다.</p>
-      </div>
-      <div class="aibox">
-        <b>AI 면접관 (무료 · 추천)</b>
-        <p class="note" style="margin:4px 0 8px">Google AI Studio(aistudio.google.com)에서 카드 등록 없이 무료 Gemini 키를 발급받아 넣으면, 면접관이 내 답변을 읽고 즉석에서 꼬리 질문을 만들고 답변마다 허점과 개선 답변 예시를 줍니다. 키가 없으면 기본 질문 은행으로 진행하고, 끝난 뒤 무료 Claude·ChatGPT로 내용 피드백을 받을 수 있습니다.</p>
-        <input id="apikey" type="password" autocomplete="off" placeholder="AIza... 무료 키 붙여 넣기 (선택)">
-        <label class="row note" style="margin-top:6px"><input type="checkbox" id="keySave" style="width:18px;height:18px"> 이 기기에 키 저장 (공용 PC에서는 끄세요)</label>
-        <b style="display:block;margin-top:14px">자연스러운 면접관 목소리 (ElevenLabs 무료 · 선택)</b>
-        <p class="note" style="margin:4px 0 8px">elevenlabs.io 무료 계정의 API 키를 넣으면 실제 사람 같은 목소리로 질문합니다(월 1만 크레딧, 한 번 만든 문장은 다시 쓰여 크레딧을 아낍니다). 없거나 한도를 넘으면 브라우저 음성으로 자동 전환됩니다.</p>
-        <input id="elkey" type="password" autocomplete="off" placeholder="ElevenLabs API 키 (선택)">
-        <details style="margin-top:6px"><summary class="note">면접관별 목소리 ID 바꾸기</summary><p class="note">ElevenLabs Voice Library에서 마음에 드는 목소리의 ID를 붙여 넣으세요. 비워 두면 기본 목소리를 씁니다 — 남자1 Arnold(VR6AewLTigWG4xSOukaG)·남자2 Liam(TX3LPaxmHKxFdv7VOQHJ)·여자1 Charlotte(XB0fDUnXU5powFXDhCwa). 보이스 세팅(안정도·유사도·스타일)은 면접관별로 다르게 들어갑니다.</p>
-        <input id="elA" placeholder="1 남 · 인사팀장 목소리 ID" style="margin-top:4px"><input id="elB" placeholder="2 남 · 실무 팀장 목소리 ID" style="margin-top:4px"><input id="elC" placeholder="3 여 · 임원 목소리 ID" style="margin-top:4px"></details>
-        <details id="elVoiceDetails" style="margin-top:6px"><summary class="note">내 ElevenLabs 계정 목소리 목록에서 고르기</summary><p class="note">키를 넣고 아래 버튼을 누르면 이 계정에서 쓸 수 있는 목소리 목록을 불러와 면접관별로 고를 수 있습니다.</p>
-        <button class="ghost mini" type="button" id="elLoad">목소리 목록 불러오기</button>
-        <div class="elv hide" id="elVoiceBox"><span class="note">1 남 · 인사팀장</span><select id="elvA"></select><span class="note">2 남 · 실무 팀장</span><select id="elvB"></select><span class="note">3 여 · 임원</span><select id="elvC"></select></div></details>
-        <b style="display:block;margin-top:14px">면접관 3인 목소리 (남자 2명 · 여자 1명)</b>
-        <p class="note" style="margin:4px 0 0">남자1은 묵직한 저음, 남자2는 또렷한 중음, 여자1은 차분한 중저음으로 고정했습니다. 브라우저에 한국어 남성 음성(인준·현수·봉진 등)이 있으면 먼저 그것을 쓰고, 없으면 pitch를 낮춰 성별 느낌을 살립니다.</p>
-        <div class="vroles" id="vRoles"></div>
-        <label class="lbl" for="vRate" style="margin-top:10px">면접관 말하기 속도 <b id="vRateV">1.0x</b> <span style="font-weight:400;color:var(--mute)">· 내장 음성·브라우저 음성 모두 적용</span> <span style="font-weight:400;color:var(--mute)">(0.9 느리게 ~ 1.2 빠르게)</span></label>
-        <input type="range" id="vRate" min="0.9" max="1.2" step="0.05" value="1" aria-label="면접관 말하기 속도">
-        <div class="vprev" id="vPrevRow">
-          <button class="ghost mini" type="button" data-vp="A">▶ 1 남</button>
-          <button class="ghost mini" type="button" data-vp="B">▶ 2 남</button>
-          <button class="ghost mini" type="button" data-vp="C">▶ 3 여</button>
-          <button class="ghost mini" type="button" id="vTest">▶ 셋 다 미리 듣기</button>
+        <p class="note" style="margin:6px 0 0">면접관이 이 내용을 근거로 꼬리질문을 만듭니다. AI 키가 없어도 키워드를 감지해 <b>맞춤 질문 1~2개</b>를 자동으로 넣습니다.</p>
+      </section>
+
+      <section class="advSec">
+        <span class="lbl">내 상황 <span class="hint">— 해당되면 고르세요, 면접관이 그 약점을 파고듭니다</span></span>
+        <div class="chips" id="tagSel">
+          <button class="opt" data-v="transfer" aria-pressed="false">편입·학점은행제</button>
+          <button class="opt" data-v="gap" aria-pressed="false">공백기 있음</button>
+          <button class="opt" data-v="age" aria-pressed="false">동기보다 나이 많음</button>
+          <button class="opt" data-v="abroad" aria-pressed="false">해외 생활 경험</button>
         </div>
-        <p class="note" id="vTestMsg" style="margin:6px 0 0">버튼을 누르면 지금 설정된 음성으로 바로 읽어 줍니다.</p>
-        <details id="vBox"><summary class="note">면접관별 음성 직접 고르기</summary>
-        <p class="note">비워 두면 성별에 맞춰 자동으로 고릅니다. 목록 뒤의 (남)(여)는 브라우저가 알려준 성별입니다.</p>
-        <div class="grid" style="gap:6px;grid-template-columns:auto minmax(0,1fr);align-items:center;margin-top:6px">
-         <span class="note">1 남 · 인사팀장</span><select id="vA"></select><span class="note">2 남 · 실무 팀장</span><select id="vB"></select><span class="note">3 여 · 임원</span><select id="vC"></select></div>
+      </section>
+
+      <section class="advSec">
+        <span class="lbl">면접 분위기</span>
+        <div class="chips" id="styleSel">
+          <button class="opt" data-v="press" aria-pressed="true">압박</button>
+          <button class="opt" data-v="normal" aria-pressed="false">일반</button>
+          <button class="opt" data-v="loose" aria-pressed="false">편안</button>
+          <button class="opt" data-v="mixed" aria-pressed="false">섞어서</button>
+        </div>
+        <span class="lbl">본질문 수 <span class="hint">(자기소개·마무리 별도, 꼬리 질문은 최대 3개)</span></span>
+        <div class="chips" id="countSel">
+          <button class="opt" data-v="3" aria-pressed="false">3문항 · 약 6분</button>
+          <button class="opt" data-v="5" aria-pressed="false">5문항 · 약 10분</button>
+          <button class="opt" data-v="7" aria-pressed="true">7문항 · 약 15분</button>
+          <button class="opt" data-v="9" aria-pressed="false">9문항 · 약 20분</button>
+        </div>
+        <label class="row" style="margin-top:14px;font-size:15px"><input type="checkbox" id="eng" checked style="width:20px;height:20px"> 영어 질문 포함</label>
+      </section>
+
+      <section class="advSec">
+        <span class="lbl">카메라·마이크 점검 <span class="hint">— 켜면 시선·자세·표정까지 피드백합니다</span></span>
+        <div class="camWrap">
+          <div class="cam"><video id="prev" autoplay muted playsinline></video><div class="ph" id="ph">카메라·마이크를 켜면 여기에 내 모습이 나옵니다</div></div>
+          <div class="meter"><i id="mic"></i></div>
+          <ul class="checks">
+            <li id="ckFace">얼굴 인식</li><li id="ckLight">조명</li><li id="ckFrame">화면 구도</li><li id="ckMic">마이크</li><li id="ckStt">음성 인식</li>
+          </ul>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button id="btnMedia" class="ghost" type="button">카메라·마이크 켜기</button>
+          <button id="btnStart" class="ac" type="button" disabled>카메라 켜고 시작</button>
+        </div>
+        <p class="note" style="margin-top:6px">Chrome 권장. 이어폰을 쓰면 면접관 음성이 내 답변에 섞이지 않습니다. 녹화 영상은 이 컴퓨터에만 남고 어디로도 전송되지 않습니다.</p>
+      </section>
+
+      <section class="advSec">
+        <span class="lbl">선사 1분 브리핑 <span class="hint">— 고른 선사의 최근 이슈와 면접 포인트</span></span>
+        <div id="coTip" class="hide"></div>
+      </section>
+
+      <section class="advSec">
+        <details class="subAdv">
+          <summary>AI 면접관 · 목소리 키 연결 (선택) — 없어도 기본 면접관 3인 음성으로 진행됩니다</summary>
+          <p class="note" style="margin:8px 0">Google AI Studio(aistudio.google.com)에서 카드 등록 없이 무료 Gemini 키를 넣으면, 면접관이 내 답변을 읽고 즉석에서 꼬리 질문과 개선 답변 예시를 줍니다.</p>
+          <input id="apikey" type="password" autocomplete="off" placeholder="AIza... 무료 Gemini 키 붙여 넣기 (선택)">
+          <label class="row note" style="margin-top:6px"><input type="checkbox" id="keySave" style="width:18px;height:18px"> 이 기기에 키 저장 (공용 PC에서는 끄세요)</label>
+          <p class="note" style="margin:12px 0 4px">elevenlabs.io 무료 키를 넣으면 더 사람 같은 목소리로 질문합니다(월 1만 크레딧). 없으면 내장 Neural 음성으로 재생됩니다.</p>
+          <input id="elkey" type="password" autocomplete="off" placeholder="ElevenLabs API 키 (선택)">
+          <label class="lbl" for="model">모델 (비워 두면 자동)</label>
+          <input id="model" value="" placeholder="예: gemini-flash-latest">
+          <p class="note">Claude API 키(sk-ant-, 유료)도 됩니다. 키는 이 브라우저에만 저장됩니다.</p>
         </details>
-        <details style="margin-top:8px"><summary class="note">자세히</summary><p class="note">키는 이 브라우저에만 저장됩니다. 무료 등급에서는 보낸 답변 텍스트가 Google 서비스 개선에 쓰일 수 있습니다. Claude API 키(sk-ant-, 유료)도 됩니다.</p><label class="lbl" for="model">모델 (비워 두면 자동)</label><input id="model" value="" placeholder="예: gemini-flash-latest"></details>
-      </div>
-      <details class="adv"><summary>세부 설정 · 분위기, 질문 수, 영어, 내 상황, 이력</summary>
-      <span class="lbl">면접 분위기</span>
-      <div class="chips" id="styleSel">
-        <button class="opt" data-v="press" aria-pressed="true">압박</button>
-        <button class="opt" data-v="normal" aria-pressed="false">일반</button>
-        <button class="opt" data-v="loose" aria-pressed="false">편안</button>
-        <button class="opt" data-v="mixed" aria-pressed="false">섞어서</button>
-      </div>
-      <span class="lbl">본질문 수 (자기소개·마무리 별도, 꼬리 질문은 최대 3개)</span>
-      <div class="chips" id="countSel">
-        <button class="opt" data-v="3" aria-pressed="false">3문항 · 약 6분</button>
-        <button class="opt" data-v="5" aria-pressed="false">5문항 · 약 10분</button>
-        <button class="opt" data-v="7" aria-pressed="true">7문항 · 약 15분</button>
-        <button class="opt" data-v="9" aria-pressed="false">9문항 · 약 20분</button>
-      </div>
-      <label class="row" style="margin-top:14px;font-size:15px"><input type="checkbox" id="eng" checked style="width:20px;height:20px"> 영어 질문 포함</label>
-      <span class="lbl">내 상황 (해당되면 고르세요 — 면접관이 그 약점을 파고듭니다)</span>
-      <div class="chips" id="tagSel">
-        <button class="opt" data-v="transfer" aria-pressed="false">편입·학점은행제</button>
-        <button class="opt" data-v="gap" aria-pressed="false">공백기 있음</button>
-        <button class="opt" data-v="age" aria-pressed="false">동기보다 나이 많음</button>
-        <button class="opt" data-v="abroad" aria-pressed="false">해외 생활 경험</button>
-      </div>
-      <span class="lbl">면접실 꾸미기 (선택 · 사진 파일)</span>
-      <div class="grid" style="gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
-        <label class="note">배경 사진<input type="file" accept="image/*" data-img="bg"></label>
-        <label class="note">면접관 1 남 · 인사팀장(왼쪽)<input type="file" accept="image/*" data-img="A"></label>
-        <label class="note">면접관 2 남 · 실무 팀장(가운데)<input type="file" accept="image/*" data-img="B"></label>
-        <label class="note">면접관 3 여 · 임원(오른쪽)<input type="file" accept="image/*" data-img="C"></label>
-      </div>
-      <p class="note">면접관은 배경을 지운 상반신 PNG가 가장 자연스럽습니다. 실제 인물 사진은 본인 동의를 받은 것만 쓰세요.</p>
-      <label class="lbl" for="profile">내 이력 (선택 · AI 면접관 연결 시 맞춤 질문에 쓰입니다)</label>
-      <textarea id="profile" rows="3" placeholder="예: 항해학부 3학년, 토익 800, 승선실습 예정, LNG선 희망"></textarea>
-      </details>
+      </section>
+
+      <section class="advSec">
+        <span class="lbl">면접실 꾸미기 <span class="hint">(선택 · 사진 파일)</span></span>
+        <div class="grid" style="gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+          <label class="note">배경 사진<input type="file" accept="image/*" data-img="bg"></label>
+          <label class="note">면접관 1 남 · 인사팀장(왼쪽)<input type="file" accept="image/*" data-img="A"></label>
+          <label class="note">면접관 2 남 · 실무 팀장(가운데)<input type="file" accept="image/*" data-img="B"></label>
+          <label class="note">면접관 3 여 · 임원(오른쪽)<input type="file" accept="image/*" data-img="C"></label>
+        </div>
+        <p class="note">면접관은 배경을 지운 상반신 PNG가 가장 자연스럽습니다. 실제 인물 사진은 본인 동의를 받은 것만 쓰세요.</p>
+        <label class="lbl" for="profile">내 이력 <span class="hint">(선택 · AI 면접관 연결 시 맞춤 질문에 쓰입니다)</span></label>
+        <textarea id="profile" rows="3" placeholder="예: 항해학부 3학년, 토익 800, 승선실습 예정, LNG선 희망"></textarea>
+      </section>
     </div>
-    <div class="panel">
-      <span class="lbl">장비 점검</span>
-      <div class="cam"><video id="prev" autoplay muted playsinline></video><div class="ph" id="ph">카메라·마이크를 켜면 여기에 내 모습이 나옵니다</div></div>
-      <div class="meter"><i id="mic"></i></div>
-      <ul class="checks">
-        <li id="ckFace">얼굴 인식</li><li id="ckLight">조명</li><li id="ckFrame">화면 구도</li><li id="ckMic">마이크</li><li id="ckStt">음성 인식</li>
-      </ul>
-      <div class="row" style="margin-top:16px">
-        <button id="btnMedia" class="ghost">카메라·마이크 켜기</button>
-        <button id="btnStart" class="ac" disabled>면접 시작</button>
-      </div>
-      <button id="btnStartNoCam" class="ghost" style="width:100%;margin-top:8px">카메라 없이 음성·타이핑으로 시작</button>
-      <p class="note" style="margin-top:6px">카메라·마이크 권한 없이도 바로 시작할 수 있습니다(카페·이동 중 연습용). 이때는 음성 인식(브라우저가 마이크를 허용하면 동작)이나 타이핑으로 답하고, 화면 속 모습·녹화 피드백만 빠집니다.</p>
-      <p class="note">Chrome 권장. 이어폰을 쓰면 면접관 음성이 내 답변에 섞이지 않습니다. 녹화 영상은 이 컴퓨터에만 남고 어디로도 전송되지 않습니다. AI 연결 시에는 답변 텍스트와 캡처 사진 2장만 전송됩니다.</p>
-    </div>
-  </div>
+  </details>
 </main>
 
 <section id="room" class="hide">
@@ -375,7 +433,7 @@ input[type=range]{padding:0;height:30px;accent-color:var(--ac);background:transp
       <div class="row hide" id="typedRow" style="margin-top:6px"><span class="note" style="color:#9aa3ab">Enter로 완료 · Shift+Enter 줄바꿈</span></div>
     </div>
     <div class="ctl">
-      <span class="note" id="prog" style="color:#9aa3ab"></span>
+      <span class="note" id="prog" style="color:#9aa3ab"></span><span class="langTag" id="langTag"></span>
       <span class="timer" id="timer">0:00</span>
       <button id="btnDone" class="ac" disabled>답변 완료<span class="kbd"> (Space)</span></button>
       <button id="btnRec" class="ghost" aria-pressed="true">● 녹화 켬</button>
@@ -390,7 +448,6 @@ input[type=range]{padding:0;height:30px;accent-color:var(--ac);background:transp
   </div>
 </section>
 
-<div id="mStart"><button id="mGo" class="ac">카메라 켜고 면접 시작</button><button id="mGoNoCam" class="ghost">카메라 없이</button></div>
 <main id="report" class="hide"></main>
 <video id="src" autoplay muted playsinline style="position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none"></video>
 
@@ -786,26 +843,20 @@ $('#profile').value=store.profile||PROFILE;
 $('#resume').value=store.resume||'';S.resume=$('#resume').value;
 $('#apikey').value=store.key||'';
 $('#elkey').value=store.elkey||'';
-if(store.el){$('#elA').value=store.el.A||'';$('#elB').value=store.el.B||'';$('#elC').value=store.el.C||'';}
 /* 키 저장 체크박스: Gemini/Claude 키나 ElevenLabs 키 중 하나라도 저장돼 있으면 켜 둔다.
    (예전 코드는 이 다음 줄에서 다시 !!store.key 로 덮어써 ElevenLabs 키만 저장한 사람은 체크가 풀렸음) */
 $('#keySave').checked=!!(store.key||store.elkey);
 S.vPick=store.vp||{};
 if(store.model)$('#model').value=store.model;
-if(store.rate)$('#vRate').value=store.rate;
 
 function group(sel,key,num){$$(sel+' .opt').forEach(b=>b.onclick=()=>{$$(sel+' .opt').forEach(x=>x.setAttribute('aria-pressed',x===b));S[key]=num?+b.dataset.v:b.dataset.v})}
 $$('#tagSel .opt').forEach(b=>b.onclick=()=>{const v=b.dataset.v,on=!S.tags.has(v);on?S.tags.add(v):S.tags.delete(v);b.setAttribute('aria-pressed',on)});
 function fillOrgs(){const pub=S.track==='pub';$('#company').innerHTML=ORGS[pub?'pub':'sea'].map(o=>`<option>${o}</option>`).join('');$('#companyL').textContent=pub?'지원 기관':'지원 선사';$('#shipBox').style.visibility=TRACKS[S.track].ship?'visible':'hidden';$('#eng').closest('label').style.display=S.track==='en'?'none':'';applyTrackNames();}
 $$('#trackSel .opt').forEach(b=>b.addEventListener('click',()=>{$$('#trackSel .opt').forEach(x=>x.setAttribute('aria-pressed',x===b));S.track=b.dataset.v;fillOrgs();showCoTip();}));
 fillOrgs();
-['A','B','C'].forEach(iv=>$('#v'+iv).onchange=()=>{S.vPick[iv]=$('#v'+iv).value;try{store.vp=S.vPick;localStorage.setItem('aiint',JSON.stringify(Object.assign(JSON.parse(localStorage.getItem('aiint')||'{}'),{vp:S.vPick})))}catch(_){}});
-$('#vTest').onclick=async()=>{
- for(const iv of ['A','B','C']){if(S.aborted)break;await preview(iv,true)}
- const msg=$('#vTestMsg');if(msg)msg.textContent='셋 다 읽었습니다 — 1 남 '+voiceSummary('A')+' / 2 남 '+voiceSummary('B')+' / 3 여 '+voiceSummary('C');};
-$$('#vPrevRow [data-vp]').forEach(b=>b.onclick=()=>preview(b.dataset.vp));
+['A','B','C'].forEach(iv=>{const el=$('#v'+iv);if(el)el.onchange=()=>{S.vPick[iv]=el.value;try{store.vp=S.vPick;localStorage.setItem('aiint',JSON.stringify(Object.assign(JSON.parse(localStorage.getItem('aiint')||'{}'),{vp:S.vPick})))}catch(_){}}});
 const PREVIEW={A:'반갑습니다. 오늘 면접을 진행할 인사팀장 김정민입니다. 긴장 푸시고 편하게 답변해 주십시오.',B:'한 번 타면 보통 사에서 육 개월은 집에 못 갑니다. 가족 문제로 중도 하선하면 회사가 큰 손해를 봅니다. 확신할 수 있습니까?',C:'십 년 뒤 본인은 어디서 무엇을 하고 있을 것 같습니까?'};
-function readElVoiceInputs(){return{A:$('#elvA').value||$('#elA').value.trim()||IV.A.el.voice,B:$('#elvB').value||$('#elB').value.trim()||IV.B.el.voice,C:$('#elvC').value||$('#elC').value.trim()||IV.C.el.voice}}
+function readElVoiceInputs(){return{A:EL_VOICES.A,B:EL_VOICES.B,C:EL_VOICES.C}}
 async function preview(iv,quiet){
  try{speechSynthesis.cancel()}catch(_){}
  if(S.audio){try{S.audio.pause()}catch(_){}}
@@ -828,7 +879,7 @@ function showCoTip(){
   <div class="k">최근 이슈 · 면접 포인트</div>
   <ul class="brief-tips">${c.tip.map((t,i)=>`<li data-i="${i+1}">${esc(t)}</li>`).join('')}</ul>
  </div>
- <div class="brief-foot">이 회사를 고르면 맞춤 질문 1~2개가 들어갑니다 · 조건은 최신 공고로 다시 확인하세요</div>`;
+ <div class="brief-foot">🎙 실제 해운사 취업박람회·면접특강 현장에서 직접 녹음·기록한 내용을 AI로 분석한 브리핑입니다 · 이 회사를 고르면 맞춤 질문 1~2개가 들어갑니다 · 채용 조건은 최신 공고로 다시 확인하세요</div>`;
 }
 $('#company').addEventListener('change',()=>{showCoTip();updateFocusNote()});
 group('#modeSel','mode');group('#styleSel','style');group('#countSel','count',true);group('#focusSel','focus');
@@ -836,8 +887,8 @@ $$('#focusSel .opt').forEach(b=>b.addEventListener('click',()=>{updateFocusNote(
 function updateFocusNote(){const el=$('#focusNote');if(!el)return;const f=S.focus||'all';
  if(f==='co'&&!coKey()){el.innerHTML='<b style="color:var(--bad)">선사 맞춤</b>은 위 선사 목록에 있는 회사를 골랐을 때만 쓸 수 있습니다. 선사를 고르면 맞춤 질문이 나옵니다.';return}
  el.textContent={all:'전체 코스로 진행합니다 (인성·직무·영어·선사 맞춤이 섞입니다).',p:'인성·압박 질문만 모아 진행합니다. 분위기를 “압박”으로 두고 같이 쓰면 더 좋습니다.',j:'해기 직무·규정·선종 질문만 모아 진행합니다.',en:'영어 질문만으로 진행합니다. 자기소개도 영어로 시작합니다.',co:($('#company').value||'선사')+' 맞춤 질문과 지원 동기로 진행합니다.'}[f]||''}
-const rateEl=$('#vRate');const showRate=()=>{S.rate=+rateEl.value||1;$('#vRateV').textContent=S.rate.toFixed(2).replace(/0$/,'')+'x'};
-rateEl.addEventListener('input',showRate);rateEl.addEventListener('change',showRate);showRate();
+/* 면접관 말하기 속도는 1.0x 고정(설정 UI 없이도 자연스럽게 들리도록) */
+S.rate=1;
 /* ---------- 설정 자동 저장 / 복원 ---------- */
 function setChips(sel,v){$$(sel+' .opt').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===String(v)))}
 (function restoreSettings(){
@@ -1211,20 +1262,6 @@ function chunks(t){
  if(cur)out.push(cur);
  return out.flatMap(s=>{if(s.length<=220)return [s];const parts=s.split(/(?<=[,，·;:])\s*/);const r=[];let c='';for(const q of parts){if(!c)c=q;else if((c+q).length<=180)c+=' '+q;else{r.push(c);c=q}}if(c)r.push(c);return r});
 }
-function speakOne(t,iv,lang){return new Promise(res=>{
- if(!t)return res();
- if(!('speechSynthesis' in window)){setTimeout(res,t.length*90);return}
- const u=new SpeechSynthesisUtterance(t);const v=voiceFor(iv,lang);if(v)u.voice=v;u.lang=lang==='en'?'en-US':'ko-KR';
- /* 면접관별 고정 음색: 남자1 pitch .84 / .94x, 남자2 .90 / 1.03x, 여자1 .86 / .97x (사용자 속도 배율만 곱한다) */
- const mism=!!v&&!(IV[iv].gender==='m'?isMalName(v.name):isFemName(v.name));
- const pr=lang==='ko'?prosodyFor(iv,v):{pitch:+(IV[iv].enPitch*(mism?.9:1)).toFixed(3),rate:+(IV[iv].rateM*clamp(S.rate||1,.85,1.3)).toFixed(3)};
- /* 모바일에서 금속성 기계음이 나지 않도록 pitch는 0.80~1.0 사이로만 쓴다 */
- u.pitch=clamp(pr.pitch,.80,1);u.rate=pr.rate;
- let done=false;const to=setTimeout(()=>fin(),4000+t.length*220);
- const ka=v&&/Google/i.test(v.name)?setInterval(()=>{if(speechSynthesis.speaking){speechSynthesis.pause();speechSynthesis.resume()}},9000):0;
- function fin(){if(done)return;done=true;clearTimeout(to);clearInterval(ka);res()}
- u.onend=fin;u.onerror=fin;speechSynthesis.speak(u);
-})}
 const EL_VOICES={A:'VR6AewLTigWG4xSOukaG',B:'TX3LPaxmHKxFdv7VOQHJ',C:'XB0fDUnXU5powFXDhCwa'};
 const elCache=new Map();let elFail=false;
 async function elSpeak(text,iv){
@@ -1238,33 +1275,12 @@ async function elSpeak(text,iv){
  await new Promise(res=>{const a=new Audio(url);S.audio=a;let done=false;const fin=()=>{if(!done){done=true;res()}};a.onended=fin;a.onerror=fin;a.play().catch(fin);setTimeout(fin,60000);});
 }
 /* ElevenLabs 계정의 목소리 목록을 불러와 면접관별로 고르게 한다 */
-async function loadElVoices(){
- const btn=$('#elLoad'),k=($('#elkey').value||'').trim();
- if(!k){btn.textContent='ElevenLabs 키를 먼저 입력하세요';setTimeout(()=>{btn.textContent='목소리 목록 불러오기'},2500);return}
- btn.disabled=true;btn.textContent='불러오는 중…';
- try{
-  const r=await fetch('https://api.elevenlabs.io/v1/voices',{headers:{'xi-api-key':k}});
-  if(!r.ok)throw new Error('ElevenLabs '+r.status);
-  const j=await r.json(),vs=(j.voices||[]).map(v=>({id:v.voice_id,name:v.name,cat:v.category||''}));
-  if(!vs.length)throw new Error('empty');
-  ['A','B','C'].forEach(iv=>{
-   const sel=$('#elv'+iv),cur=($('#el'+iv).value||'').trim();
-   sel.innerHTML='<option value="">기본 목소리</option>'+vs.map(v=>`<option value="${esc(v.id)}"${v.id===cur?' selected':''}>${esc(v.name)}${v.cat?' · '+esc(v.cat):''}</option>`).join('');
-   sel.onchange=()=>{$('#el'+iv).value=sel.value};
-  });
-  $('#elVoiceBox').classList.remove('hide');
-  btn.textContent='목소리 '+vs.length+'개를 불러왔습니다';
- }catch(e){
-  console.warn(e);btn.disabled=false;btn.textContent='목록을 못 불러왔습니다 — 키 권한·네트워크 확인';
-  setTimeout(()=>{btn.textContent='목소리 목록 불러오기'},3000);return;
- }
- btn.disabled=false;
-}
 /* ---------- Neural 음성(내장 MP3) ----------
    면접관 3인의 Neural 목소리(남1 InJoon 저음 · 남2 HyunsuMultilingual · 여1 SunHi 중저음)로
    빠른 시연 코스·자소서 맞춤질문·주요 공용 질문·리액션을 미리 만들어 두고,
-   같은 문장이면 API 키 없이도 항상 자연스러운 목소리로 재생한다. 없는 문장만 TTS로 넘어간다. */
-const AUDIO_MAN={"intro":{"i":"A","t":"반갑습니다. 긴장 푸시고, 먼저 1분 자기소개 부탁드립니다."},"q_motive__co_고려해운":{"i":"A","t":"여러 선사 중에 고려해운에 지원한 이유가 뭡니까?"},"q_motive__co_현대글로비스":{"i":"A","t":"여러 선사 중에 현대글로비스에 지원한 이유가 뭡니까?"},"q_motive__co_상지해운":{"i":"A","t":"여러 선사 중에 상지해운에 지원한 이유가 뭡니까?"},"q_motive__co_윌헬름슨WSMKorea":{"i":"A","t":"여러 선사 중에 윌헬름슨(WSM Korea)에 지원한 이유가 뭡니까?"},"q_motive__co_KSS해운":{"i":"A","t":"여러 선사 중에 KSS해운에 지원한 이유가 뭡니까?"},"q_motive__co_SK해운":{"i":"A","t":"여러 선사 중에 SK해운에 지원한 이유가 뭡니까?"},"q_motive__co_에이치라인해운":{"i":"A","t":"여러 선사 중에 에이치라인해운에 지원한 이유가 뭡니까?"},"q_motive__co_팬오션":{"i":"A","t":"여러 선사 중에 팬오션에 지원한 이유가 뭡니까?"},"q_motive__co_폴라리스쉬핑":{"i":"A","t":"여러 선사 중에 폴라리스쉬핑에 지원한 이유가 뭡니까?"},"motive_hmm":{"i":"A","t":"여러 선사 중에 HMM에 지원한 이유가 뭡니까?"},"q_motive__co_대한해운":{"i":"A","t":"여러 선사 중에 대한해운에 지원한 이유가 뭡니까?"},"q_motive__co_장금상선":{"i":"A","t":"여러 선사 중에 장금상선에 지원한 이유가 뭡니까?"},"q_motive__co_한국해양교통안전공단":{"i":"A","t":"여러 선사 중에 한국해양교통안전공단에 지원한 이유가 뭡니까?"},"q_motive__co_해양환경공단":{"i":"A","t":"여러 선사 중에 해양환경공단에 지원한 이유가 뭡니까?"},"q_motive__co_한국해양진흥공사":{"i":"A","t":"여러 선사 중에 한국해양진흥공사에 지원한 이유가 뭡니까?"},"q_motive__co_부산항만공사":{"i":"A","t":"여러 선사 중에 부산항만공사에 지원한 이유가 뭡니까?"},"q_motive__co_인천항만공사":{"i":"A","t":"여러 선사 중에 인천항만공사에 지원한 이유가 뭡니까?"},"q_motive__co_여수광양항만공사":{"i":"A","t":"여러 선사 중에 여수광양항만공사에 지원한 이유가 뭡니까?"},"q_motive__co_울산항만공사":{"i":"A","t":"여러 선사 중에 울산항만공사에 지원한 이유가 뭡니까?"},"q_motive__co_generic":{"i":"A","t":"여러 선사 중에 저희 회사에 지원한 이유가 뭡니까?"},"q_motive__co_generic2":{"i":"A","t":"여러 선사 중에 저희 기관에 지원한 이유가 뭡니까?"},"weak":{"i":"A","t":"본인의 단점 하나를 말씀해 주세요. 포장하지 말고 진짜 단점으로요."},"conflict":{"i":"A","t":"조직에서 의견 충돌이 있었던 경험과, 본인이 어떻게 해결했는지 말씀해 주세요."},"q_gap":{"i":"B","t":"이력에 공백기가 보이는데, 그 기간에 정확히 뭘 했습니까?"},"q_age":{"i":"B","t":"동기들보다 나이가 있는 편인데, 나이 어린 선배 밑에서 일할 수 있겠습니까?"},"q_credit":{"i":"B","t":"편입생이시던데, 정규 4년 과정 출신보다 전공 기초가 약하지 않습니까?"},"sea":{"i":"B","t":"선종과 계약에 따라 다르지만 한 번 타면 보통 4~6개월 이상 집에 못 갑니다. 가족이나 연인 문제로 중도 하선하면 회사가 큰 손해를 봅니다. 확신할 수 있습니까?"},"order":{"i":"B","t":"당직 중에 선배가 규정에 어긋나는 지시를 하면 어떻게 하겠습니까?"},"money":{"i":"B","t":"솔직히 해양대 온 거, 취업 잘되고 연봉 높아서 아닙니까?"},"acc":{"i":"B","t":"기억나는 해양사고 하나와, 당직사관 입장에서 막을 수 있었던 지점을 말해 보세요."},"vision":{"i":"C","t":"10년 뒤 본인은 어디서 무엇을 하고 있을 것 같습니까?"},"q_abroad":{"i":"C","t":"해외 생활 경험이 있으시던데, 거기서 얻은 것 중 배 위에서 실제로 쓸모 있는 게 뭡니까?"},"ism":{"i":"B","t":"선박 안전관리에서 ISM Code가 왜 중요하다고 생각합니까?"},"mistake":{"i":"A","t":"실수했던 경험 하나와, 그 뒤에 무엇을 바꿨는지 말해 보세요."},"c_self":{"i":"B","t":"배 위에선 부모님도 친구도 도와줄 수 없습니다. 누구 도움 없이 스스로 결정해서 문제를 해결해 본 경험이 있습니까?"},"c_long":{"i":"C","t":"몇 달 동안 상륙을 못 하고 외국 선원들과만 지내야 할 수도 있습니다. 버틸 근거가 있습니까?"},"q_co_kmtc1":{"i":"C","t":"저희는 해상과 육상을 오가며 순환 근무를 합니다. 몇 년 타다가 육상으로 발령이 나면 어떻게 하겠습니까?"},"q_co_kmtc2":{"i":"B","t":"컨테이너선은 입출항이 잦아서 쉴 틈이 없습니다. 연속 입항으로 잠을 못 잔 상태에서 당직을 서야 하면 어떻게 하겠습니까?"},"q_co_glovis1":{"i":"B","t":"저희는 이중연료(DF) 추진선을 계속 늘리고 있습니다. DF 선박에서 해기사에게 새로 필요한 역량이 뭐라고 생각합니까?"},"q_co_glovis2":{"i":"B","t":"자동차운반선에서 가장 주의해야 할 위험이 뭐라고 생각합니까?"},"q_co_sangji1":{"i":"A","t":"저희는 선대가 작아서 같은 사람들과 오래 함께 탑니다. 공동체 생활에서 본인은 어떤 역할을 하는 사람입니까?"},"q_co_sangji2":{"i":"C","t":"솔직히 몇 년 타고 GS칼텍스 쪽으로 옮기려는 계획 아닙니까?"},"q_co_wsm1":{"i":"A","t":"저희는 Just Culture를 중요하게 생각합니다. 당직 중에 본인 실수로 작은 사고가 났다면 어떻게 하겠습니까?"},"job":{"i":"B","t":"3항사로 처음 승선하면 첫 달에 어떤 일을 맡게 됩니까? 아는 대로 말해 보세요."},"body":{"i":"A","t":"뱃멀미나 체력, 수면 패턴은 괜찮습니까? 승선 생활에서 가장 걱정되는 점을 솔직히 말해 보세요."},"multi":{"i":"C","t":"다국적 선원들과 일할 때 가장 어려운 점이 뭐라고 생각합니까?"},"weakspec":{"i":"B","t":"본인 스펙 중에 다른 지원자보다 가장 약한 게 뭡니까?"},"q_job_eng":{"i":"B","t":"3기사로 처음 승선하면 주로 어떤 장비를 맡게 됩니까?"},"q_blackout":{"i":"B","t":"항해 중 블랙아웃(전원 상실)이 발생하면 당직 기관사의 첫 조치는 무엇입니까?"},"q_erfire":{"i":"B","t":"기관실에서 화재를 발견하면 무엇부터 하겠습니까?"},"q_ums":{"i":"B","t":"무인 기관실(UMS) 운전 중 야간 당번 기관사는 무엇을 합니까?"},"q_orb":{"i":"B","t":"기름기록부를 왜 정확하게 써야 합니까? 선배가 기름 섞인 물을 몰래 버리자고 하면요?"},"q_sulphur":{"i":"C","t":"IMO의 황 규제(일반 해역 0.50%, 배출규제해역 0.10%)와 최근 탄소 규제(CII·EEXI, EU ETS)에 선사들은 어떻게 대응하고 있습니까?"},"lights":{"i":"B","t":"야간 당직 중 우현 선수 쪽에 앞뒤로 떨어진 흰 불 두 개와 빨간 불 하나가 보입니다. 상대는 어떤 배이고, 나는 어떻게 해야 합니까?"},"handover":{"i":"B","t":"항해 당직을 인수할 때 무엇을 확인합니까?"},"q_ecdis":{"i":"B","t":"ECDIS만 믿고 항해하면 안 되는 이유는 무엇입니까?"},"q_pilot":{"i":"B","t":"도선사가 승선해 있을 때 당직사관의 역할은 무엇입니까?"},"q_c_why__co_고려해운":{"i":"A","t":"실습 선사로 고려해운를 지원한 이유가 뭡니까?"},"q_c_why__co_현대글로비스":{"i":"A","t":"실습 선사로 현대글로비스를 지원한 이유가 뭡니까?"},"q_c_why__co_상지해운":{"i":"A","t":"실습 선사로 상지해운를 지원한 이유가 뭡니까?"},"q_c_why__co_윌헬름슨WSMKorea":{"i":"A","t":"실습 선사로 윌헬름슨(WSM Korea)를 지원한 이유가 뭡니까?"},"q_c_why__co_KSS해운":{"i":"A","t":"실습 선사로 KSS해운를 지원한 이유가 뭡니까?"},"q_c_why__co_SK해운":{"i":"A","t":"실습 선사로 SK해운를 지원한 이유가 뭡니까?"},"q_c_why__co_에이치라인해운":{"i":"A","t":"실습 선사로 에이치라인해운를 지원한 이유가 뭡니까?"},"q_c_why__co_팬오션":{"i":"A","t":"실습 선사로 팬오션를 지원한 이유가 뭡니까?"},"q_c_why__co_폴라리스쉬핑":{"i":"A","t":"실습 선사로 폴라리스쉬핑를 지원한 이유가 뭡니까?"},"c_why_hmm":{"i":"A","t":"실습 선사로 HMM를 지원한 이유가 뭡니까?"},"q_c_why__co_대한해운":{"i":"A","t":"실습 선사로 대한해운를 지원한 이유가 뭡니까?"},"q_c_why__co_장금상선":{"i":"A","t":"실습 선사로 장금상선를 지원한 이유가 뭡니까?"},"q_c_why__co_한국해양교통안전공단":{"i":"A","t":"실습 선사로 한국해양교통안전공단를 지원한 이유가 뭡니까?"},"q_c_why__co_해양환경공단":{"i":"A","t":"실습 선사로 해양환경공단를 지원한 이유가 뭡니까?"},"q_c_why__co_한국해양진흥공사":{"i":"A","t":"실습 선사로 한국해양진흥공사를 지원한 이유가 뭡니까?"},"q_c_why__co_부산항만공사":{"i":"A","t":"실습 선사로 부산항만공사를 지원한 이유가 뭡니까?"},"q_c_why__co_인천항만공사":{"i":"A","t":"실습 선사로 인천항만공사를 지원한 이유가 뭡니까?"},"q_c_why__co_여수광양항만공사":{"i":"A","t":"실습 선사로 여수광양항만공사를 지원한 이유가 뭡니까?"},"q_c_why__co_울산항만공사":{"i":"A","t":"실습 선사로 울산항만공사를 지원한 이유가 뭡니까?"},"q_c_why__co_generic":{"i":"A","t":"실습 선사로 저희 회사를 지원한 이유가 뭡니까?"},"q_c_why__co_generic2":{"i":"A","t":"실습 선사로 저희 기관를 지원한 이유가 뭡니까?"},"c_goal":{"i":"A","t":"1년 실습 동안 무엇을 가장 배우고 싶습니까?"},"q_c_trb":{"i":"B","t":"실습 기록부(Training Record Book)는 어떻게 관리할 계획입니까?"},"q_c_chores":{"i":"B","t":"실습생에게 허드렛일만 시키는 사관이 있다면 어떻게 하겠습니까?"},"c_mooring":{"i":"B","t":"계류 작업 때 가장 위험한 것은 무엇입니까?"},"c_stay":{"i":"C","t":"실습이 끝나면 우리 회사에 입사할 생각입니까? 다른 선사가 더 좋은 조건을 주면요?"},"c_alcohol":{"i":"B","t":"선내 음주 규정을 알고 있습니까? 선배가 당직 전에 술을 권하면 어떻게 하겠습니까?"},"q_c_sns":{"i":"A","t":"선내 사진이나 항로를 SNS에 올리면 안 되는 이유는 무엇입니까?"},"q_p_why__co_고려해운":{"i":"A","t":"배를 타는 대신 고려해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_현대글로비스":{"i":"A","t":"배를 타는 대신 현대글로비스의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_상지해운":{"i":"A","t":"배를 타는 대신 상지해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_윌헬름슨WSMKorea":{"i":"A","t":"배를 타는 대신 윌헬름슨(WSM Korea)의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_KSS해운":{"i":"A","t":"배를 타는 대신 KSS해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_SK해운":{"i":"A","t":"배를 타는 대신 SK해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_에이치라인해운":{"i":"A","t":"배를 타는 대신 에이치라인해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_팬오션":{"i":"A","t":"배를 타는 대신 팬오션의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_폴라리스쉬핑":{"i":"A","t":"배를 타는 대신 폴라리스쉬핑의 해기직을 택한 이유는 무엇입니까?"},"p_why_hmm":{"i":"A","t":"배를 타는 대신 HMM의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_대한해운":{"i":"A","t":"배를 타는 대신 대한해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_장금상선":{"i":"A","t":"배를 타는 대신 장금상선의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_한국해양교통안전공단":{"i":"A","t":"배를 타는 대신 한국해양교통안전공단의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_해양환경공단":{"i":"A","t":"배를 타는 대신 해양환경공단의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_한국해양진흥공사":{"i":"A","t":"배를 타는 대신 한국해양진흥공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_부산항만공사":{"i":"A","t":"배를 타는 대신 부산항만공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_인천항만공사":{"i":"A","t":"배를 타는 대신 인천항만공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_여수광양항만공사":{"i":"A","t":"배를 타는 대신 여수광양항만공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_울산항만공사":{"i":"A","t":"배를 타는 대신 울산항만공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_generic":{"i":"A","t":"배를 타는 대신 저희 회사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_generic2":{"i":"A","t":"배를 타는 대신 저희 기관의 해기직을 택한 이유는 무엇입니까?"},"q_p_rule":{"i":"B","t":"선박 점검에서 선주가 \"이번만 봐 달라\"고 하면 어떻게 하겠습니까?"},"q_p_issue":{"i":"C","t":"최근 해양 분야 정책 이슈 하나를 골라 본인 생각을 말해 보세요."},"q_p_gift":{"i":"A","t":"업무 관계자가 감사하다며 선물을 보내오면 어떻게 하겠습니까?"},"q_p_safety":{"i":"B","t":"소형 선박이나 어선 사고를 줄이려면 어떤 방법이 효과적이라고 생각합니까?"},"q_p_team":{"i":"A","t":"민원인이 규정을 이해하지 못하고 화를 낸다면 어떻게 하겠습니까?"},"ship_nav_lng":{"i":"B","t":"LNG 화물의 특성과, 운항 중 가장 위험한 상황이 뭐라고 생각합니까?"},"ship_nav_container":{"i":"B","t":"컨테이너선은 정시성 압박이 큽니다. 기상 악화로 안전과 스케줄이 충돌하면 어떻게 하겠습니까?"},"q_ship_nav_bulk":{"i":"B","t":"벌크선 화물 중 니켈광처럼 액상화 위험이 있는 화물이 왜 위험한지 설명해 보세요."},"q_ship_nav_tanker":{"i":"B","t":"유조선 화물 작업 중 가장 큰 위험은 무엇이고, 불활성가스 장치(IGS)는 왜 필요합니까?"},"q_ship_eng_lng":{"i":"B","t":"LNG선은 증발가스를 연료로 쓰는 이중연료 엔진이 많습니다. 기관사로서 가장 주의할 점은?"},"q_ship_eng_container":{"i":"B","t":"감속 운항(slow steaming)이 주기관에 주는 영향은 무엇입니까?"},"q_ship_eng_bulk":{"i":"B","t":"선령이 높은 벌크선 기관실에서 가장 신경 써야 할 점은 무엇입니까?"},"q_ship_eng_tanker":{"i":"B","t":"유조선의 불활성가스 장치에서 기관사가 관리할 것은 무엇입니까?"},"q_n_fog":{"i":"B","t":"짙은 안개로 시정이 0.5마일입니다. 레이더에 좌현 정횡 전방 3마일에서 접근하는 물표가 잡혔습니다. 어떻게 하겠습니까?"},"q_n_rest":{"i":"B","t":"최소 휴식시간 기준을 알고 있습니까? 입항 준비로 휴식시간이 깨지면 어떻게 하겠습니까?"},"q_n_passage":{"i":"B","t":"항해계획(Passage Plan)은 어떤 단계로 세웁니까?"},"q_n_gm":{"i":"B","t":"GM이 너무 크거나 너무 작으면 각각 어떤 문제가 생깁니까?"},"n_mob":{"i":"B","t":"당직 중 사람이 바다에 빠졌다는 보고를 받았습니다. 첫 1분 동안 무엇을 합니까?"},"q_e_omd":{"i":"B","t":"주기관 오일 미스트 디텍터 경보가 울렸습니다. 어떻게 하겠습니까?"},"q_e_dali":{"i":"B","t":"2024년 볼티모어에서 DALI호가 출항 중 정전으로 교량과 충돌했습니다. 기관사로서 이런 사고를 막으려면?"},"q_e_ows":{"i":"B","t":"기름여과장치로 빌지를 배출할 수 있는 조건은 무엇입니까?"},"q_e_bunker":{"i":"B","t":"벙커링 중에 갑판으로 기름이 넘쳤습니다. 첫 조치는?"},"q_e_fuel":{"i":"C","t":"메탄올·암모니아 연료 선박이 늘고 있습니다. 기관사에게 어떤 역량이 새로 필요합니까?"},"c_cert":{"i":"B","t":"승선 전에 갖춰야 할 교육과 서류에는 무엇이 있습니까?"},"c_famil":{"i":"B","t":"승선 첫날 가장 먼저 익혀야 할 것은 무엇입니까?"},"c_enclosed":{"i":"B","t":"동료가 밀폐 구역 안에서 쓰러져 있습니다. 어떻게 하겠습니까?"},"q_c_scold":{"i":"A","t":"사관에게 사람들 앞에서 크게 혼났습니다. 절반은 내 잘못, 절반은 오해입니다. 어떻게 하겠습니까?"},"c_reserve":{"i":"C","t":"승선근무예비역 의무 기간만 채우고 육상으로 갈 생각 아닙니까?"},"q_p_org__co_고려해운":{"i":"A","t":"고려해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_현대글로비스":{"i":"A","t":"현대글로비스의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_상지해운":{"i":"A","t":"상지해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_윌헬름슨WSMKorea":{"i":"A","t":"윌헬름슨(WSM Korea)의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_KSS해운":{"i":"A","t":"KSS해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_SK해운":{"i":"A","t":"SK해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_에이치라인해운":{"i":"A","t":"에이치라인해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_팬오션":{"i":"A","t":"팬오션의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_폴라리스쉬핑":{"i":"A","t":"폴라리스쉬핑의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_HMM":{"i":"A","t":"HMM의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_대한해운":{"i":"A","t":"대한해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_장금상선":{"i":"A","t":"장금상선의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_한국해양교통안전공단":{"i":"A","t":"한국해양교통안전공단의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_해양환경공단":{"i":"A","t":"해양환경공단의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_한국해양진흥공사":{"i":"A","t":"한국해양진흥공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_부산항만공사":{"i":"A","t":"부산항만공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_인천항만공사":{"i":"A","t":"인천항만공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_여수광양항만공사":{"i":"A","t":"여수광양항만공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_울산항만공사":{"i":"A","t":"울산항만공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_generic":{"i":"A","t":"저희 회사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_generic2":{"i":"A","t":"저희 기관의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_law":{"i":"B","t":"해사안전법이 몇 년 전 둘로 나뉘었습니다. 무엇으로 나뉘었고, 현장에 어떤 의미가 있습니까?"},"q_p_ferry":{"i":"B","t":"기상이 출항 통제 기준에 가까운데 여객선 선장이 출항하겠다고 합니다. 어떻게 하겠습니까?"},"q_p_active":{"i":"A","t":"규정에는 없지만 국민 안전을 위해 꼭 필요한 일이 생기면 어떻게 하겠습니까?"},"q_p_rotate":{"i":"A","t":"지방·도서 지역 순환 근무가 잦습니다. 괜찮습니까?"},"last":{"i":"A","t":"마지막으로 꼭 하고 싶은 말이 있으면 30초 드리겠습니다."},"r_lng":{"i":"B","t":"자소서에 LNG선 경험이 있다고 쓰셨습니다. 그 배에서 화물과 관련해 가장 위험하다고 배운 것 두 가지와, 실제로 어떻게 대비했는지 말씀해 주세요."},"r_cont":{"i":"B","t":"자소서에 컨테이너 경험이 있던데, 하역이 지연되거나 크레인 작업이 멈춘 상황을 겪어 봤습니까? 그때 갑판 담당으로 무엇을 먼저 확인해야 합니까?"},"r_bulk":{"i":"B","t":"자소서에 벌크선 경험을 쓰셨는데, 벌크선에서 가장 무서운 사고가 뭐라고 생각합니까? 이유도 함께 말씀해 주세요."},"r_tanker":{"i":"B","t":"자소서에 탱커 경험이 있던데, 유조선·케미컬선에서 정전기와 가스 위험을 어떻게 관리하는지 설명해 보세요."},"r_watch":{"i":"A","t":"자소서에 야간 당직 경험이 있다고 쓰셨습니다. 야간 당직에서 가장 위험했던 순간과 그때 본인이 한 판단을 말씀해 주세요."},"r_lead":{"i":"A","t":"자소서에 학회장 역할을 하셨는데, 선상에서는 직급이 절대적입니다. 그 경험이 배 위에서 어떻게 도움이 됩니까?"},"r_eng":{"i":"C","t":"자소서에 토익 성적을 쓰셨습니다. 다국적 선원에게 \"안전모를 쓰세요\"를 영어로 지시한다면 어떻게 말하겠습니까? 한 문장으로 해 보세요."},"r_safe":{"i":"A","t":"자소서에 안전관리자 교육 경험이 있던데, 그때 배운 안전 원칙 하나를 실제 당직 상황에 적용해 설명해 보세요."},"r_train":{"i":"C","t":"자소서에 실습선 경험을 쓰셨습니다. 실습 중 가장 당황했던 순간과, 그때 무엇을 배웠는지 말씀해 주세요."},"r_gen":{"i":"A","t":"자소서에 쓴 경험 중 가장 자신 있는 하나를 골라, 상황·본인 행동·결과를 숫자로 말씀해 주세요."},"f_intro_1_A":{"i":"A","t":"자기소개에서 이 직무와 연결되는 강점이 잘 안 보이는데, 한 문장으로 정리해 보세요."},"f_intro_1_B":{"i":"B","t":"자기소개에서 이 직무와 연결되는 강점이 잘 안 보이는데, 한 문장으로 정리해 보세요."},"f_motive_1_A__co_고려해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 고려해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_고려해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 고려해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_현대글로비스":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 현대글로비스여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_현대글로비스":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 현대글로비스여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_상지해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 상지해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_상지해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 상지해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_윌헬름슨WSMKorea":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 윌헬름슨(WSM Korea)여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_윌헬름슨WSMKorea":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 윌헬름슨(WSM Korea)여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_KSS해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? KSS해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_KSS해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? KSS해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_SK해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? SK해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_SK해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? SK해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_에이치라인해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 에이치라인해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_에이치라인해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 에이치라인해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_팬오션":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 팬오션여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_팬오션":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 팬오션여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_폴라리스쉬핑":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 폴라리스쉬핑여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_폴라리스쉬핑":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 폴라리스쉬핑여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_HMM":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? HMM여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_HMM":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? HMM여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_대한해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 대한해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_대한해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 대한해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_장금상선":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 장금상선여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_장금상선":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 장금상선여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_한국해양교통안전공단":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 한국해양교통안전공단여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_한국해양교통안전공단":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 한국해양교통안전공단여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_해양환경공단":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 해양환경공단여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_해양환경공단":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 해양환경공단여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_한국해양진흥공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 한국해양진흥공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_한국해양진흥공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 한국해양진흥공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_부산항만공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 부산항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_부산항만공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 부산항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_인천항만공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 인천항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_인천항만공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 인천항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_여수광양항만공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 여수광양항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_여수광양항만공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 여수광양항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_울산항만공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 울산항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_울산항만공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 울산항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_generic":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 저희 회사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_generic":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 저희 회사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_generic2":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 저희 기관여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_generic2":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 저희 기관여야만 하는 이유 하나만 대 보세요."},"f_motive_2_A__co_고려해운":{"i":"A","t":"고려해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_고려해운":{"i":"B","t":"고려해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_현대글로비스":{"i":"A","t":"현대글로비스의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_현대글로비스":{"i":"B","t":"현대글로비스의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_상지해운":{"i":"A","t":"상지해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_상지해운":{"i":"B","t":"상지해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_윌헬름슨WSMKorea":{"i":"A","t":"윌헬름슨(WSM Korea)의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_윌헬름슨WSMKorea":{"i":"B","t":"윌헬름슨(WSM Korea)의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_KSS해운":{"i":"A","t":"KSS해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_KSS해운":{"i":"B","t":"KSS해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_SK해운":{"i":"A","t":"SK해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_SK해운":{"i":"B","t":"SK해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_에이치라인해운":{"i":"A","t":"에이치라인해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_에이치라인해운":{"i":"B","t":"에이치라인해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_팬오션":{"i":"A","t":"팬오션의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_팬오션":{"i":"B","t":"팬오션의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_폴라리스쉬핑":{"i":"A","t":"폴라리스쉬핑의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_폴라리스쉬핑":{"i":"B","t":"폴라리스쉬핑의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_HMM":{"i":"A","t":"HMM의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_HMM":{"i":"B","t":"HMM의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_대한해운":{"i":"A","t":"대한해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_대한해운":{"i":"B","t":"대한해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_장금상선":{"i":"A","t":"장금상선의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_장금상선":{"i":"B","t":"장금상선의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_한국해양교통안전공단":{"i":"A","t":"한국해양교통안전공단의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_한국해양교통안전공단":{"i":"B","t":"한국해양교통안전공단의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_해양환경공단":{"i":"A","t":"해양환경공단의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_해양환경공단":{"i":"B","t":"해양환경공단의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_한국해양진흥공사":{"i":"A","t":"한국해양진흥공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_한국해양진흥공사":{"i":"B","t":"한국해양진흥공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_부산항만공사":{"i":"A","t":"부산항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_부산항만공사":{"i":"B","t":"부산항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_인천항만공사":{"i":"A","t":"인천항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_인천항만공사":{"i":"B","t":"인천항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_여수광양항만공사":{"i":"A","t":"여수광양항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_여수광양항만공사":{"i":"B","t":"여수광양항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_울산항만공사":{"i":"A","t":"울산항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_울산항만공사":{"i":"B","t":"울산항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_generic":{"i":"A","t":"저희 회사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_generic":{"i":"B","t":"저희 회사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_generic2":{"i":"A","t":"저희 기관의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_generic2":{"i":"B","t":"저희 기관의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_weak_1_A":{"i":"A","t":"그건 단점이 아니라 장점을 포장한 것 같은데요?"},"f_weak_1_B":{"i":"B","t":"그건 단점이 아니라 장점을 포장한 것 같은데요?"},"f_weak_2_A":{"i":"A","t":"그 단점 때문에 실제로 일을 그르친 적이 있습니까?"},"f_weak_2_B":{"i":"B","t":"그 단점 때문에 실제로 일을 그르친 적이 있습니까?"},"f_conflict_1_A":{"i":"A","t":"결과적으로 본인 의견이 틀렸던 건 아닙니까?"},"f_conflict_1_B":{"i":"B","t":"결과적으로 본인 의견이 틀렸던 건 아닙니까?"},"f_conflict_2_A":{"i":"A","t":"지금 다시 그 상황이면 뭘 다르게 하겠습니까?"},"f_conflict_2_B":{"i":"B","t":"지금 다시 그 상황이면 뭘 다르게 하겠습니까?"},"f_gap_1_B":{"i":"B","t":"솔직히 말해서, 그냥 시간 보낸 거 아닙니까?"},"f_gap_2_B":{"i":"B","t":"그 3년이 해기사 일에 어떻게 도움이 됩니까? 구체적으로요."},"f_gap_3_B":{"i":"B","t":"그때처럼 또 방황하지 않는다는 보장이 있습니까?"},"f_age_1_B":{"i":"B","t":"어린 선배가 사람들 앞에서 면박을 주면 어떻게 하겠습니까?"},"f_credit_1_B":{"i":"B","t":"그럼 지금 전공 중에 가장 자신 없는 과목은 뭡니까?"},"f_credit_2_B":{"i":"B","t":"그 과목 핵심 개념 하나만 지금 설명해 보세요."},"f_sea_1_B":{"i":"B","t":"확신의 근거가 뭡니까? 말로는 누구나 할 수 있습니다."},"f_sea_2_B":{"i":"B","t":"첫 승선 3개월 차에 그만두고 싶어지면 어떻게 하겠습니까?"},"f_order_1_B":{"i":"B","t":"그 선배가 \"여기선 원래 이렇게 한다\"고 하면요?"},"f_order_2_B":{"i":"B","t":"보고했다가 배 안에서 따돌림을 당하면요?"},"f_money_1_B":{"i":"B","t":"돈이 이유라면 몇 년 타고 육상직으로 빠지는 거 아닙니까?"},"f_acc_1_B":{"i":"B","t":"그건 결과론 아닙니까? 그 상황이면 본인도 똑같이 했을 수 있잖아요."},"f_vision_1_C":{"i":"C","t":"그건 회사 입장에서는 이직 계획처럼 들리는데요?"},"f_vision_1_B":{"i":"B","t":"그건 회사 입장에서는 이직 계획처럼 들리는데요?"},"f_abroad_1_C":{"i":"C","t":"다국적 선원이 지시를 무시하면 어떻게 하겠습니까?"},"f_abroad_1_B":{"i":"B","t":"다국적 선원이 지시를 무시하면 어떻게 하겠습니까?"},"f_abroad_2_C":{"i":"C","t":"그 정도 해외 경험은 요즘 누구나 있지 않습니까?"},"f_abroad_2_B":{"i":"B","t":"그 정도 해외 경험은 요즘 누구나 있지 않습니까?"},"f_ism_1_B":{"i":"B","t":"서류 작업만 늘린다는 현장 불만도 있는데, 어떻게 생각합니까?"},"f_mistake_1_A":{"i":"A","t":"그 실수를 아무도 몰랐다면 그래도 보고했겠습니까?"},"f_mistake_1_B":{"i":"B","t":"그 실수를 아무도 몰랐다면 그래도 보고했겠습니까?"},"f_mistake_2_A":{"i":"A","t":"재발 방지책이 실제로 효과가 있었다는 근거가 있습니까?"},"f_mistake_2_B":{"i":"B","t":"재발 방지책이 실제로 효과가 있었다는 근거가 있습니까?"},"f_c_self_1_B":{"i":"B","t":"그때 결정이 틀렸다면 어떻게 했겠습니까?"},"f_c_self_2_B":{"i":"B","t":"선배와 의견이 다르면 누구 말을 따르겠습니까?"},"f_c_long_1_C":{"i":"C","t":"그건 육지에서 한 경험이잖아요. 배는 도망갈 곳이 없습니다."},"f_c_long_1_B":{"i":"B","t":"그건 육지에서 한 경험이잖아요. 배는 도망갈 곳이 없습니다."},"f_co_kmtc1_1_C":{"i":"C","t":"반대로 육상이 편해서 다시 배를 안 타려 하면요?"},"f_co_kmtc1_1_B":{"i":"B","t":"반대로 육상이 편해서 다시 배를 안 타려 하면요?"},"f_co_kmtc2_1_B":{"i":"B","t":"다들 피곤한데 혼자 힘들다고 하면 눈치 보이지 않겠습니까?"},"f_co_glovis1_1_B":{"i":"B","t":"그럼 지금 그걸 위해 준비하고 있는 게 있습니까?"},"f_co_glovis2_1_B":{"i":"B","t":"전기차 화재는 일반 화재와 뭐가 다릅니까?"},"f_co_sangji1_1_A":{"i":"A","t":"같은 사람과 오래 지내다 사이가 틀어지면 어떻게 하겠습니까?"},"f_co_sangji1_1_B":{"i":"B","t":"같은 사람과 오래 지내다 사이가 틀어지면 어떻게 하겠습니까?"},"f_co_sangji2_1_C":{"i":"C","t":"그럼 이직 제안이 오면 거절하겠습니까?"},"f_co_sangji2_1_B":{"i":"B","t":"그럼 이직 제안이 오면 거절하겠습니까?"},"f_co_wsm1_1_A":{"i":"A","t":"보고하면 본인 평가가 나빠질 텐데 그래도요?"},"f_co_wsm1_1_B":{"i":"B","t":"보고하면 본인 평가가 나빠질 텐데 그래도요?"},"f_en1_1_C":{"i":"C","t":"What is your biggest strength as a future ship officer?"},"f_en1_1_B":{"i":"B","t":"What is your biggest strength as a future ship officer?"},"f_en3_1_C":{"i":"C","t":"And what if the fire is near the cargo area?"},"f_en3_1_B":{"i":"B","t":"And what if the fire is near the cargo area?"},"f_job_1_B":{"i":"B","t":"그중에 본인이 가장 자신 없는 업무는 뭡니까?"},"f_body_1_A":{"i":"A","t":"그 걱정이 현실이 되면 어떻게 하겠습니까?"},"f_body_1_B":{"i":"B","t":"그 걱정이 현실이 되면 어떻게 하겠습니까?"},"f_multi_1_C":{"i":"C","t":"나이 많은 외국인 갑판장이 지시를 무시하면 어떻게 하겠습니까?"},"f_multi_1_B":{"i":"B","t":"나이 많은 외국인 갑판장이 지시를 무시하면 어떻게 하겠습니까?"},"f_weakspec_1_B":{"i":"B","t":"그걸 언제까지 어느 수준으로 올릴 계획입니까?"},"f_job_eng_1_B":{"i":"B","t":"그중 청정기(purifier)의 원리를 설명해 보세요."},"f_blackout_1_B":{"i":"B","t":"비상발전기도 기동하지 않으면요?"},"f_erfire_1_B":{"i":"B","t":"CO2를 방출하기 전에 반드시 확인할 것은?"},"f_ums_1_B":{"i":"B","t":"혼자 기관실에 들어갈 때 지켜야 할 규칙은?"},"f_orb_1_B":{"i":"B","t":"그 선배가 기관장이라면요?"},"f_sulphur_1_C":{"i":"C","t":"저유황유로 바꿀 때 기관 쪽에서 주의할 점은?"},"f_sulphur_1_B":{"i":"B","t":"저유황유로 바꿀 때 기관 쪽에서 주의할 점은?"},"f_lights_1_B":{"i":"B","t":"방위가 변하는지 어떻게 확인합니까?"},"f_lights_2_B":{"i":"B","t":"그 배가 나를 피해 간다면 나는 어떻게 하겠습니까?"},"f_handover_1_B":{"i":"B","t":"인계자가 피곤하다며 빨리 넘기려 하면요?"},"f_ecdis_1_B":{"i":"B","t":"GPS 위치가 갑자기 튀면 어떻게 확인합니까?"},"f_pilot_1_B":{"i":"B","t":"도선사 지시가 위험해 보이면요?"},"f_c_why_1_A":{"i":"A","t":"다른 선사 실습도 지원했습니까?"},"f_c_why_1_B":{"i":"B","t":"다른 선사 실습도 지원했습니까?"},"f_c_goal_1_A":{"i":"A","t":"그걸 배웠다는 걸 어떻게 증명하겠습니까?"},"f_c_goal_1_B":{"i":"B","t":"그걸 배웠다는 걸 어떻게 증명하겠습니까?"},"f_c_trb_1_B":{"i":"B","t":"담당 사관이 바빠서 서명을 계속 미루면요?"},"f_c_chores_1_B":{"i":"B","t":"그게 몇 달째 반복되면요?"},"f_c_mooring_1_B":{"i":"B","t":"계류 갑판에서 위험 구역은 어디까지라고 봐야 합니까?"},"f_c_stay_1_C":{"i":"C","t":"실습하면서 우리 회사가 마음에 안 들면요?"},"f_c_stay_1_B":{"i":"B","t":"실습하면서 우리 회사가 마음에 안 들면요?"},"f_c_alcohol_1_B":{"i":"B","t":"회식 자리에서 계속 권하면요?"},"f_c_sns_1_A":{"i":"A","t":"동기가 올린 걸 보면 어떻게 하겠습니까?"},"f_c_sns_1_B":{"i":"B","t":"동기가 올린 걸 보면 어떻게 하겠습니까?"},"f_p_why_1_A":{"i":"A","t":"승선 경력도 짧은데 현장 사람들을 설득할 수 있겠습니까?"},"f_p_why_1_B":{"i":"B","t":"승선 경력도 짧은데 현장 사람들을 설득할 수 있겠습니까?"},"f_p_rule_1_B":{"i":"B","t":"상급자가 넘어가라고 하면요?"},"f_p_issue_1_C":{"i":"C","t":"그 이슈에서 우리 기관이 할 수 있는 일은 뭡니까?"},"f_p_issue_1_B":{"i":"B","t":"그 이슈에서 우리 기관이 할 수 있는 일은 뭡니까?"},"f_p_gift_1_A":{"i":"A","t":"소액이라도 안 됩니까?"},"f_p_gift_1_B":{"i":"B","t":"소액이라도 안 됩니까?"},"f_p_safety_1_B":{"i":"B","t":"예산이 거의 없다면요?"},"f_p_team_1_A":{"i":"A","t":"그래도 욕설을 하면요?"},"f_p_team_1_B":{"i":"B","t":"그래도 욕설을 하면요?"},"f_en4_1_B":{"i":"B","t":"What if the officer you relieve looks very tired?"},"f_ship_nav_lng_1_B":{"i":"B","t":"BOG는 보통 어떻게 처리합니까?"},"f_ship_nav_container_1_B":{"i":"B","t":"파라메트릭 롤링이라는 말을 들어 봤습니까?"},"f_ship_nav_bulk_1_B":{"i":"B","t":"화주의 수분 함량 증명서가 의심스러우면 어떻게 하겠습니까?"},"f_ship_nav_tanker_1_B":{"i":"B","t":"밀폐 구역에 들어가기 전에 무엇을 확인합니까?"},"f_ship_eng_lng_1_B":{"i":"B","t":"가스 누출 경보가 울리면 첫 조치는?"},"f_ship_eng_container_1_B":{"i":"B","t":"저부하 운전이 길어지면 어떤 정비가 늘어납니까?"},"f_ship_eng_bulk_1_B":{"i":"B","t":"예비품이 없을 때 임시 수리는 어디까지 해도 된다고 봅니까?"},"f_ship_eng_tanker_1_B":{"i":"B","t":"갑판 수봉은 왜 필요합니까?"},"f_n_fog_1_B":{"i":"B","t":"우현 정횡 후방에서 접근하는 배라면 어느 쪽으로 피합니까?"},"f_n_fog_2_B":{"i":"B","t":"레이더만으로 판단할 때 위험한 점은?"},"f_n_rest_1_B":{"i":"B","t":"선배들이 휴식시간 기록을 맞춰서 쓰라고 하면요?"},"f_n_passage_1_B":{"i":"B","t":"UKC는 무엇을 고려해 정합니까?"},"f_n_gm_1_B":{"i":"B","t":"자유수면효과를 줄이려면 어떻게 합니까?"},"f_n_mob_1_B":{"i":"B","t":"윌리엄슨 턴은 언제 쓰고, 언제 다른 방법을 씁니까?"},"f_e_omd_1_B":{"i":"B","t":"왜 바로 크랭크케이스 문을 열면 안 됩니까?"},"f_e_dali_1_B":{"i":"B","t":"입출항 때 발전기를 두 대 이상 병렬로 돌리는 이유는?"},"f_e_ows_1_B":{"i":"B","t":"15ppm 경보장치를 속이는 행위가 왜 중대한 범죄입니까?"},"f_e_bunker_1_B":{"i":"B","t":"벙커링 전에 스커퍼를 막는 이유는?"},"f_e_fuel_1_C":{"i":"C","t":"IMO 탄소 규제 논의가 어디까지 왔는지 압니까?"},"f_e_fuel_1_B":{"i":"B","t":"IMO 탄소 규제 논의가 어디까지 왔는지 압니까?"},"f_c_cert_1_B":{"i":"B","t":"기본안전교육에서 가장 기억나는 훈련은?"},"f_c_famil_1_B":{"i":"B","t":"일반비상경보 신호는 어떻게 울립니까?"},"f_c_enclosed_1_B":{"i":"B","t":"동료가 숨을 안 쉬는 것 같아도 기다립니까?"},"f_c_scold_1_A":{"i":"A","t":"그 사관이 계속 그러면요?"},"f_c_scold_1_B":{"i":"B","t":"그 사관이 계속 그러면요?"},"f_c_reserve_1_C":{"i":"C","t":"다른 길도 있는데 굳이 배를 타려는 이유는?"},"f_c_reserve_1_B":{"i":"B","t":"다른 길도 있는데 굳이 배를 타려는 이유는?"},"f_p_org_1_A":{"i":"A","t":"그 사업의 최근 문제점을 알고 있습니까?"},"f_p_org_1_B":{"i":"B","t":"그 사업의 최근 문제점을 알고 있습니까?"},"f_p_law_1_B":{"i":"B","t":"선박 음주 운항 기준 혈중알코올농도는 몇 퍼센트입니까?"},"f_p_ferry_1_B":{"i":"B","t":"선사가 민원과 손해를 들어 항의하면요?"},"f_p_active_1_A":{"i":"A","t":"그 일로 감사를 받게 되면요?"},"f_p_active_1_B":{"i":"B","t":"그 일로 감사를 받게 되면요?"},"f_p_rotate_1_A":{"i":"A","t":"가족이 반대하면요?"},"f_p_rotate_1_B":{"i":"B","t":"가족이 반대하면요?"},"f_en_headon_1_B":{"i":"B","t":"What if she does not alter her course?"},"f_r_lng_1_B":{"i":"B","t":"그 위험을 실제로 확인한 절차는 무엇이었습니까?"},"f_r_cont_1_B":{"i":"B","t":"계류삭이 끊어질 뻔했다면 무엇부터 하겠습니까?"},"f_r_bulk_1_B":{"i":"B","t":"액화 위험을 막으려면 선적 전에 무엇을 확인합니까?"},"f_r_tanker_1_B":{"i":"B","t":"가스 측정에서 이상 수치가 나오면 어떻게 하겠습니까?"},"f_r_watch_1_A":{"i":"A","t":"상대 선박이 VHF에 응답하지 않으면 어떻게 하겠습니까?"},"f_r_watch_1_B":{"i":"B","t":"상대 선박이 VHF에 응답하지 않으면 어떻게 하겠습니까?"},"f_r_lead_1_A":{"i":"A","t":"리더였을 때 본인 지시가 틀렸다는 걸 알았다면 어떻게 했습니까?"},"f_r_lead_1_B":{"i":"B","t":"리더였을 때 본인 지시가 틀렸다는 걸 알았다면 어떻게 했습니까?"},"f_r_eng_1_C":{"i":"C","t":"그 지시를 못 알아들었다면 어떻게 확인하겠습니까?"},"f_r_eng_1_B":{"i":"B","t":"그 지시를 못 알아들었다면 어떻게 확인하겠습니까?"},"f_r_safe_1_A":{"i":"A","t":"그 원칙으로 막을 수 없는 사고는 무엇입니까?"},"f_r_safe_1_B":{"i":"B","t":"그 원칙으로 막을 수 없는 사고는 무엇입니까?"},"f_r_train_1_C":{"i":"C","t":"그때 선배에게 무엇을 물어봤습니까?"},"f_r_train_1_B":{"i":"B","t":"그때 선배에게 무엇을 물어봤습니까?"},"f_r_gen_1_A":{"i":"A","t":"그 결과가 본인 덕분이라고 볼 근거는 무엇입니까?"},"f_r_gen_1_B":{"i":"B","t":"그 결과가 본인 덕분이라고 볼 근거는 무엇입니까?"},"r_press_1_A":{"i":"A","t":"음... 그건 다른 지원자들도 다 하는 얘기네요."},"r_press_1_B":{"i":"B","t":"음... 그건 다른 지원자들도 다 하는 얘기네요."},"r_press_1_C":{"i":"C","t":"음... 그건 다른 지원자들도 다 하는 얘기네요."},"r_press_2_A":{"i":"A","t":"글쎄요, 잘 와닿지는 않습니다."},"r_press_2_B":{"i":"B","t":"글쎄요, 잘 와닿지는 않습니다."},"r_press_2_C":{"i":"C","t":"글쎄요, 잘 와닿지는 않습니다."},"r_press_3_A":{"i":"A","t":"네. 시간 관계상 넘어가겠습니다."},"r_press_3_B":{"i":"B","t":"네. 시간 관계상 넘어가겠습니다."},"r_press_3_C":{"i":"C","t":"네. 시간 관계상 넘어가겠습니다."},"r_press_4_A":{"i":"A","t":"답변이 좀 길었습니다."},"r_press_4_B":{"i":"B","t":"답변이 좀 길었습니다."},"r_press_4_C":{"i":"C","t":"답변이 좀 길었습니다."},"ack3_a":{"i":"A","t":"네, 알겠습니다."},"ack3_b":{"i":"B","t":"네, 알겠습니다."},"ack3_c":{"i":"C","t":"네, 알겠습니다."},"ack1_a":{"i":"A","t":"네, 잘 들었습니다."},"ack1_b":{"i":"B","t":"네, 잘 들었습니다."},"ack1_c":{"i":"C","t":"네, 잘 들었습니다."},"r_loose_1_A":{"i":"A","t":"네, 좋습니다. 편하게 하셔도 돼요."},"r_loose_1_B":{"i":"B","t":"네, 좋습니다. 편하게 하셔도 돼요."},"r_loose_1_C":{"i":"C","t":"네, 좋습니다. 편하게 하셔도 돼요."},"r_loose_2_A":{"i":"A","t":"좋네요. 긴장 안 하셔도 됩니다."},"r_loose_2_B":{"i":"B","t":"좋네요. 긴장 안 하셔도 됩니다."},"r_loose_2_C":{"i":"C","t":"좋네요. 긴장 안 하셔도 됩니다."},"d_1_A":{"i":"A","t":"구체적인 사례를 하나만 들어 보세요."},"d_1_B":{"i":"B","t":"구체적인 사례를 하나만 들어 보세요."},"d_1_C":{"i":"C","t":"구체적인 사례를 하나만 들어 보세요."},"d_2_A":{"i":"A","t":"방금 말씀하신 것 중에 숫자로 증명할 수 있는 게 있습니까?"},"d_2_B":{"i":"B","t":"방금 말씀하신 것 중에 숫자로 증명할 수 있는 게 있습니까?"},"d_2_C":{"i":"C","t":"방금 말씀하신 것 중에 숫자로 증명할 수 있는 게 있습니까?"},"d_3_A":{"i":"A","t":"결론만 한 문장으로 다시 말씀해 보세요."},"d_3_B":{"i":"B","t":"결론만 한 문장으로 다시 말씀해 보세요."},"d_3_C":{"i":"C","t":"결론만 한 문장으로 다시 말씀해 보세요."},"d_4_A":{"i":"A","t":"그건 본인 생각이고, 객관적인 근거는 뭡니까?"},"d_4_B":{"i":"B","t":"그건 본인 생각이고, 객관적인 근거는 뭡니까?"},"d_4_C":{"i":"C","t":"그건 본인 생각이고, 객관적인 근거는 뭡니까?"},"g_1_A":{"i":"A","t":"그 경험에서 본인이 직접 결정한 부분은 어디였습니까?"},"g_1_B":{"i":"B","t":"그 경험에서 본인이 직접 결정한 부분은 어디였습니까?"},"g_1_C":{"i":"C","t":"그 경험에서 본인이 직접 결정한 부분은 어디였습니까?"},"g_2_A":{"i":"A","t":"그때 상황을 조금만 더 들려주시겠습니까?"},"g_2_B":{"i":"B","t":"그때 상황을 조금만 더 들려주시겠습니까?"},"g_2_C":{"i":"C","t":"그때 상황을 조금만 더 들려주시겠습니까?"},"g_3_A":{"i":"A","t":"그 뒤에 무엇이 달라졌습니까?"},"g_3_B":{"i":"B","t":"그 뒤에 무엇이 달라졌습니까?"},"g_3_C":{"i":"C","t":"그 뒤에 무엇이 달라졌습니까?"},"g_4_A":{"i":"A","t":"그 일에서 가장 어려웠던 점은 무엇이었습니까?"},"g_4_B":{"i":"B","t":"그 일에서 가장 어려웠던 점은 무엇이었습니까?"},"g_4_C":{"i":"C","t":"그 일에서 가장 어려웠던 점은 무엇이었습니까?"},"cut_b":{"i":"B","t":"네, 알겠습니다. 핵심만 한 문장으로 다시 말씀해 주세요."},"outro_a":{"i":"A","t":"수고하셨습니다. 오늘 면접은 여기까지입니다."},"drill_1":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 1개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_2":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 2개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_3":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 3개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_4":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 4개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_5":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 5개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_6":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 6개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_7":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 7개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_8":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 8개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_9":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 9개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_10":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 10개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_11":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 11개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_12":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 12개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_13":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 13개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_14":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 14개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_15":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 15개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_16":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 16개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_17":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 17개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_18":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 18개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_19":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 19개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_20":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 20개만 다시 보겠습니다. 편하게 답해 주십시오."},"greet_press":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 상무님이십니다. 시간이 많지 않으니 답변은 핵심만 해 주십시오. 시작하겠습니다."},"greet_mixed":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 상무님이십니다. 편하게 답변해 주시면 됩니다. 시작하겠습니다."},"greet_loose":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 상무님이십니다. 긴장 풀고 대화하듯 편하게 하세요. 시작하겠습니다."},"greet_press_박태수실습감독이현주상무":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 실습감독님, 오른쪽은 이현주 상무님이십니다. 시간이 많지 않으니 답변은 핵심만 해 주십시오. 시작하겠습니다."},"greet_normal_박태수실습감독이현주상무":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 실습감독님, 오른쪽은 이현주 상무님이십니다. 편하게 답변해 주시면 됩니다. 시작하겠습니다."},"greet_loose_박태수실습감독이현주상무":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 실습감독님, 오른쪽은 이현주 상무님이십니다. 긴장 풀고 대화하듯 편하게 하세요. 시작하겠습니다."},"greet_press_박태수팀장이현주본부장":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 본부장님이십니다. 시간이 많지 않으니 답변은 핵심만 해 주십시오. 시작하겠습니다."},"greet_normal_박태수팀장이현주본부장":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 본부장님이십니다. 편하게 답변해 주시면 됩니다. 시작하겠습니다."},"greet_loose_박태수팀장이현주본부장":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 본부장님이십니다. 긴장 풀고 대화하듯 편하게 하세요. 시작하겠습니다."},"prev_a":{"i":"A","t":"반갑습니다. 오늘 면접을 진행할 인사팀장 김정민입니다. 긴장 푸시고 편하게 답변해 주십시오."},"prev_b":{"i":"B","t":"한 번 타면 보통 사에서 육 개월은 집에 못 갑니다. 가족 문제로 중도 하선하면 회사가 큰 손해를 봅니다. 확신할 수 있습니까?"},"prev_c":{"i":"C","t":"십 년 뒤 본인은 어디서 무엇을 하고 있을 것 같습니까?"},"ack2_a":{"i":"A","t":"간결하게 정리해 주셨네요."},"ack2_b":{"i":"B","t":"간결하게 정리해 주셨네요."},"ack2_c":{"i":"C","t":"간결하게 정리해 주셨네요."},"ack4_a":{"i":"A","t":"좋습니다. 말씀 잘 들었습니다."},"ack4_b":{"i":"B","t":"좋습니다. 말씀 잘 들었습니다."},"ack4_c":{"i":"C","t":"좋습니다. 말씀 잘 들었습니다."},"cl_1_A":{"i":"A","t":"'열심히' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_1_B":{"i":"B","t":"'열심히' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_1_C":{"i":"C","t":"'열심히' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_2_A":{"i":"A","t":"'최선' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_2_B":{"i":"B","t":"'최선' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_2_C":{"i":"C","t":"'최선' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_3_A":{"i":"A","t":"'성실' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_3_B":{"i":"B","t":"'성실' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_3_C":{"i":"C","t":"'성실' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_4_A":{"i":"A","t":"'책임감' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_4_B":{"i":"B","t":"'책임감' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_4_C":{"i":"C","t":"'책임감' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_5_A":{"i":"A","t":"'소통' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_5_B":{"i":"B","t":"'소통' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_5_C":{"i":"C","t":"'소통' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_6_A":{"i":"A","t":"'배우는 자세' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_6_B":{"i":"B","t":"'배우는 자세' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_6_C":{"i":"C","t":"'배우는 자세' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_7_A":{"i":"A","t":"'긍정적' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_7_B":{"i":"B","t":"'긍정적' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_7_C":{"i":"C","t":"'긍정적' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_8_A":{"i":"A","t":"'열정' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_8_B":{"i":"B","t":"'열정' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_8_C":{"i":"C","t":"'열정' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_9_A":{"i":"A","t":"'도전' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_9_B":{"i":"B","t":"'도전' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_9_C":{"i":"C","t":"'도전' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."}};
+   같은 문장이면 API 키 없이도 항상 자연스러운 목소리로 재생한다.
+   대본에 없는 문장은 소리 없이 자막으로만 넘긴다(브라우저 TTS를 쓰지 않아 하이톤이 끼어들지 않는다). */
+const AUDIO_MAN={"intro":{"i":"A","t":"반갑습니다. 긴장 푸시고, 먼저 1분 자기소개 부탁드립니다."},"q_motive__co_고려해운":{"i":"A","t":"여러 선사 중에 고려해운에 지원한 이유가 뭡니까?"},"q_motive__co_현대글로비스":{"i":"A","t":"여러 선사 중에 현대글로비스에 지원한 이유가 뭡니까?"},"q_motive__co_상지해운":{"i":"A","t":"여러 선사 중에 상지해운에 지원한 이유가 뭡니까?"},"q_motive__co_윌헬름슨WSMKorea":{"i":"A","t":"여러 선사 중에 윌헬름슨(WSM Korea)에 지원한 이유가 뭡니까?"},"q_motive__co_KSS해운":{"i":"A","t":"여러 선사 중에 KSS해운에 지원한 이유가 뭡니까?"},"q_motive__co_SK해운":{"i":"A","t":"여러 선사 중에 SK해운에 지원한 이유가 뭡니까?"},"q_motive__co_에이치라인해운":{"i":"A","t":"여러 선사 중에 에이치라인해운에 지원한 이유가 뭡니까?"},"q_motive__co_팬오션":{"i":"A","t":"여러 선사 중에 팬오션에 지원한 이유가 뭡니까?"},"q_motive__co_폴라리스쉬핑":{"i":"A","t":"여러 선사 중에 폴라리스쉬핑에 지원한 이유가 뭡니까?"},"motive_hmm":{"i":"A","t":"여러 선사 중에 HMM에 지원한 이유가 뭡니까?"},"q_motive__co_대한해운":{"i":"A","t":"여러 선사 중에 대한해운에 지원한 이유가 뭡니까?"},"q_motive__co_장금상선":{"i":"A","t":"여러 선사 중에 장금상선에 지원한 이유가 뭡니까?"},"q_motive__co_한국해양교통안전공단":{"i":"A","t":"여러 선사 중에 한국해양교통안전공단에 지원한 이유가 뭡니까?"},"q_motive__co_해양환경공단":{"i":"A","t":"여러 선사 중에 해양환경공단에 지원한 이유가 뭡니까?"},"q_motive__co_한국해양진흥공사":{"i":"A","t":"여러 선사 중에 한국해양진흥공사에 지원한 이유가 뭡니까?"},"q_motive__co_부산항만공사":{"i":"A","t":"여러 선사 중에 부산항만공사에 지원한 이유가 뭡니까?"},"q_motive__co_인천항만공사":{"i":"A","t":"여러 선사 중에 인천항만공사에 지원한 이유가 뭡니까?"},"q_motive__co_여수광양항만공사":{"i":"A","t":"여러 선사 중에 여수광양항만공사에 지원한 이유가 뭡니까?"},"q_motive__co_울산항만공사":{"i":"A","t":"여러 선사 중에 울산항만공사에 지원한 이유가 뭡니까?"},"q_motive__co_generic":{"i":"A","t":"여러 선사 중에 저희 회사에 지원한 이유가 뭡니까?"},"q_motive__co_generic2":{"i":"A","t":"여러 선사 중에 저희 기관에 지원한 이유가 뭡니까?"},"weak":{"i":"A","t":"본인의 단점 하나를 말씀해 주세요. 포장하지 말고 진짜 단점으로요."},"conflict":{"i":"A","t":"조직에서 의견 충돌이 있었던 경험과, 본인이 어떻게 해결했는지 말씀해 주세요."},"q_gap":{"i":"B","t":"이력에 공백기가 보이는데, 그 기간에 정확히 뭘 했습니까?"},"q_age":{"i":"B","t":"동기들보다 나이가 있는 편인데, 나이 어린 선배 밑에서 일할 수 있겠습니까?"},"q_credit":{"i":"B","t":"편입생이시던데, 정규 4년 과정 출신보다 전공 기초가 약하지 않습니까?"},"sea":{"i":"B","t":"선종과 계약에 따라 다르지만 한 번 타면 보통 4~6개월 이상 집에 못 갑니다. 가족이나 연인 문제로 중도 하선하면 회사가 큰 손해를 봅니다. 확신할 수 있습니까?"},"order":{"i":"B","t":"당직 중에 선배가 규정에 어긋나는 지시를 하면 어떻게 하겠습니까?"},"money":{"i":"B","t":"솔직히 해양대 온 거, 취업 잘되고 연봉 높아서 아닙니까?"},"acc":{"i":"B","t":"기억나는 해양사고 하나와, 당직사관 입장에서 막을 수 있었던 지점을 말해 보세요."},"vision":{"i":"C","t":"10년 뒤 본인은 어디서 무엇을 하고 있을 것 같습니까?"},"q_abroad":{"i":"C","t":"해외 생활 경험이 있으시던데, 거기서 얻은 것 중 배 위에서 실제로 쓸모 있는 게 뭡니까?"},"ism":{"i":"B","t":"선박 안전관리에서 ISM Code가 왜 중요하다고 생각합니까?"},"mistake":{"i":"A","t":"실수했던 경험 하나와, 그 뒤에 무엇을 바꿨는지 말해 보세요."},"c_self":{"i":"B","t":"배 위에선 부모님도 친구도 도와줄 수 없습니다. 누구 도움 없이 스스로 결정해서 문제를 해결해 본 경험이 있습니까?"},"c_long":{"i":"C","t":"몇 달 동안 상륙을 못 하고 외국 선원들과만 지내야 할 수도 있습니다. 버틸 근거가 있습니까?"},"q_co_kmtc1":{"i":"C","t":"저희는 해상과 육상을 오가며 순환 근무를 합니다. 몇 년 타다가 육상으로 발령이 나면 어떻게 하겠습니까?"},"q_co_kmtc2":{"i":"B","t":"컨테이너선은 입출항이 잦아서 쉴 틈이 없습니다. 연속 입항으로 잠을 못 잔 상태에서 당직을 서야 하면 어떻게 하겠습니까?"},"q_co_glovis1":{"i":"B","t":"저희는 이중연료(DF) 추진선을 계속 늘리고 있습니다. DF 선박에서 해기사에게 새로 필요한 역량이 뭐라고 생각합니까?"},"q_co_glovis2":{"i":"B","t":"자동차운반선에서 가장 주의해야 할 위험이 뭐라고 생각합니까?"},"q_co_sangji1":{"i":"A","t":"저희는 선대가 작아서 같은 사람들과 오래 함께 탑니다. 공동체 생활에서 본인은 어떤 역할을 하는 사람입니까?"},"q_co_sangji2":{"i":"C","t":"솔직히 몇 년 타고 GS칼텍스 쪽으로 옮기려는 계획 아닙니까?"},"q_co_wsm1":{"i":"A","t":"저희는 Just Culture를 중요하게 생각합니다. 당직 중에 본인 실수로 작은 사고가 났다면 어떻게 하겠습니까?"},"job":{"i":"B","t":"3항사로 처음 승선하면 첫 달에 어떤 일을 맡게 됩니까? 아는 대로 말해 보세요."},"body":{"i":"A","t":"뱃멀미나 체력, 수면 패턴은 괜찮습니까? 승선 생활에서 가장 걱정되는 점을 솔직히 말해 보세요."},"multi":{"i":"C","t":"다국적 선원들과 일할 때 가장 어려운 점이 뭐라고 생각합니까?"},"weakspec":{"i":"B","t":"본인 스펙 중에 다른 지원자보다 가장 약한 게 뭡니까?"},"q_job_eng":{"i":"B","t":"3기사로 처음 승선하면 주로 어떤 장비를 맡게 됩니까?"},"q_blackout":{"i":"B","t":"항해 중 블랙아웃(전원 상실)이 발생하면 당직 기관사의 첫 조치는 무엇입니까?"},"q_erfire":{"i":"B","t":"기관실에서 화재를 발견하면 무엇부터 하겠습니까?"},"q_ums":{"i":"B","t":"무인 기관실(UMS) 운전 중 야간 당번 기관사는 무엇을 합니까?"},"q_orb":{"i":"B","t":"기름기록부를 왜 정확하게 써야 합니까? 선배가 기름 섞인 물을 몰래 버리자고 하면요?"},"q_sulphur":{"i":"C","t":"IMO의 황 규제(일반 해역 0.50%, 배출규제해역 0.10%)와 최근 탄소 규제(CII·EEXI, EU ETS)에 선사들은 어떻게 대응하고 있습니까?"},"lights":{"i":"B","t":"야간 당직 중 우현 선수 쪽에 앞뒤로 떨어진 흰 불 두 개와 빨간 불 하나가 보입니다. 상대는 어떤 배이고, 나는 어떻게 해야 합니까?"},"handover":{"i":"B","t":"항해 당직을 인수할 때 무엇을 확인합니까?"},"q_ecdis":{"i":"B","t":"ECDIS만 믿고 항해하면 안 되는 이유는 무엇입니까?"},"q_pilot":{"i":"B","t":"도선사가 승선해 있을 때 당직사관의 역할은 무엇입니까?"},"q_c_why__co_고려해운":{"i":"A","t":"실습 선사로 고려해운를 지원한 이유가 뭡니까?"},"q_c_why__co_현대글로비스":{"i":"A","t":"실습 선사로 현대글로비스를 지원한 이유가 뭡니까?"},"q_c_why__co_상지해운":{"i":"A","t":"실습 선사로 상지해운를 지원한 이유가 뭡니까?"},"q_c_why__co_윌헬름슨WSMKorea":{"i":"A","t":"실습 선사로 윌헬름슨(WSM Korea)를 지원한 이유가 뭡니까?"},"q_c_why__co_KSS해운":{"i":"A","t":"실습 선사로 KSS해운를 지원한 이유가 뭡니까?"},"q_c_why__co_SK해운":{"i":"A","t":"실습 선사로 SK해운를 지원한 이유가 뭡니까?"},"q_c_why__co_에이치라인해운":{"i":"A","t":"실습 선사로 에이치라인해운를 지원한 이유가 뭡니까?"},"q_c_why__co_팬오션":{"i":"A","t":"실습 선사로 팬오션를 지원한 이유가 뭡니까?"},"q_c_why__co_폴라리스쉬핑":{"i":"A","t":"실습 선사로 폴라리스쉬핑를 지원한 이유가 뭡니까?"},"c_why_hmm":{"i":"A","t":"실습 선사로 HMM를 지원한 이유가 뭡니까?"},"q_c_why__co_대한해운":{"i":"A","t":"실습 선사로 대한해운를 지원한 이유가 뭡니까?"},"q_c_why__co_장금상선":{"i":"A","t":"실습 선사로 장금상선를 지원한 이유가 뭡니까?"},"q_c_why__co_한국해양교통안전공단":{"i":"A","t":"실습 선사로 한국해양교통안전공단를 지원한 이유가 뭡니까?"},"q_c_why__co_해양환경공단":{"i":"A","t":"실습 선사로 해양환경공단를 지원한 이유가 뭡니까?"},"q_c_why__co_한국해양진흥공사":{"i":"A","t":"실습 선사로 한국해양진흥공사를 지원한 이유가 뭡니까?"},"q_c_why__co_부산항만공사":{"i":"A","t":"실습 선사로 부산항만공사를 지원한 이유가 뭡니까?"},"q_c_why__co_인천항만공사":{"i":"A","t":"실습 선사로 인천항만공사를 지원한 이유가 뭡니까?"},"q_c_why__co_여수광양항만공사":{"i":"A","t":"실습 선사로 여수광양항만공사를 지원한 이유가 뭡니까?"},"q_c_why__co_울산항만공사":{"i":"A","t":"실습 선사로 울산항만공사를 지원한 이유가 뭡니까?"},"q_c_why__co_generic":{"i":"A","t":"실습 선사로 저희 회사를 지원한 이유가 뭡니까?"},"q_c_why__co_generic2":{"i":"A","t":"실습 선사로 저희 기관를 지원한 이유가 뭡니까?"},"c_goal":{"i":"A","t":"1년 실습 동안 무엇을 가장 배우고 싶습니까?"},"q_c_trb":{"i":"B","t":"실습 기록부(Training Record Book)는 어떻게 관리할 계획입니까?"},"q_c_chores":{"i":"B","t":"실습생에게 허드렛일만 시키는 사관이 있다면 어떻게 하겠습니까?"},"c_mooring":{"i":"B","t":"계류 작업 때 가장 위험한 것은 무엇입니까?"},"c_stay":{"i":"C","t":"실습이 끝나면 우리 회사에 입사할 생각입니까? 다른 선사가 더 좋은 조건을 주면요?"},"c_alcohol":{"i":"B","t":"선내 음주 규정을 알고 있습니까? 선배가 당직 전에 술을 권하면 어떻게 하겠습니까?"},"q_c_sns":{"i":"A","t":"선내 사진이나 항로를 SNS에 올리면 안 되는 이유는 무엇입니까?"},"q_p_why__co_고려해운":{"i":"A","t":"배를 타는 대신 고려해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_현대글로비스":{"i":"A","t":"배를 타는 대신 현대글로비스의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_상지해운":{"i":"A","t":"배를 타는 대신 상지해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_윌헬름슨WSMKorea":{"i":"A","t":"배를 타는 대신 윌헬름슨(WSM Korea)의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_KSS해운":{"i":"A","t":"배를 타는 대신 KSS해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_SK해운":{"i":"A","t":"배를 타는 대신 SK해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_에이치라인해운":{"i":"A","t":"배를 타는 대신 에이치라인해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_팬오션":{"i":"A","t":"배를 타는 대신 팬오션의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_폴라리스쉬핑":{"i":"A","t":"배를 타는 대신 폴라리스쉬핑의 해기직을 택한 이유는 무엇입니까?"},"p_why_hmm":{"i":"A","t":"배를 타는 대신 HMM의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_대한해운":{"i":"A","t":"배를 타는 대신 대한해운의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_장금상선":{"i":"A","t":"배를 타는 대신 장금상선의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_한국해양교통안전공단":{"i":"A","t":"배를 타는 대신 한국해양교통안전공단의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_해양환경공단":{"i":"A","t":"배를 타는 대신 해양환경공단의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_한국해양진흥공사":{"i":"A","t":"배를 타는 대신 한국해양진흥공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_부산항만공사":{"i":"A","t":"배를 타는 대신 부산항만공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_인천항만공사":{"i":"A","t":"배를 타는 대신 인천항만공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_여수광양항만공사":{"i":"A","t":"배를 타는 대신 여수광양항만공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_울산항만공사":{"i":"A","t":"배를 타는 대신 울산항만공사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_generic":{"i":"A","t":"배를 타는 대신 저희 회사의 해기직을 택한 이유는 무엇입니까?"},"q_p_why__co_generic2":{"i":"A","t":"배를 타는 대신 저희 기관의 해기직을 택한 이유는 무엇입니까?"},"q_p_rule":{"i":"B","t":"선박 점검에서 선주가 \"이번만 봐 달라\"고 하면 어떻게 하겠습니까?"},"q_p_issue":{"i":"C","t":"최근 해양 분야 정책 이슈 하나를 골라 본인 생각을 말해 보세요."},"q_p_gift":{"i":"A","t":"업무 관계자가 감사하다며 선물을 보내오면 어떻게 하겠습니까?"},"q_p_safety":{"i":"B","t":"소형 선박이나 어선 사고를 줄이려면 어떤 방법이 효과적이라고 생각합니까?"},"q_p_team":{"i":"A","t":"민원인이 규정을 이해하지 못하고 화를 낸다면 어떻게 하겠습니까?"},"ship_nav_lng":{"i":"B","t":"LNG 화물의 특성과, 운항 중 가장 위험한 상황이 뭐라고 생각합니까?"},"ship_nav_container":{"i":"B","t":"컨테이너선은 정시성 압박이 큽니다. 기상 악화로 안전과 스케줄이 충돌하면 어떻게 하겠습니까?"},"q_ship_nav_bulk":{"i":"B","t":"벌크선 화물 중 니켈광처럼 액상화 위험이 있는 화물이 왜 위험한지 설명해 보세요."},"q_ship_nav_tanker":{"i":"B","t":"유조선 화물 작업 중 가장 큰 위험은 무엇이고, 불활성가스 장치(IGS)는 왜 필요합니까?"},"q_ship_eng_lng":{"i":"B","t":"LNG선은 증발가스를 연료로 쓰는 이중연료 엔진이 많습니다. 기관사로서 가장 주의할 점은?"},"q_ship_eng_container":{"i":"B","t":"감속 운항(slow steaming)이 주기관에 주는 영향은 무엇입니까?"},"q_ship_eng_bulk":{"i":"B","t":"선령이 높은 벌크선 기관실에서 가장 신경 써야 할 점은 무엇입니까?"},"q_ship_eng_tanker":{"i":"B","t":"유조선의 불활성가스 장치에서 기관사가 관리할 것은 무엇입니까?"},"q_n_fog":{"i":"B","t":"짙은 안개로 시정이 0.5마일입니다. 레이더에 좌현 정횡 전방 3마일에서 접근하는 물표가 잡혔습니다. 어떻게 하겠습니까?"},"q_n_rest":{"i":"B","t":"최소 휴식시간 기준을 알고 있습니까? 입항 준비로 휴식시간이 깨지면 어떻게 하겠습니까?"},"q_n_passage":{"i":"B","t":"항해계획(Passage Plan)은 어떤 단계로 세웁니까?"},"q_n_gm":{"i":"B","t":"GM이 너무 크거나 너무 작으면 각각 어떤 문제가 생깁니까?"},"n_mob":{"i":"B","t":"당직 중 사람이 바다에 빠졌다는 보고를 받았습니다. 첫 1분 동안 무엇을 합니까?"},"q_e_omd":{"i":"B","t":"주기관 오일 미스트 디텍터 경보가 울렸습니다. 어떻게 하겠습니까?"},"q_e_dali":{"i":"B","t":"2024년 볼티모어에서 DALI호가 출항 중 정전으로 교량과 충돌했습니다. 기관사로서 이런 사고를 막으려면?"},"q_e_ows":{"i":"B","t":"기름여과장치로 빌지를 배출할 수 있는 조건은 무엇입니까?"},"q_e_bunker":{"i":"B","t":"벙커링 중에 갑판으로 기름이 넘쳤습니다. 첫 조치는?"},"q_e_fuel":{"i":"C","t":"메탄올·암모니아 연료 선박이 늘고 있습니다. 기관사에게 어떤 역량이 새로 필요합니까?"},"c_cert":{"i":"B","t":"승선 전에 갖춰야 할 교육과 서류에는 무엇이 있습니까?"},"c_famil":{"i":"B","t":"승선 첫날 가장 먼저 익혀야 할 것은 무엇입니까?"},"c_enclosed":{"i":"B","t":"동료가 밀폐 구역 안에서 쓰러져 있습니다. 어떻게 하겠습니까?"},"q_c_scold":{"i":"A","t":"사관에게 사람들 앞에서 크게 혼났습니다. 절반은 내 잘못, 절반은 오해입니다. 어떻게 하겠습니까?"},"c_reserve":{"i":"C","t":"승선근무예비역 의무 기간만 채우고 육상으로 갈 생각 아닙니까?"},"q_p_org__co_고려해운":{"i":"A","t":"고려해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_현대글로비스":{"i":"A","t":"현대글로비스의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_상지해운":{"i":"A","t":"상지해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_윌헬름슨WSMKorea":{"i":"A","t":"윌헬름슨(WSM Korea)의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_KSS해운":{"i":"A","t":"KSS해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_SK해운":{"i":"A","t":"SK해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_에이치라인해운":{"i":"A","t":"에이치라인해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_팬오션":{"i":"A","t":"팬오션의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_폴라리스쉬핑":{"i":"A","t":"폴라리스쉬핑의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_HMM":{"i":"A","t":"HMM의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_대한해운":{"i":"A","t":"대한해운의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_장금상선":{"i":"A","t":"장금상선의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_한국해양교통안전공단":{"i":"A","t":"한국해양교통안전공단의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_해양환경공단":{"i":"A","t":"해양환경공단의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_한국해양진흥공사":{"i":"A","t":"한국해양진흥공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_부산항만공사":{"i":"A","t":"부산항만공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_인천항만공사":{"i":"A","t":"인천항만공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_여수광양항만공사":{"i":"A","t":"여수광양항만공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_울산항만공사":{"i":"A","t":"울산항만공사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_generic":{"i":"A","t":"저희 회사의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_org__co_generic2":{"i":"A","t":"저희 기관의 핵심 사업 세 가지와, 본인이 가장 기여할 수 있는 분야를 말해 보세요."},"q_p_law":{"i":"B","t":"해사안전법이 몇 년 전 둘로 나뉘었습니다. 무엇으로 나뉘었고, 현장에 어떤 의미가 있습니까?"},"q_p_ferry":{"i":"B","t":"기상이 출항 통제 기준에 가까운데 여객선 선장이 출항하겠다고 합니다. 어떻게 하겠습니까?"},"q_p_active":{"i":"A","t":"규정에는 없지만 국민 안전을 위해 꼭 필요한 일이 생기면 어떻게 하겠습니까?"},"q_p_rotate":{"i":"A","t":"지방·도서 지역 순환 근무가 잦습니다. 괜찮습니까?"},"last":{"i":"A","t":"마지막으로 꼭 하고 싶은 말이 있으면 30초 드리겠습니다."},"r_lng":{"i":"B","t":"자소서에 LNG선 경험이 있다고 쓰셨습니다. 그 배에서 화물과 관련해 가장 위험하다고 배운 것 두 가지와, 실제로 어떻게 대비했는지 말씀해 주세요."},"r_cont":{"i":"B","t":"자소서에 컨테이너 경험이 있던데, 하역이 지연되거나 크레인 작업이 멈춘 상황을 겪어 봤습니까? 그때 갑판 담당으로 무엇을 먼저 확인해야 합니까?"},"r_bulk":{"i":"B","t":"자소서에 벌크선 경험을 쓰셨는데, 벌크선에서 가장 무서운 사고가 뭐라고 생각합니까? 이유도 함께 말씀해 주세요."},"r_tanker":{"i":"B","t":"자소서에 탱커 경험이 있던데, 유조선·케미컬선에서 정전기와 가스 위험을 어떻게 관리하는지 설명해 보세요."},"r_watch":{"i":"A","t":"자소서에 야간 당직 경험이 있다고 쓰셨습니다. 야간 당직에서 가장 위험했던 순간과 그때 본인이 한 판단을 말씀해 주세요."},"r_lead":{"i":"A","t":"자소서에 학회장 역할을 하셨는데, 선상에서는 직급이 절대적입니다. 그 경험이 배 위에서 어떻게 도움이 됩니까?"},"r_eng":{"i":"C","t":"자소서에 토익 성적을 쓰셨습니다. 다국적 선원에게 \"안전모를 쓰세요\"를 영어로 지시한다면 어떻게 말하겠습니까? 한 문장으로 해 보세요."},"r_safe":{"i":"A","t":"자소서에 안전관리자 교육 경험이 있던데, 그때 배운 안전 원칙 하나를 실제 당직 상황에 적용해 설명해 보세요."},"r_train":{"i":"C","t":"자소서에 실습선 경험을 쓰셨습니다. 실습 중 가장 당황했던 순간과, 그때 무엇을 배웠는지 말씀해 주세요."},"r_gen":{"i":"A","t":"자소서에 쓴 경험 중 가장 자신 있는 하나를 골라, 상황·본인 행동·결과를 숫자로 말씀해 주세요."},"f_intro_1_A":{"i":"A","t":"자기소개에서 이 직무와 연결되는 강점이 잘 안 보이는데, 한 문장으로 정리해 보세요."},"f_intro_1_B":{"i":"B","t":"자기소개에서 이 직무와 연결되는 강점이 잘 안 보이는데, 한 문장으로 정리해 보세요."},"f_motive_1_A__co_고려해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 고려해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_고려해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 고려해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_현대글로비스":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 현대글로비스여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_현대글로비스":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 현대글로비스여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_상지해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 상지해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_상지해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 상지해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_윌헬름슨WSMKorea":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 윌헬름슨(WSM Korea)여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_윌헬름슨WSMKorea":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 윌헬름슨(WSM Korea)여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_KSS해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? KSS해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_KSS해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? KSS해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_SK해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? SK해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_SK해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? SK해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_에이치라인해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 에이치라인해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_에이치라인해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 에이치라인해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_팬오션":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 팬오션여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_팬오션":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 팬오션여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_폴라리스쉬핑":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 폴라리스쉬핑여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_폴라리스쉬핑":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 폴라리스쉬핑여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_HMM":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? HMM여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_HMM":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? HMM여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_대한해운":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 대한해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_대한해운":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 대한해운여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_장금상선":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 장금상선여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_장금상선":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 장금상선여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_한국해양교통안전공단":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 한국해양교통안전공단여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_한국해양교통안전공단":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 한국해양교통안전공단여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_해양환경공단":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 해양환경공단여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_해양환경공단":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 해양환경공단여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_한국해양진흥공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 한국해양진흥공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_한국해양진흥공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 한국해양진흥공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_부산항만공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 부산항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_부산항만공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 부산항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_인천항만공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 인천항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_인천항만공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 인천항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_여수광양항만공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 여수광양항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_여수광양항만공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 여수광양항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_울산항만공사":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 울산항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_울산항만공사":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 울산항만공사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_generic":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 저희 회사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_generic":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 저희 회사여야만 하는 이유 하나만 대 보세요."},"f_motive_1_A__co_generic2":{"i":"A","t":"그 이유라면 다른 선사도 똑같지 않습니까? 저희 기관여야만 하는 이유 하나만 대 보세요."},"f_motive_1_B__co_generic2":{"i":"B","t":"그 이유라면 다른 선사도 똑같지 않습니까? 저희 기관여야만 하는 이유 하나만 대 보세요."},"f_motive_2_A__co_고려해운":{"i":"A","t":"고려해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_고려해운":{"i":"B","t":"고려해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_현대글로비스":{"i":"A","t":"현대글로비스의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_현대글로비스":{"i":"B","t":"현대글로비스의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_상지해운":{"i":"A","t":"상지해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_상지해운":{"i":"B","t":"상지해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_윌헬름슨WSMKorea":{"i":"A","t":"윌헬름슨(WSM Korea)의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_윌헬름슨WSMKorea":{"i":"B","t":"윌헬름슨(WSM Korea)의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_KSS해운":{"i":"A","t":"KSS해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_KSS해운":{"i":"B","t":"KSS해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_SK해운":{"i":"A","t":"SK해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_SK해운":{"i":"B","t":"SK해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_에이치라인해운":{"i":"A","t":"에이치라인해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_에이치라인해운":{"i":"B","t":"에이치라인해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_팬오션":{"i":"A","t":"팬오션의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_팬오션":{"i":"B","t":"팬오션의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_폴라리스쉬핑":{"i":"A","t":"폴라리스쉬핑의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_폴라리스쉬핑":{"i":"B","t":"폴라리스쉬핑의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_HMM":{"i":"A","t":"HMM의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_HMM":{"i":"B","t":"HMM의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_대한해운":{"i":"A","t":"대한해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_대한해운":{"i":"B","t":"대한해운의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_장금상선":{"i":"A","t":"장금상선의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_장금상선":{"i":"B","t":"장금상선의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_한국해양교통안전공단":{"i":"A","t":"한국해양교통안전공단의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_한국해양교통안전공단":{"i":"B","t":"한국해양교통안전공단의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_해양환경공단":{"i":"A","t":"해양환경공단의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_해양환경공단":{"i":"B","t":"해양환경공단의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_한국해양진흥공사":{"i":"A","t":"한국해양진흥공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_한국해양진흥공사":{"i":"B","t":"한국해양진흥공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_부산항만공사":{"i":"A","t":"부산항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_부산항만공사":{"i":"B","t":"부산항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_인천항만공사":{"i":"A","t":"인천항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_인천항만공사":{"i":"B","t":"인천항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_여수광양항만공사":{"i":"A","t":"여수광양항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_여수광양항만공사":{"i":"B","t":"여수광양항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_울산항만공사":{"i":"A","t":"울산항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_울산항만공사":{"i":"B","t":"울산항만공사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_generic":{"i":"A","t":"저희 회사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_generic":{"i":"B","t":"저희 회사의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_A__co_generic2":{"i":"A","t":"저희 기관의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_motive_2_B__co_generic2":{"i":"B","t":"저희 기관의 주력 선종과 최근 사업 방향을 알고 계십니까?"},"f_weak_1_A":{"i":"A","t":"그건 단점이 아니라 장점을 포장한 것 같은데요?"},"f_weak_1_B":{"i":"B","t":"그건 단점이 아니라 장점을 포장한 것 같은데요?"},"f_weak_2_A":{"i":"A","t":"그 단점 때문에 실제로 일을 그르친 적이 있습니까?"},"f_weak_2_B":{"i":"B","t":"그 단점 때문에 실제로 일을 그르친 적이 있습니까?"},"f_conflict_1_A":{"i":"A","t":"결과적으로 본인 의견이 틀렸던 건 아닙니까?"},"f_conflict_1_B":{"i":"B","t":"결과적으로 본인 의견이 틀렸던 건 아닙니까?"},"f_conflict_2_A":{"i":"A","t":"지금 다시 그 상황이면 뭘 다르게 하겠습니까?"},"f_conflict_2_B":{"i":"B","t":"지금 다시 그 상황이면 뭘 다르게 하겠습니까?"},"f_gap_1_B":{"i":"B","t":"솔직히 말해서, 그냥 시간 보낸 거 아닙니까?"},"f_gap_2_B":{"i":"B","t":"그 3년이 해기사 일에 어떻게 도움이 됩니까? 구체적으로요."},"f_gap_3_B":{"i":"B","t":"그때처럼 또 방황하지 않는다는 보장이 있습니까?"},"f_age_1_B":{"i":"B","t":"어린 선배가 사람들 앞에서 면박을 주면 어떻게 하겠습니까?"},"f_credit_1_B":{"i":"B","t":"그럼 지금 전공 중에 가장 자신 없는 과목은 뭡니까?"},"f_credit_2_B":{"i":"B","t":"그 과목 핵심 개념 하나만 지금 설명해 보세요."},"f_sea_1_B":{"i":"B","t":"확신의 근거가 뭡니까? 말로는 누구나 할 수 있습니다."},"f_sea_2_B":{"i":"B","t":"첫 승선 3개월 차에 그만두고 싶어지면 어떻게 하겠습니까?"},"f_order_1_B":{"i":"B","t":"그 선배가 \"여기선 원래 이렇게 한다\"고 하면요?"},"f_order_2_B":{"i":"B","t":"보고했다가 배 안에서 따돌림을 당하면요?"},"f_money_1_B":{"i":"B","t":"돈이 이유라면 몇 년 타고 육상직으로 빠지는 거 아닙니까?"},"f_acc_1_B":{"i":"B","t":"그건 결과론 아닙니까? 그 상황이면 본인도 똑같이 했을 수 있잖아요."},"f_vision_1_C":{"i":"C","t":"그건 회사 입장에서는 이직 계획처럼 들리는데요?"},"f_vision_1_B":{"i":"B","t":"그건 회사 입장에서는 이직 계획처럼 들리는데요?"},"f_abroad_1_C":{"i":"C","t":"다국적 선원이 지시를 무시하면 어떻게 하겠습니까?"},"f_abroad_1_B":{"i":"B","t":"다국적 선원이 지시를 무시하면 어떻게 하겠습니까?"},"f_abroad_2_C":{"i":"C","t":"그 정도 해외 경험은 요즘 누구나 있지 않습니까?"},"f_abroad_2_B":{"i":"B","t":"그 정도 해외 경험은 요즘 누구나 있지 않습니까?"},"f_ism_1_B":{"i":"B","t":"서류 작업만 늘린다는 현장 불만도 있는데, 어떻게 생각합니까?"},"f_mistake_1_A":{"i":"A","t":"그 실수를 아무도 몰랐다면 그래도 보고했겠습니까?"},"f_mistake_1_B":{"i":"B","t":"그 실수를 아무도 몰랐다면 그래도 보고했겠습니까?"},"f_mistake_2_A":{"i":"A","t":"재발 방지책이 실제로 효과가 있었다는 근거가 있습니까?"},"f_mistake_2_B":{"i":"B","t":"재발 방지책이 실제로 효과가 있었다는 근거가 있습니까?"},"f_c_self_1_B":{"i":"B","t":"그때 결정이 틀렸다면 어떻게 했겠습니까?"},"f_c_self_2_B":{"i":"B","t":"선배와 의견이 다르면 누구 말을 따르겠습니까?"},"f_c_long_1_C":{"i":"C","t":"그건 육지에서 한 경험이잖아요. 배는 도망갈 곳이 없습니다."},"f_c_long_1_B":{"i":"B","t":"그건 육지에서 한 경험이잖아요. 배는 도망갈 곳이 없습니다."},"f_co_kmtc1_1_C":{"i":"C","t":"반대로 육상이 편해서 다시 배를 안 타려 하면요?"},"f_co_kmtc1_1_B":{"i":"B","t":"반대로 육상이 편해서 다시 배를 안 타려 하면요?"},"f_co_kmtc2_1_B":{"i":"B","t":"다들 피곤한데 혼자 힘들다고 하면 눈치 보이지 않겠습니까?"},"f_co_glovis1_1_B":{"i":"B","t":"그럼 지금 그걸 위해 준비하고 있는 게 있습니까?"},"f_co_glovis2_1_B":{"i":"B","t":"전기차 화재는 일반 화재와 뭐가 다릅니까?"},"f_co_sangji1_1_A":{"i":"A","t":"같은 사람과 오래 지내다 사이가 틀어지면 어떻게 하겠습니까?"},"f_co_sangji1_1_B":{"i":"B","t":"같은 사람과 오래 지내다 사이가 틀어지면 어떻게 하겠습니까?"},"f_co_sangji2_1_C":{"i":"C","t":"그럼 이직 제안이 오면 거절하겠습니까?"},"f_co_sangji2_1_B":{"i":"B","t":"그럼 이직 제안이 오면 거절하겠습니까?"},"f_co_wsm1_1_A":{"i":"A","t":"보고하면 본인 평가가 나빠질 텐데 그래도요?"},"f_co_wsm1_1_B":{"i":"B","t":"보고하면 본인 평가가 나빠질 텐데 그래도요?"},"f_en1_1_C":{"i":"C","t":"What is your biggest strength as a future ship officer?"},"f_en1_1_B":{"i":"B","t":"What is your biggest strength as a future ship officer?"},"f_en3_1_C":{"i":"C","t":"And what if the fire is near the cargo area?"},"f_en3_1_B":{"i":"B","t":"And what if the fire is near the cargo area?"},"f_job_1_B":{"i":"B","t":"그중에 본인이 가장 자신 없는 업무는 뭡니까?"},"f_body_1_A":{"i":"A","t":"그 걱정이 현실이 되면 어떻게 하겠습니까?"},"f_body_1_B":{"i":"B","t":"그 걱정이 현실이 되면 어떻게 하겠습니까?"},"f_multi_1_C":{"i":"C","t":"나이 많은 외국인 갑판장이 지시를 무시하면 어떻게 하겠습니까?"},"f_multi_1_B":{"i":"B","t":"나이 많은 외국인 갑판장이 지시를 무시하면 어떻게 하겠습니까?"},"f_weakspec_1_B":{"i":"B","t":"그걸 언제까지 어느 수준으로 올릴 계획입니까?"},"f_job_eng_1_B":{"i":"B","t":"그중 청정기(purifier)의 원리를 설명해 보세요."},"f_blackout_1_B":{"i":"B","t":"비상발전기도 기동하지 않으면요?"},"f_erfire_1_B":{"i":"B","t":"CO2를 방출하기 전에 반드시 확인할 것은?"},"f_ums_1_B":{"i":"B","t":"혼자 기관실에 들어갈 때 지켜야 할 규칙은?"},"f_orb_1_B":{"i":"B","t":"그 선배가 기관장이라면요?"},"f_sulphur_1_C":{"i":"C","t":"저유황유로 바꿀 때 기관 쪽에서 주의할 점은?"},"f_sulphur_1_B":{"i":"B","t":"저유황유로 바꿀 때 기관 쪽에서 주의할 점은?"},"f_lights_1_B":{"i":"B","t":"방위가 변하는지 어떻게 확인합니까?"},"f_lights_2_B":{"i":"B","t":"그 배가 나를 피해 간다면 나는 어떻게 하겠습니까?"},"f_handover_1_B":{"i":"B","t":"인계자가 피곤하다며 빨리 넘기려 하면요?"},"f_ecdis_1_B":{"i":"B","t":"GPS 위치가 갑자기 튀면 어떻게 확인합니까?"},"f_pilot_1_B":{"i":"B","t":"도선사 지시가 위험해 보이면요?"},"f_c_why_1_A":{"i":"A","t":"다른 선사 실습도 지원했습니까?"},"f_c_why_1_B":{"i":"B","t":"다른 선사 실습도 지원했습니까?"},"f_c_goal_1_A":{"i":"A","t":"그걸 배웠다는 걸 어떻게 증명하겠습니까?"},"f_c_goal_1_B":{"i":"B","t":"그걸 배웠다는 걸 어떻게 증명하겠습니까?"},"f_c_trb_1_B":{"i":"B","t":"담당 사관이 바빠서 서명을 계속 미루면요?"},"f_c_chores_1_B":{"i":"B","t":"그게 몇 달째 반복되면요?"},"f_c_mooring_1_B":{"i":"B","t":"계류 갑판에서 위험 구역은 어디까지라고 봐야 합니까?"},"f_c_stay_1_C":{"i":"C","t":"실습하면서 우리 회사가 마음에 안 들면요?"},"f_c_stay_1_B":{"i":"B","t":"실습하면서 우리 회사가 마음에 안 들면요?"},"f_c_alcohol_1_B":{"i":"B","t":"회식 자리에서 계속 권하면요?"},"f_c_sns_1_A":{"i":"A","t":"동기가 올린 걸 보면 어떻게 하겠습니까?"},"f_c_sns_1_B":{"i":"B","t":"동기가 올린 걸 보면 어떻게 하겠습니까?"},"f_p_why_1_A":{"i":"A","t":"승선 경력도 짧은데 현장 사람들을 설득할 수 있겠습니까?"},"f_p_why_1_B":{"i":"B","t":"승선 경력도 짧은데 현장 사람들을 설득할 수 있겠습니까?"},"f_p_rule_1_B":{"i":"B","t":"상급자가 넘어가라고 하면요?"},"f_p_issue_1_C":{"i":"C","t":"그 이슈에서 우리 기관이 할 수 있는 일은 뭡니까?"},"f_p_issue_1_B":{"i":"B","t":"그 이슈에서 우리 기관이 할 수 있는 일은 뭡니까?"},"f_p_gift_1_A":{"i":"A","t":"소액이라도 안 됩니까?"},"f_p_gift_1_B":{"i":"B","t":"소액이라도 안 됩니까?"},"f_p_safety_1_B":{"i":"B","t":"예산이 거의 없다면요?"},"f_p_team_1_A":{"i":"A","t":"그래도 욕설을 하면요?"},"f_p_team_1_B":{"i":"B","t":"그래도 욕설을 하면요?"},"f_en4_1_B":{"i":"B","t":"What if the officer you relieve looks very tired?"},"f_ship_nav_lng_1_B":{"i":"B","t":"BOG는 보통 어떻게 처리합니까?"},"f_ship_nav_container_1_B":{"i":"B","t":"파라메트릭 롤링이라는 말을 들어 봤습니까?"},"f_ship_nav_bulk_1_B":{"i":"B","t":"화주의 수분 함량 증명서가 의심스러우면 어떻게 하겠습니까?"},"f_ship_nav_tanker_1_B":{"i":"B","t":"밀폐 구역에 들어가기 전에 무엇을 확인합니까?"},"f_ship_eng_lng_1_B":{"i":"B","t":"가스 누출 경보가 울리면 첫 조치는?"},"f_ship_eng_container_1_B":{"i":"B","t":"저부하 운전이 길어지면 어떤 정비가 늘어납니까?"},"f_ship_eng_bulk_1_B":{"i":"B","t":"예비품이 없을 때 임시 수리는 어디까지 해도 된다고 봅니까?"},"f_ship_eng_tanker_1_B":{"i":"B","t":"갑판 수봉은 왜 필요합니까?"},"f_n_fog_1_B":{"i":"B","t":"우현 정횡 후방에서 접근하는 배라면 어느 쪽으로 피합니까?"},"f_n_fog_2_B":{"i":"B","t":"레이더만으로 판단할 때 위험한 점은?"},"f_n_rest_1_B":{"i":"B","t":"선배들이 휴식시간 기록을 맞춰서 쓰라고 하면요?"},"f_n_passage_1_B":{"i":"B","t":"UKC는 무엇을 고려해 정합니까?"},"f_n_gm_1_B":{"i":"B","t":"자유수면효과를 줄이려면 어떻게 합니까?"},"f_n_mob_1_B":{"i":"B","t":"윌리엄슨 턴은 언제 쓰고, 언제 다른 방법을 씁니까?"},"f_e_omd_1_B":{"i":"B","t":"왜 바로 크랭크케이스 문을 열면 안 됩니까?"},"f_e_dali_1_B":{"i":"B","t":"입출항 때 발전기를 두 대 이상 병렬로 돌리는 이유는?"},"f_e_ows_1_B":{"i":"B","t":"15ppm 경보장치를 속이는 행위가 왜 중대한 범죄입니까?"},"f_e_bunker_1_B":{"i":"B","t":"벙커링 전에 스커퍼를 막는 이유는?"},"f_e_fuel_1_C":{"i":"C","t":"IMO 탄소 규제 논의가 어디까지 왔는지 압니까?"},"f_e_fuel_1_B":{"i":"B","t":"IMO 탄소 규제 논의가 어디까지 왔는지 압니까?"},"f_c_cert_1_B":{"i":"B","t":"기본안전교육에서 가장 기억나는 훈련은?"},"f_c_famil_1_B":{"i":"B","t":"일반비상경보 신호는 어떻게 울립니까?"},"f_c_enclosed_1_B":{"i":"B","t":"동료가 숨을 안 쉬는 것 같아도 기다립니까?"},"f_c_scold_1_A":{"i":"A","t":"그 사관이 계속 그러면요?"},"f_c_scold_1_B":{"i":"B","t":"그 사관이 계속 그러면요?"},"f_c_reserve_1_C":{"i":"C","t":"다른 길도 있는데 굳이 배를 타려는 이유는?"},"f_c_reserve_1_B":{"i":"B","t":"다른 길도 있는데 굳이 배를 타려는 이유는?"},"f_p_org_1_A":{"i":"A","t":"그 사업의 최근 문제점을 알고 있습니까?"},"f_p_org_1_B":{"i":"B","t":"그 사업의 최근 문제점을 알고 있습니까?"},"f_p_law_1_B":{"i":"B","t":"선박 음주 운항 기준 혈중알코올농도는 몇 퍼센트입니까?"},"f_p_ferry_1_B":{"i":"B","t":"선사가 민원과 손해를 들어 항의하면요?"},"f_p_active_1_A":{"i":"A","t":"그 일로 감사를 받게 되면요?"},"f_p_active_1_B":{"i":"B","t":"그 일로 감사를 받게 되면요?"},"f_p_rotate_1_A":{"i":"A","t":"가족이 반대하면요?"},"f_p_rotate_1_B":{"i":"B","t":"가족이 반대하면요?"},"f_en_headon_1_B":{"i":"B","t":"What if she does not alter her course?"},"f_r_lng_1_B":{"i":"B","t":"그 위험을 실제로 확인한 절차는 무엇이었습니까?"},"f_r_cont_1_B":{"i":"B","t":"계류삭이 끊어질 뻔했다면 무엇부터 하겠습니까?"},"f_r_bulk_1_B":{"i":"B","t":"액화 위험을 막으려면 선적 전에 무엇을 확인합니까?"},"f_r_tanker_1_B":{"i":"B","t":"가스 측정에서 이상 수치가 나오면 어떻게 하겠습니까?"},"f_r_watch_1_A":{"i":"A","t":"상대 선박이 VHF에 응답하지 않으면 어떻게 하겠습니까?"},"f_r_watch_1_B":{"i":"B","t":"상대 선박이 VHF에 응답하지 않으면 어떻게 하겠습니까?"},"f_r_lead_1_A":{"i":"A","t":"리더였을 때 본인 지시가 틀렸다는 걸 알았다면 어떻게 했습니까?"},"f_r_lead_1_B":{"i":"B","t":"리더였을 때 본인 지시가 틀렸다는 걸 알았다면 어떻게 했습니까?"},"f_r_eng_1_C":{"i":"C","t":"그 지시를 못 알아들었다면 어떻게 확인하겠습니까?"},"f_r_eng_1_B":{"i":"B","t":"그 지시를 못 알아들었다면 어떻게 확인하겠습니까?"},"f_r_safe_1_A":{"i":"A","t":"그 원칙으로 막을 수 없는 사고는 무엇입니까?"},"f_r_safe_1_B":{"i":"B","t":"그 원칙으로 막을 수 없는 사고는 무엇입니까?"},"f_r_train_1_C":{"i":"C","t":"그때 선배에게 무엇을 물어봤습니까?"},"f_r_train_1_B":{"i":"B","t":"그때 선배에게 무엇을 물어봤습니까?"},"f_r_gen_1_A":{"i":"A","t":"그 결과가 본인 덕분이라고 볼 근거는 무엇입니까?"},"f_r_gen_1_B":{"i":"B","t":"그 결과가 본인 덕분이라고 볼 근거는 무엇입니까?"},"r_press_1_A":{"i":"A","t":"음... 그건 다른 지원자들도 다 하는 얘기네요."},"r_press_1_B":{"i":"B","t":"음... 그건 다른 지원자들도 다 하는 얘기네요."},"r_press_1_C":{"i":"C","t":"음... 그건 다른 지원자들도 다 하는 얘기네요."},"r_press_2_A":{"i":"A","t":"글쎄요, 잘 와닿지는 않습니다."},"r_press_2_B":{"i":"B","t":"글쎄요, 잘 와닿지는 않습니다."},"r_press_2_C":{"i":"C","t":"글쎄요, 잘 와닿지는 않습니다."},"r_press_3_A":{"i":"A","t":"네. 시간 관계상 넘어가겠습니다."},"r_press_3_B":{"i":"B","t":"네. 시간 관계상 넘어가겠습니다."},"r_press_3_C":{"i":"C","t":"네. 시간 관계상 넘어가겠습니다."},"r_press_4_A":{"i":"A","t":"답변이 좀 길었습니다."},"r_press_4_B":{"i":"B","t":"답변이 좀 길었습니다."},"r_press_4_C":{"i":"C","t":"답변이 좀 길었습니다."},"ack3_a":{"i":"A","t":"네, 알겠습니다."},"ack3_b":{"i":"B","t":"네, 알겠습니다."},"ack3_c":{"i":"C","t":"네, 알겠습니다."},"ack1_a":{"i":"A","t":"네, 잘 들었습니다."},"ack1_b":{"i":"B","t":"네, 잘 들었습니다."},"ack1_c":{"i":"C","t":"네, 잘 들었습니다."},"r_loose_1_A":{"i":"A","t":"네, 좋습니다. 편하게 하셔도 돼요."},"r_loose_1_B":{"i":"B","t":"네, 좋습니다. 편하게 하셔도 돼요."},"r_loose_1_C":{"i":"C","t":"네, 좋습니다. 편하게 하셔도 돼요."},"r_loose_2_A":{"i":"A","t":"좋네요. 긴장 안 하셔도 됩니다."},"r_loose_2_B":{"i":"B","t":"좋네요. 긴장 안 하셔도 됩니다."},"r_loose_2_C":{"i":"C","t":"좋네요. 긴장 안 하셔도 됩니다."},"d_1_A":{"i":"A","t":"구체적인 사례를 하나만 들어 보세요."},"d_1_B":{"i":"B","t":"구체적인 사례를 하나만 들어 보세요."},"d_1_C":{"i":"C","t":"구체적인 사례를 하나만 들어 보세요."},"d_2_A":{"i":"A","t":"방금 말씀하신 것 중에 숫자로 증명할 수 있는 게 있습니까?"},"d_2_B":{"i":"B","t":"방금 말씀하신 것 중에 숫자로 증명할 수 있는 게 있습니까?"},"d_2_C":{"i":"C","t":"방금 말씀하신 것 중에 숫자로 증명할 수 있는 게 있습니까?"},"d_3_A":{"i":"A","t":"결론만 한 문장으로 다시 말씀해 보세요."},"d_3_B":{"i":"B","t":"결론만 한 문장으로 다시 말씀해 보세요."},"d_3_C":{"i":"C","t":"결론만 한 문장으로 다시 말씀해 보세요."},"d_4_A":{"i":"A","t":"그건 본인 생각이고, 객관적인 근거는 뭡니까?"},"d_4_B":{"i":"B","t":"그건 본인 생각이고, 객관적인 근거는 뭡니까?"},"d_4_C":{"i":"C","t":"그건 본인 생각이고, 객관적인 근거는 뭡니까?"},"g_1_A":{"i":"A","t":"그 경험에서 본인이 직접 결정한 부분은 어디였습니까?"},"g_1_B":{"i":"B","t":"그 경험에서 본인이 직접 결정한 부분은 어디였습니까?"},"g_1_C":{"i":"C","t":"그 경험에서 본인이 직접 결정한 부분은 어디였습니까?"},"g_2_A":{"i":"A","t":"그때 상황을 조금만 더 들려주시겠습니까?"},"g_2_B":{"i":"B","t":"그때 상황을 조금만 더 들려주시겠습니까?"},"g_2_C":{"i":"C","t":"그때 상황을 조금만 더 들려주시겠습니까?"},"g_3_A":{"i":"A","t":"그 뒤에 무엇이 달라졌습니까?"},"g_3_B":{"i":"B","t":"그 뒤에 무엇이 달라졌습니까?"},"g_3_C":{"i":"C","t":"그 뒤에 무엇이 달라졌습니까?"},"g_4_A":{"i":"A","t":"그 일에서 가장 어려웠던 점은 무엇이었습니까?"},"g_4_B":{"i":"B","t":"그 일에서 가장 어려웠던 점은 무엇이었습니까?"},"g_4_C":{"i":"C","t":"그 일에서 가장 어려웠던 점은 무엇이었습니까?"},"cut_b":{"i":"B","t":"네, 알겠습니다. 핵심만 한 문장으로 다시 말씀해 주세요."},"outro_a":{"i":"A","t":"수고하셨습니다. 오늘 면접은 여기까지입니다."},"drill_1":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 1개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_2":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 2개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_3":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 3개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_4":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 4개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_5":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 5개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_6":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 6개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_7":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 7개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_8":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 8개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_9":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 9개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_10":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 10개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_11":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 11개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_12":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 12개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_13":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 13개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_14":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 14개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_15":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 15개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_16":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 16개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_17":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 17개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_18":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 18개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_19":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 19개만 다시 보겠습니다. 편하게 답해 주십시오."},"drill_20":{"i":"A","t":"네, 방금 면접에서 아쉬웠던 질문 20개만 다시 보겠습니다. 편하게 답해 주십시오."},"greet_press":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 상무님이십니다. 시간이 많지 않으니 답변은 핵심만 해 주십시오. 시작하겠습니다."},"greet_mixed":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 상무님이십니다. 편하게 답변해 주시면 됩니다. 시작하겠습니다."},"greet_loose":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 상무님이십니다. 긴장 풀고 대화하듯 편하게 하세요. 시작하겠습니다."},"greet_press_박태수실습감독이현주상무":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 실습감독님, 오른쪽은 이현주 상무님이십니다. 시간이 많지 않으니 답변은 핵심만 해 주십시오. 시작하겠습니다."},"greet_normal_박태수실습감독이현주상무":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 실습감독님, 오른쪽은 이현주 상무님이십니다. 편하게 답변해 주시면 됩니다. 시작하겠습니다."},"greet_loose_박태수실습감독이현주상무":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 실습감독님, 오른쪽은 이현주 상무님이십니다. 긴장 풀고 대화하듯 편하게 하세요. 시작하겠습니다."},"greet_press_박태수팀장이현주본부장":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 본부장님이십니다. 시간이 많지 않으니 답변은 핵심만 해 주십시오. 시작하겠습니다."},"greet_normal_박태수팀장이현주본부장":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 본부장님이십니다. 편하게 답변해 주시면 됩니다. 시작하겠습니다."},"greet_loose_박태수팀장이현주본부장":{"i":"A","t":"안녕하세요, 오늘 면접을 진행할 인사팀장 김정민입니다. 가운데는 박태수 팀장님, 오른쪽은 이현주 본부장님이십니다. 긴장 풀고 대화하듯 편하게 하세요. 시작하겠습니다."},"prev_a":{"i":"A","t":"반갑습니다. 오늘 면접을 진행할 인사팀장 김정민입니다. 긴장 푸시고 편하게 답변해 주십시오."},"prev_b":{"i":"B","t":"한 번 타면 보통 사에서 육 개월은 집에 못 갑니다. 가족 문제로 중도 하선하면 회사가 큰 손해를 봅니다. 확신할 수 있습니까?"},"prev_c":{"i":"C","t":"십 년 뒤 본인은 어디서 무엇을 하고 있을 것 같습니까?"},"ack2_a":{"i":"A","t":"간결하게 정리해 주셨네요."},"ack2_b":{"i":"B","t":"간결하게 정리해 주셨네요."},"ack2_c":{"i":"C","t":"간결하게 정리해 주셨네요."},"ack4_a":{"i":"A","t":"좋습니다. 말씀 잘 들었습니다."},"ack4_b":{"i":"B","t":"좋습니다. 말씀 잘 들었습니다."},"ack4_c":{"i":"C","t":"좋습니다. 말씀 잘 들었습니다."},"cl_1_A":{"i":"A","t":"'열심히' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_1_B":{"i":"B","t":"'열심히' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_1_C":{"i":"C","t":"'열심히' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_2_A":{"i":"A","t":"'최선' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_2_B":{"i":"B","t":"'최선' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_2_C":{"i":"C","t":"'최선' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_3_A":{"i":"A","t":"'성실' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_3_B":{"i":"B","t":"'성실' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_3_C":{"i":"C","t":"'성실' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_4_A":{"i":"A","t":"'책임감' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_4_B":{"i":"B","t":"'책임감' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_4_C":{"i":"C","t":"'책임감' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_5_A":{"i":"A","t":"'소통' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_5_B":{"i":"B","t":"'소통' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_5_C":{"i":"C","t":"'소통' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_6_A":{"i":"A","t":"'배우는 자세' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_6_B":{"i":"B","t":"'배우는 자세' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_6_C":{"i":"C","t":"'배우는 자세' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_7_A":{"i":"A","t":"'긍정적' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_7_B":{"i":"B","t":"'긍정적' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_7_C":{"i":"C","t":"'긍정적' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_8_A":{"i":"A","t":"'열정' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_8_B":{"i":"B","t":"'열정' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_8_C":{"i":"C","t":"'열정' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_9_A":{"i":"A","t":"'도전' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_9_B":{"i":"B","t":"'도전' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"cl_9_C":{"i":"C","t":"'도전' 같은 말은 모든 지원자가 합니다. 그걸 증명하는 행동 하나만 말씀해 보세요."},"en_co_wsm2_C":{"i":"C","t":"Why do you want to join a global ship management company rather than a Korean shipping company?"},"en_en1_C":{"i":"C","t":"Now, please introduce yourself briefly in English."},"en_en2_C":{"i":"C","t":"Why do you want to work at sea, not on land?"},"en_en3_C":{"i":"C","t":"If you discovered a fire during your watch, what would you do first?"},"en_en4_B":{"i":"B","t":"What do you check when you take over a watch?"},"en_en5_C":{"i":"C","t":"What would you do if a crew member refuses to wear safety equipment?"},"en_en6_C":{"i":"C","t":"Tell me about a time you worked with people from different cultures."},"en_en7_A":{"i":"A","t":"What do you know about our company and the ships we operate?"},"en_en8_A":{"i":"A","t":"How do you handle stress during a long voyage?"},"en_en_last_A":{"i":"A","t":"That is all from us. Is there anything you would like to add?"},"en_en_headon_B":{"i":"B","t":"You see a vessel right ahead showing both sidelights and her masthead lights in line. What is the situation and what do you do?"},"en_en_smcp_B":{"i":"B","t":"A crew member does not understand your order on the radio. How do you make sure he understands?"},"en_en_abandon_B":{"i":"B","t":"The master orders abandon ship. What are your duties as a junior officer?"},"en_en_weak_A":{"i":"A","t":"What is your biggest weakness?"},"en_en_hire_C":{"i":"C","t":"Why should we hire you instead of other candidates?"},"en_ack1_a":{"i":"A","t":"Thank you, that is clear."},"en_ack1_b":{"i":"B","t":"Thank you, that is clear."},"en_ack1_c":{"i":"C","t":"Thank you, that is clear."},"en_ack2_a":{"i":"A","t":"I see, thank you."},"en_ack2_b":{"i":"B","t":"I see, thank you."},"en_ack2_c":{"i":"C","t":"I see, thank you."},"en_ack3_a":{"i":"A","t":"Understood, thank you."},"en_ack3_b":{"i":"B","t":"Understood, thank you."},"en_ack3_c":{"i":"C","t":"Understood, thank you."},"en_ack4_a":{"i":"A","t":"Thank you, that was concise."},"en_ack4_b":{"i":"B","t":"Thank you, that was concise."},"en_ack4_c":{"i":"C","t":"Thank you, that was concise."},"en_g_1_a":{"i":"A","t":"Could you walk me through what you did?"},"en_g_1_b":{"i":"B","t":"Could you walk me through what you did?"},"en_g_1_c":{"i":"C","t":"Could you walk me through what you did?"},"en_g_2_a":{"i":"A","t":"What was the result?"},"en_g_2_b":{"i":"B","t":"What was the result?"},"en_g_2_c":{"i":"C","t":"What was the result?"},"en_g_3_a":{"i":"A","t":"What was the hardest part for you?"},"en_g_3_b":{"i":"B","t":"What was the hardest part for you?"},"en_g_3_c":{"i":"C","t":"What was the hardest part for you?"},"en_g_4_a":{"i":"A","t":"Can you give me one example?"},"en_g_4_b":{"i":"B","t":"Can you give me one example?"},"en_g_4_c":{"i":"C","t":"Can you give me one example?"},"en_cut_b":{"i":"B","t":"Okay, thank you. Give me your point in one sentence."},"en_deep_b":{"i":"B","t":"Can you give me a specific example?"}};
 const AUDIO_IDX=new Map();
 const AUDIO_BYID=Object.assign({},AUDIO_MAN);
 const nrmTxt=s=>String(s).replace(/\s+/g,' ').trim();
@@ -1304,30 +1320,47 @@ function playMp3(url){
 async function speakAs(iv,text,lang='ko'){
  setTalk(iv);$('#who').textContent=IV[iv].name;
  const said=say(text,lang);
- if(!S.aborted&&lang!=='en'){
-  const mp3=audioFor(iv,text);
-  if(mp3){
-   /* 내장 대본 음성: 일시적인 로딩 지연은 한 번 더 시도하고, 그래도 안 되면 조용히 넘긴다.
-      예전에는 여기서 브라우저 TTS로 넘어가며 다른 목소리(하이톤)가 튀었다. */
-   for(let k=0;k<2;k++){
-    try{await playMp3(mp3);setTalk(null);return}
-    catch(e){if(S.aborted)break;await sleep(280)}
-   }
-   console.info('[audio] 대본 음성 재생 실패 — 이 문장은 소리 없이 넘어갑니다:',text);
-   setTalk(null);return;
+ /* 내장 대본 음성(한국어·영어 모두). 문장이 대본에 있으면 언제나 이 음성만 쓴다.
+    일시적인 로딩 지연은 한 번 더 시도하고, 그래도 안 되면 조용히 넘어간다(브라우저 TTS 금지). */
+ const mp3=audioFor(iv,text);
+ if(!S.aborted&&mp3){
+  for(let k=0;k<2;k++){
+   try{await playMp3(mp3);setTalk(null);return}
+   catch(e){if(S.aborted)break;await sleep(280)}
   }
+  console.info('[audio] 대본 음성 재생 실패 — 이 문장은 소리 없이 넘어갑니다:',text);
+  setTalk(null);return;
  }
- if(S.elKey&&!elFail&&!S.aborted){try{await elSpeak(said,iv);setTalk(null);return}catch(e){console.warn(e);elFail=true;toast('ElevenLabs 연결 실패 — 브라우저 음성으로 진행합니다');}}
- try{speechSynthesis.cancel()}catch(_){}
- const cs=chunks(said);for(let i=0;i<cs.length;i++){if(S.aborted)break;await speakOne(cs[i],iv,lang);if(i<cs.length-1)await new Promise(r=>setTimeout(r,40))}
- setTalk(null);
+ /* 대본에 없는 한국어 문장은 사용자가 ElevenLabs 키를 넣었을 때만 그 목소리로 읽는다 */
+ if(lang!=='en'&&S.elKey&&!elFail&&!S.aborted){try{await elSpeak(said,iv);setTalk(null);return}catch(e){console.warn(e);elFail=true;toast('목소리 연결에 실패해 내장 음성으로 진행합니다');}}
+ /* 브라우저 내장 TTS는 쓰지 않는다 — 기기·브라우저마다 하이톤 목소리가 섞여 몰입이 깨지기 때문.
+    대본에 없는 문장(예: AI가 즉석에서 만든 질문)은 소리 없이 자막으로만 넘긴다. */
+ console.info('[audio] 대본 음성 없음 — 자막으로만 진행:',text);
+ await sleep(500);setTalk(null);
+}
+/* 답변 인식 언어: 질문이 영어(또는 영어 문장)면 en-US, 아니면 ko-KR */
+function answerLang(t){
+ if(!t)return 'ko';
+ if(t.lang==='en')return 'en';
+ const q=String(t.q||'');const lat=(q.match(/[A-Za-z]/g)||[]).length,han=(q.match(/[가-힣]/g)||[]).length;
+ return lat>8&&lat>han*1.5?'en':'ko';
+}
+function setLangTag(lang){
+ const el=$('#langTag');if(!el)return;
+ el.textContent=lang==='en'?'🎙️ EN':'🎙️ KR';
+ el.classList.toggle('en',lang==='en');
+ el.title=lang==='en'?'영어 질문 — 음성 답변은 영어(en-US)로 인식합니다':'한국어 질문 — 음성 답변은 한국어(ko-KR)로 인식합니다';
 }
 function startRec(lang){
- if(!SR||S.typing)return;S.listening=true;const r=new SR();
- r.lang=lang==='en'?'en-US':'ko-KR';r.continuous=true;r.interimResults=true;
+ if(!SR||S.typing)return;
+ const tag=lang==='en'?'en-US':'ko-KR';
+ S.recLang=tag;setLangTag(lang);
+ if(S.rec&&S.listening){/* 이미 돌고 있으면 언어만 맞춰 다시 시작한다 */try{S.rec.stop()}catch(_){}}
+ S.listening=true;const r=new SR();
+ r.lang=tag;r.continuous=true;r.interimResults=true;
  r.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)S.text+=x[0].transcript.trim()+' ';else it+=x[0].transcript}S.interim=it;renderAns()};
  r.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){S.listening=false;toast('음성 인식이 막혔습니다 — 타이핑으로 답변하세요');setTyping(true)}};
- r.onend=()=>{if(S.listening&&S.rec===r){try{r.start()}catch(_){}}};
+ r.onend=()=>{if(S.listening&&S.rec===r){try{r.lang=S.recLang||r.lang;r.start()}catch(_){}}};
  S.rec=r;try{r.start()}catch(_){}
 }
 function stopRec(){S.listening=false;if(S.rec){try{S.rec.stop()}catch(_){}}}
@@ -1402,7 +1435,7 @@ async function start(custom){
  S.drill=!!drill;
  S.company=/미정/.test($('#company').value)?(S.track==='pub'?'저희 기관':'저희 회사'):$('#company').value;S.ship=$('#ship').value;
  {applyTrackNames();scene();}
- S.profile=$('#profile').value.trim();S.resume=$('#resume').value.trim();S.key=$('#apikey').value.trim();S.eng=$('#eng').checked;S.rate=+$('#vRate').value||1;
+ S.profile=$('#profile').value.trim();S.resume=$('#resume').value.trim();S.key=$('#apikey').value.trim();S.eng=$('#eng').checked;S.rate=1;
  /* 모델: 사용자가 직접 적은 값 우선, 아니면 키 종류에 맞는 기본값 (예전 기본값 claude-sonnet-5-5는 존재하지 않는 모델명이었음) */
  {const typed=$('#model').value.trim(),k=S.key;
   S.model=typed||(/^sk-ant/.test(k)?'claude-sonnet-4-5':/^AIza/.test(k)?'gemini-flash-latest':'gemini-flash-latest');}
@@ -1410,7 +1443,7 @@ async function start(custom){
  {const pp=$('.pip');if(pp)pp.classList.toggle('hide',!S.stream);
   const br=$('#btnRec'),bp=$('#btnReplay');if(br)br.classList.toggle('hide',!S.stream);if(bp)bp.classList.toggle('hide',!S.stream)}
  S.elKey=$('#elkey').value.trim();elFail=false;$('#elCredit').classList.toggle('hide',!S.elKey);
- S.elVoices={A:$('#elvA').value||$('#elA').value.trim()||EL_VOICES.A,B:$('#elvB').value||$('#elB').value.trim()||EL_VOICES.B,C:$('#elvC').value||$('#elC').value.trim()||EL_VOICES.C};
+ S.elVoices={A:EL_VOICES.A,B:EL_VOICES.B,C:EL_VOICES.C};
  /* 설정 자동 저장(기존 저장값을 지우지 않고 병합) */
  try{const cur=JSON.parse(localStorage.getItem('aiint')||'{}');
   Object.assign(cur,{profile:S.profile,resume:S.resume,key:$('#keySave').checked?S.key:'',elkey:$('#keySave').checked?S.elKey:'',el:S.elVoices,vp:S.vPick,
@@ -1424,9 +1457,8 @@ async function start(custom){
   for(const a of ACK_KO)for(const iv of ['A','B','C'])lines.push([iv,a]);
   if(S.demo)for(const k in DEMO_FOLLOW)lines.push([DEMO_FOLLOW[k][0],DEMO_FOLLOW[k][1]]);
   warmLines(lines)}catch(_){}
- $('#setup').classList.add('hide');$('#mStart').style.display='none';$('#report').classList.add('hide');$('#room').classList.remove('hide');
+ $('#setup').classList.add('hide');$('#report').classList.add('hide');$('#room').classList.remove('hide');
  $('#btnSkip').classList.toggle('hide',S.mode!=='practice');$('#live').innerHTML='';$('#btnEnd').textContent='종료';
- const dcb=$('#btnStartNoCam');if(dcb){dcb.textContent='카메라 없이 음성·타이핑으로 시작';dcb.classList.remove('democta')}
  /* 실전 모드로 다시 시작할 때 연습 가이드가 남지 않도록 */
  $('#guide').classList.add('hide');$('#guide').innerHTML='';
  $('#timer').textContent='0:00';$('#timer').classList.remove('over');setBar(0);
@@ -1455,7 +1487,7 @@ async function ask(t){
   $('#prog').textContent=S.progTxt;}
  S.turnStyle=S.demo?curStyle():pick(['press','normal','loose']);
  $('#btnDone').disabled=true;$('#ans').innerHTML='';$('#typed').value='';$('#timer').textContent='0:00';$('#timer').classList.remove('over');setBar(0);
- $('#qtext').textContent=t.q;
+ $('#qtext').textContent=t.q;setLangTag(answerLang(t));
  if(S.mode==='practice'){$('#guide').classList.remove('hide');$('#guide').innerHTML=`<h3>질문 의도</h3><p>${esc(t.intent)}</p><h3>답변 가이드</h3><p>${esc(t.guide)}</p><h3>기본기</h3><p>카메라 렌즈 보기 · 첫 문장에 결론 · 30~90초 · 허리 펴고 시선 고정 · 다리 떨기·머리 만지기 금지</p>`}
  state((S.progTxt?S.progTxt+' · ':'')+IV[t.iv].name+(t.follow?' · 꼬리 질문':'')+' 질문 중');
  await speakAs(t.iv,t.q,t.lang);
@@ -1466,7 +1498,7 @@ function beginAnswer(){
  const t=S.cur;S.phase='answer';S.aStart=performance.now();S.buf=[];S.text='';S.interim='';
  state((S.progTxt?S.progTxt+' · ':'')+(S.typing?'답변을 입력하세요':'답변하세요 — 듣고 있습니다'));$('#btnDone').disabled=false;
  if(S.turns.length===0||S.turns.length===Math.floor(S.plan.length/2))setTimeout(snap,4000);
- startRec(t.lang);clipStart();$('#btnReplay').disabled=true;
+ startRec(answerLang(t));clipStart();$('#btnReplay').disabled=true;
  clearInterval(S.tmr);
  /* 압박 모드라도 지원자의 말을 임의로 끊지 않는다. 길이에 대한 조언은 피드백·리포트에서만 한다. */
  S.tmr=setInterval(()=>{const s=(performance.now()-S.aStart)/1000;$('#timer').textContent=fmt(s);$('#timer').classList.toggle('over',s>90);setBar(s)},250);
@@ -1487,11 +1519,8 @@ async function endAnswer(interrupted){
  if(S.key&&!interrupted&&!S.demo){state('면접관들이 답변을 검토 중…');try{const r=await aiTurn(rec);rec.ai=r.eval||null;nx=fromAI(r)}catch(e){console.warn(e);toast('AI 연결 실패 — 기본 면접관으로 진행');S.key=''}}
  if(!nx)nx=S.demo?demoNext(rec,interrupted):ruleNext(rec,interrupted);
  if(S.aborted)return;
- if(S.mode==='practice'){
-  const v=await showFeedback(rec);
-  if(v==='retry'){S.turns.pop();S.pi=snapPI;S.depth=snapD;return ask(t)}
-  if(v==='end')return finish();
- }
+ /* 연습 모드도 답변마다 점수·리포트 카드를 띄우지 않는다.
+    질문 의도·가이드만 보여 주고 답변은 끝까지 이어 간 뒤, 면접이 끝나면 리포트를 한 번에 보여 준다. */
  if(nx.reaction){await speakAs(t.iv,nx.reaction)}
  if(nx.end)return finish();
  ask(nx.turn);
@@ -1674,6 +1703,35 @@ async function aiReport(){
  return claude(content,4000);
 }
 
+/* 리포트 전체를 무료 AI에 붙여 넣을 요청문으로 만든다 */
+function copyPrompt(){
+ const shipName=({lng:'LNG선',container:'컨테이너선',bulk:'벌크선',tanker:'유조선'})[S.ship];
+ const stName=({press:'압박',normal:'일반',loose:'편안',mixed:'섞어서'})[S.style];
+ const L=[];
+ L.push('너는 한국 해운선사 채용 면접관이자 해기사 면접 코치다. 아래는 해양대학교 학생이 「선사 면접 연습실」에서 실제로 본 모의면접 기록이다. 음성 인식이라 오타가 있을 수 있으니 뜻으로 이해해 주세요.');
+ L.push('');
+ L.push('[지원 정보]');
+ L.push(`- 지원 선사: ${/저희 (회사|기관)/.test(S.company)?'미정 (일반 선사 기준으로 조언해 주세요)':S.company}`);
+ L.push(`- 직무 트랙: ${TRACKS[S.track].name}${S.track!=='pub'&&S.track!=='en'&&shipName?' / 희망 선종: '+shipName:''}`);
+ L.push(`- 면접 설정: ${S.mode==='real'?'실전':'연습'} 모드 · 분위기 ${stName} · 질문 ${S.turns.length}개${S.drill?' (약점 집중 재연습)':''}`);
+ L.push('- 질문 출처: 이 앱의 질문과 선호는 실제 해운사 취업박람회·면접특강 현장에서 직접 녹음·기록한 자료를 AI로 분석해 만든 것이다.');
+ L.push('');
+ L.push('[모의면접 기록]');
+ S.turns.forEach((r,i)=>{
+  L.push(`Q${i+1} [${IV[r.turn.iv].name}${r.turn.follow?' · 꼬리 질문':''}] ${r.turn.q}`);
+  L.push(`A${i+1} (${Math.round(r.dur)}초 · ${r.nv.typed?'타이핑':'음성'}${r.interrupted?' · 답변 중단':''}): ${r.text||'(무응답)'}`);
+  L.push('');
+ });
+ L.push('[요청] 위 기록을 실제 선사 면접관 기준으로 냉정하게 평가해 주세요. 선사·직무 특성(승선 생활, 해기 직무, 안전·규정, 선종, 영어)을 반영해 주세요.');
+ L.push('1) 답변별로 잘한 점 한 줄, 가장 큰 허점 한두 줄');
+ L.push('2) 면접관이 실제로 이어서 물을 꼬리 질문 1~2개');
+ L.push('3) 이 지원자의 경험에 맞춘 개선 답변 예시(3문장 안팎)와 더 좋은 표현');
+ L.push('4) 전체 총평과 점수(100점 기준), 합격 가능성을 높이려면 무엇을 고쳐야 하는지');
+ L.push('5) 다음 연습에서 반드시 고칠 것 3가지와 1분 자기소개 예시');
+ L.push('한국어로, 실제 면접관이 말하듯 구체적으로 답해 주세요.');
+ return L.join('\n');
+}
+
 /* ---------- practice feedback ---------- */
 const li=P=>P.map(p=>`<li class="${p.c}">${esc(p.t)}</li>`).join('');
 function showFeedback(rec){return new Promise(res=>{
@@ -1773,9 +1831,15 @@ function renderReport(rep){
  const list=a=>Array.isArray(a)&&a.length?`<ul class="pts">${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';
  R.innerHTML=`<div class="hero"><div class="score" style="--p:${clamp(+overall||0,0,100)}"><span>${esc(overall)}</span></div>
  <div><h1>${esc(verdict)}</h1><p class="sub" style="margin:0">${/저희/.test(S.company)?'':esc(S.company)+' · '}${esc(TRACKS[S.track].name)} · ${S.mode==='real'?'실전':'연습'} 모드 · ${({press:'압박',normal:'일반',loose:'편안',mixed:'섞어서'})[S.style]} · 질문 ${T.length}개${S.drill?' · 약점 집중':''}</p>
+ <p class="srcNote">🎙 질문과 선호는 실제 해운사 취업박람회·면접특강 현장에서 직접 녹음·기록한 자료를 AI로 분석해 반영했습니다</p>
  <div class="bars">${Object.entries(cats).map(([k,v])=>`<div class="bar"><span>${esc(k)}</span><span class="t"><i style="width:${clamp(+v||0,0,100)}%"></i></span><span class="v">${esc(v)}</span></div>`).join('')}</div></div></div>
+ <div class="sec copybox"><h2>답변 전체를 복사해 무료 AI에게 물어보기</h2>
+  <p class="note" style="margin:0">이 리포트는 요약입니다. 지원 선사·직무, 질문, 내 답변, 답변 시간을 그대로 담은 요청문을 복사해 ChatGPT·Gemini에 붙여 넣으면 더 자세한 선사 면접 피드백과 개선 답변 예시를 받을 수 있습니다.</p>
+  <button class="ac bigcopy" id="copyAll">📋 ChatGPT·Gemini용 답변 전체 복사</button>
+  <p class="note" id="copyMsg" style="margin:8px 0 0">복사한 뒤 chatgpt.com이나 gemini.google.com 채팅창에 붙여 넣으세요. 무료 계정으로 충분합니다.</p>
+  <p class="row" style="margin-top:10px"><a class="btn ghost" id="aiC" target="_blank" rel="noopener" style="text-decoration:none">Claude 열기 ↗</a><a class="btn ghost" id="aiG" target="_blank" rel="noopener" style="text-decoration:none">ChatGPT 열기 ↗</a></p>
+ </div>
  ${!ai?`<p class="note">${rep.aiErr?'AI 채점 실패('+esc(rep.aiErr)+') — ':'AI 미연결 — '}답변 내용의 질은 판단하지 못하고, 길이·구체성·구조·전달·비언어만 채점했습니다.</p>`:''}
- ${!ai?`<div class="sec"><h2>생성형 AI 코치에게 내용 피드백 받기</h2><p>아래 버튼을 누르면 내 질문·답변 기록이 담긴 요청과 함께 AI 채팅이 열립니다. 답변 내용의 논리, 선사 면접관 관점의 허점, 개선 답변 예시를 받아 보세요. (API 키를 연결하면 이 과정이 면접 중에 자동으로 이뤄집니다.)</p><p class="row"><button class="ac" id="aiCopy">① 요청문 복사</button><a class="btn ghost" id="aiC" target="_blank" rel="noopener">② Claude 열기 ↗</a><a class="btn ghost" id="aiG" target="_blank" rel="noopener">② ChatGPT 열기 ↗</a></p><p class="note" id="aiMsg">무료 계정으로 충분합니다. 복사한 요청문을 채팅창에 붙여 넣으세요(짧은 면접은 링크만 눌러도 자동 입력됩니다).</p></div>`:''}
  ${histHTML}
  <div class="sec"><h2>가장 먼저 고칠 것</h2>${list(ai&&ai.actions?ai.actions:rep.top)||'<p>두드러진 문제가 없습니다.</p>'}</div>
  ${ai?`<div class="sec two"><div><h2>강점</h2>${list(ai.strengths)}</div><div><h2>약점</h2>${list(ai.weaknesses)}</div></div>
@@ -1792,9 +1856,21 @@ function renderReport(rep){
  <div class="two"><div><h4>답변 형식</h4><ul class="pts">${li(r.ta.P)||'<li>특이 사항 없음</li>'}</ul></div><div><h4>화면 속 모습 · 목소리</h4><ul class="pts">${li(r.nvE.P)}</ul></div></div></div></details>`}).join('')}</div>
  <div class="sec"><h2>약점 문항 다시 연습</h2>${weak.length?`<div class="weakbox"><b>이번 면접에서 다시 볼 문항 ${weak.length}개</b><ul class="weaklist">${weak.map(w=>`<li>Q${w.i+1} ${esc(T[w.i].turn.q.length>56?T[w.i].turn.q.slice(0,56)+'…':T[w.i].turn.q)} <span class="note">— ${esc(w.why)}</span></li>`).join('')}</ul><button class="ac" id="weakGo">이 문항들만 다시 연습</button><p class="note" style="margin:8px 0 0">같은 설정으로 이 질문들만 이어서 봅니다. 새 리포트로 바뀌니 필요하면 먼저 “리포트 텍스트 복사”를 눌러 두세요.</p></div>`:'<p class="note">70점 미만이거나 오답·위험 신호가 잡힌 문항이 없습니다. 좋습니다.</p>'}</div>
  <div class="sec row"><button class="ac" id="again">다시 면접 보기</button><button class="ghost" id="copy">리포트 텍스트 복사</button></div>`;
+ if($('#copyAll'))$('#copyAll').onclick=async()=>{
+  const txt=copyPrompt();let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true}catch(_){}
+  if(!ok){try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(__){ok=false}}
+  const b=$('#copyAll'),m=$('#copyMsg');
+  if(ok){b.textContent='✅ 복사 완료 — ChatGPT·Gemini에 붙여 넣으세요';b.classList.add('done');
+   if(m)m.innerHTML=`<b style="color:var(--ok)">질문·답변 ${S.turns.length}개(약 ${txt.length.toLocaleString()}자)를 복사했습니다.</b> chatgpt.com 또는 gemini.google.com을 열고 입력창에 붙여 넣으세요.`;
+   setTimeout(()=>{b.textContent='📋 ChatGPT·Gemini용 답변 전체 복사';b.classList.remove('done')},4000);
+  }else{
+   if(m){m.textContent='복사가 막혔습니다. 아래 내용을 직접 선택해 복사하세요.';const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='width:100%;height:180px;margin-top:10px';m.after(ta);ta.focus();ta.select()}
+  }
+ };
  if($('#aiC')){const q=`너는 한국 해운선사(${S.company}) 신입 해기사 채용 면접관이다. 아래는 해양대학교 학생의 모의 면접 기록이다(음성 인식이라 오타가 있을 수 있음).\n\n`+T.map((r,i)=>`Q${i+1} [${IV[r.turn.iv].short}] ${r.turn.q}\nA${i+1}: ${(r.text||'(무응답)').slice(0,350)}`).join('\n')+`\n\n각 답변을 냉정하게 평가해 줘: ① 가장 큰 허점 ② 선사 면접관이 이어서 물을 꼬리 질문 ③ 이 학생에게 맞춘 개선 답변 예시(3문장 안팎). 마지막에 전체 총평과 다음 연습 때 고칠 것 3가지를 써 줘. 한국어로.`;
   const short=q.length<1800;$('#aiC').href='https://claude.ai/new'+(short?'?q='+encodeURIComponent(q):'');$('#aiG').href='https://chatgpt.com/'+(short?'?q='+encodeURIComponent(q):'');
-  $('#aiCopy').onclick=()=>{navigator.clipboard.writeText(q).then(()=>{$('#aiMsg').textContent='복사됨 — ② 버튼으로 채팅을 열고 붙여 넣으세요.'},()=>{$('#aiMsg').textContent='복사가 막혔습니다. 아래 요청문을 직접 복사하세요.';const ta=document.createElement('textarea');ta.value=q;ta.style.cssText='width:100%;height:160px;margin-top:8px';$('#aiMsg').after(ta);})};}
+  if($('#aiCopy'))$('#aiCopy').onclick=()=>{navigator.clipboard.writeText(q).then(()=>{$('#aiMsg').textContent='복사됨 — 채팅을 열고 붙여 넣으세요.'},()=>{$('#aiMsg').textContent='복사가 막혔습니다. 아래 요청문을 직접 복사하세요.';const ta=document.createElement('textarea');ta.value=q;ta.style.cssText='width:100%;height:160px;margin-top:8px';$('#aiMsg').after(ta);})};}
  const pb=$('#playback');
  if(pb){pb.addEventListener('loadedmetadata',()=>{if(pb.duration===Infinity){pb.currentTime=1e7;pb.addEventListener('timeupdate',function f(){pb.removeEventListener('timeupdate',f);pb.currentTime=0})}});
   $$('.chap button').forEach(b=>b.onclick=()=>{pb.currentTime=+b.dataset.t;pb.play().catch(()=>{})})}
@@ -1803,7 +1879,7 @@ function renderReport(rep){
   if(!keys.length)return;
   R.classList.add('hide');start(keys);
  };
- $('#again').onclick=()=>{R.classList.add('hide');$('#setup').classList.remove('hide');$('#mStart').style.display='';S.phase='idle';S.drill=false;window.scrollTo(0,0)};
+ $('#again').onclick=()=>{R.classList.add('hide');$('#setup').classList.remove('hide');S.phase='idle';S.drill=false;window.scrollTo(0,0)};
  $('#copy').onclick=()=>{const txt=`AI 면접 리포트 (${S.company})\n총점 ${overall} — ${verdict}\n`+Object.entries(cats).map(([k,v])=>`${k}: ${v}`).join(' / ')+'\n\n'+T.map((r,i)=>{const p=perQ(i);return `Q${i+1}. ${r.turn.q}\nA: ${r.text}\n`+(p&&p.comment?`지적: ${p.comment}\n`:'')+r.ta.P.concat(r.nvE.P).map(x=>'- '+x.t).join('\n')}).join('\n\n');
   navigator.clipboard.writeText(txt).then(()=>{$('#copy').textContent='복사됨'},()=>{$('#copy').textContent='복사 실패'})};
  bindSeek(R);
@@ -1829,24 +1905,18 @@ $('#btnDemo').onclick=()=>{
  $('#company').value='HMM';$('#ship').value='container';$('#eng').checked=false;
  $('#resume').value=DEMO_RESUME;$('#profile').value=DEMO_PROFILE;
  updateResumeKws();showCoTip();updateFocusNote();
- const b=$('#btnStartNoCam');
- b.textContent='🏆 지금 바로 시연 시작 (카메라 없이)';b.classList.add('democta');
- const kws=resumeKeys().map(k=>KEY_LABEL[k]||'').filter(Boolean).join(' · ');
- $('#demoMsg').innerHTML=`<b>샘플 세팅 완료</b> — HMM · 항해 · 실전 3문항 · 자소서 키워드 <b>${esc(kws)}</b>. 아래 <b>🏆 지금 바로 시연 시작</b>을 누르면 면접이 시작됩니다.`;
- b.scrollIntoView({behavior:'smooth',block:'center'});
+ /* 심사위원이 한 번만 눌러도 바로 시연이 시작되도록 확인 단계 없이 진행한다 */
+ start();
 };
 /* ---------- controls ---------- */
 $('#btnMedia').onclick=initMedia;
 $('#keySave').addEventListener('change',()=>{if(!$('#keySave').checked){try{const cur=JSON.parse(localStorage.getItem('aiint')||'{}');delete cur.key;delete cur.elkey;localStorage.setItem('aiint',JSON.stringify(cur))}catch(_){}}});
-$('#elLoad').onclick=loadElVoices;
 $$('input[data-img]').forEach(inp=>inp.onchange=()=>{const f=inp.files[0];if(!f)return;IMG[inp.dataset.img]=URL.createObjectURL(f);scene();});
-$('#mGo').onclick=async()=>{if(!S.stream){$('#mGo').textContent='카메라 준비 중…';await initMedia();if(!S.stream){$('#mGo').textContent='카메라 켜고 면접 시작';$('#ph').scrollIntoView({behavior:'smooth'});return;}await sleep(1500);}start();};
-/* 카메라·마이크 없이 시작: 장비 점검이 필요 없어 카페·이동 중에도 바로 연습 */
+/* 시작 버튼은 첫 화면의 [면접 시작하기] 하나로 통일 (모바일 하단 바 제거) */
 $('#btnStartNoCam').onclick=()=>start();
-$('#mGoNoCam').onclick=()=>start();
 $('#btnStart').onclick=()=>start();
 $('#btnDone').onclick=()=>endAnswer(false);
-$('#btnType').onclick=()=>setTyping(!S.typing);
+$('#btnType').onclick=()=>{setTyping(!S.typing);if(!S.typing&&S.phase==='answer'&&S.cur)startRec(answerLang(S.cur));else setLangTag(answerLang(S.cur));};
 $('#btnRec').onclick=()=>{S.recOn=!S.recOn;$('#btnRec').textContent=S.recOn?'● 녹화 켬':'○ 녹화 끔';$('#btnRec').setAttribute('aria-pressed',S.recOn);toast(S.recOn?'다음 답변부터 녹화합니다':'녹화를 껐습니다');};
 $('#btnReplay').onclick=()=>{const r=S.lastRec;if(!r||S.phase==='answer')return;const prev=$('#fb').classList.contains('hide');
   if(!prev)return;$('#fbc').innerHTML=`<h2>직전 답변 다시 보기</h2><p class="note">${esc(r.turn.q)}</p>${clipHTML(r,'rpclip')}<h4>화면 속 모습 · 목소리</h4><ul class="pts">${li(r.nvE.P)}</ul><div class="row" style="margin-top:14px"><button class="ac" id="rpClose">닫기</button></div>`;
